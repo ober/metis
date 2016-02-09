@@ -1,0 +1,8 @@
+(load "~/quicklisp/setup.lisp")
+(ql:quickload '(:fare-memoization :cl-fad :gzip-stream :cl-json :pcall))
+(load "pkgdcl.lisp")
+(load "collector/database.lisp")
+(load "collector/utils.lisp")
+(load "collector/ctcl.lisp")
+(load "collector/main.lisp")
+(in-package :ctcl)

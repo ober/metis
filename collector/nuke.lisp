@@ -1,0 +1,6 @@
+(load "./collector/load.lisp")
+(in-package :ctcl)
+(princ "XXX: Ensuring connections")
+(psql-ensure-connection)
+(princ "XXX: Dropping tables")
+(create-tables-psql)
