@@ -1,8 +1,9 @@
+(in-package :ctcl)
 (defun psql-do-query (query)
   ;;(format t "db-hit:~A~%" query)
   (let ((database "metis")
 	(user-name "metis")
-	(password nil)
+	(password "metis")
 	(host "localhost"))
     (ignore-errors
       (postmodern:with-connection `(,database ,user-name ,password ,host :pooled-p t)
@@ -14,4 +15,4 @@
 
 (defun psql-ensure-connection (db)
   (unless postmodern:*database*
-    (setf postmodern:*database* (postmodern:connect db "metis" nil "localhost" :pooled-p t))))
+    (setf postmodern:*database* (postmodern:connect db "metis" "metis" "localhost" :pooled-p t))))

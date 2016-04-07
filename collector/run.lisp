@@ -24,7 +24,7 @@
 (princ "XXX: Ensuring connections")
 (psql-ensure-connection "metis-test")
 ;;(princ "XXX: Dropping tables")
-(create-tables-psql)
+(create-tables-psql "metis")
 (princ "XXX: Running Test")
 (setq swank:*use-dedicated-output-stream* nil)
 (swank:create-server :dont-close t :port 2221)

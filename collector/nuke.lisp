@@ -1,6 +1,6 @@
 (load "./collector/load.lisp")
 (in-package :ctcl)
 (princ "XXX: Ensuring connections")
-(psql-ensure-connection)
+(psql-ensure-connection "metis")
 (princ "XXX: Dropping tables")
 (create-tables-psql)
