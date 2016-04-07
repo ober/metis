@@ -17,7 +17,7 @@
 (defun main ()
   ;;(ql:quickload :swank)
   (setq swank:*use-dedicated-output-stream* nil)
-  (swank:create-server :dont-close t :port 2221)
+  ;;(swank:create-server :dont-close t :port 2221)
   ;;(declare (optimize (safety 3) (debug 3)))
   (format t "XXX: ~A~%" (type-of (argv)))
   (let* ((args (argv))
