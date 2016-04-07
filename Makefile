@@ -8,6 +8,7 @@ lispworks:
 	@ ~/lw-console -build deliver.lisp
 
 sbcl:
+	@ mkdir -p dist/sbcl
 	@ cat deliver.lisp|sbcl --dynamic-space-size 2048
 ccl:
 	@ make -p dist/ccl || true
