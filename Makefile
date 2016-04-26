@@ -5,6 +5,7 @@ usage:
 
 
 lispworks:
+	@ mkdir -p dist/lispworks
 	@ ~/lw-console -build deliver.lisp
 
 sbcl:
