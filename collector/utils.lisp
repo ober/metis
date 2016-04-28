@@ -1,6 +1,12 @@
 (in-package :ctcl)
 
+#+allegro
+(require :acldns)
+
+
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
+  #+allegro
+  (socket:ipaddr-to-hostname ip)
   #+sbcl
   (ignore-errors (sb-bsd-sockets:host-ent-name
 		  (sb-bsd-sockets:get-host-by-address
