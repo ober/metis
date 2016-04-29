@@ -15,9 +15,6 @@
 
 #-allegro
 (defun main ()
-  ;;(ql:quickload :swank)
-  (setq swank:*use-dedicated-output-stream* nil)
-  ;;(swank:create-server :dont-close t :port 2221)
   ;;(declare (optimize (safety 3) (debug 3)))
   (format t "XXX: ~A~%" (type-of (argv)))
   (let* ((args (argv))
@@ -47,15 +44,12 @@
     (t (format t "Usage <~A> <p or s> <directory of logs>" app))))
 
 (defun run-bench () 
-  (ql:quickload :swank)
-  (load "collector/load.lisp")
+  ;;(load "collector/load.lisp")
   (princ "XXX: Ensuring connections")
   (psql-ensure-connection "metis")
   ;;(princ "XXX: Dropping tables")
-  (create-tables-psql "metis")
+  (create-tables-psql)
   (princ "XXX: Running Test")
-  ;;(setq swank:*use-dedicated-output-stream* nil)
-  ;;(swank:create-server :dont-close t :port 2221)
   #+sbcl (cl-user::profile "CTCL")
   #+allegro
   (progn
