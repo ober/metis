@@ -12,7 +12,7 @@ sbcl:
 	@ mkdir -p dist/sbcl
 	@ cat deliver.lisp|sbcl --dynamic-space-size 2048
 ccl:
-	@ make -p dist/ccl || true
+	@ mkdir -p dist/ccl || true
 	@ cat deliver.lisp|ccl64
 
 clisp:
