@@ -65,7 +65,7 @@
       (psql-do-query
        (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
 	       event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id)))))
-    ;;(enter-metric "normalize-insert" (- (get-internal-real-time) btime))))
+;;(enter-metric "normalize-insert" (- (get-internal-real-time) btime))))
 
 (defun load-file-values ()
   (unless *files*
@@ -73,18 +73,18 @@
       (setf *files* (psql-do-query "select value from files"))
       (mapcar #'(lambda (x)
                   (setf (gethash (car x) *h*) t))
-                  *files*)))
+	      *files*)))
   *h*)
 
 (defun have-we-seen-this-file-hash (file)
   (format t ".")
   (let ((them (load-file-values)))
     ;;(maphash #'(lambda (k v) (format t "~a => ~a~%" k v)) them)
-  ;;(format t "them: file:~A type:~A val:~A~%" (type-of (file-namestring file)) (type-of them) (gethash (file-namestring file) them))
-  ;;(inspect them)
-  (if (gethash (file-namestring file) them)
-      t
-    nil)))
+    ;;(format t "them: file:~A type:~A val:~A~%" (type-of (file-namestring file)) (type-of them) (gethash (file-namestring file) them))
+    ;;(inspect them)
+    (if (gethash (file-namestring file) them)
+	t
+	nil)))
 
 (defun have-we-seen-this-file-preload (file)
   (format t ".")
@@ -105,12 +105,6 @@
            (setf (car node) (caar node)))
           (t (setf node (cdr node))))))
 
-(defun dump-metrics ()
-  (let ((metrics (psql-do-query
-		  "select stddev(total_time) as stddev, avg(total_time) as avg, function,lisp from metrics where function = 'parse-ct-contents' group by 3,4 order by 3,2")))
-    (format t "~A~%" metrics)))
-
-;;(format t "metrics~A stddev:~A average:~A ~%" (nth 2 metrics) (nth 0 metrics) (nth 1 metrics))))
 (defun psql-drop-table (table)
   (ignore-errors
     (psql-do-query (format nil "drop table if exists ~A cascade" table))))
@@ -144,7 +138,7 @@
   (format t ".")
   (if (psql-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
       t
-    nil))
+      nil))
 
 (defun file-has-been-processed (x)
   (psql-do-query
@@ -169,7 +163,7 @@
 	(file-has-been-processed x)
 	(format t "New:~A~%" (file-namestring x))
 	(parse-ct-contents x)))))
-      ;;(enter-metric "process-ct-file" (- (get-internal-real-time) btime)))))
+;;(enter-metric "process-ct-file" (- (get-internal-real-time) btime)))))
 
 (defun parse-ct-contents (x)
   (let* ((btime (get-internal-real-time))
@@ -191,7 +185,7 @@
 ;;    (let ((etime (get-internal-real-time)))
 ;;      (enter-metric "parse-ct-contents" (- etime btime))
 ;;      (enter-metric "parse-ct-per-record" (/ (- etime btime) record-size))))
-  ;;(dump-metrics)
+;;(dump-metrics)
 ;;  ))
 
 (defun cloudtrail-report-to-psql-sync (path)
