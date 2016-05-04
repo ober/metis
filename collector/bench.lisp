@@ -1,10 +1,3 @@
 (load "collector/load.lisp")
 (in-package :ctcl)
-
-(setq *database* "ctcl")
-(setq *pcallers* 256)
-(psql-ensure-connection)
-(create-tables-psql)
-#+lispworks (setq system:*stack-overflow-behaviour* nil)
-(time (ctcl::cloudtrail-report-to-psql "/home/akkad/CT"))
-;;(quit)
+(ctcl::run-bench)

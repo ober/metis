@@ -1,7 +1,6 @@
 (in-package :ctcl)
 
-#+allegro
-(require :acldns)
+
 
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
   (let ((benching (get-env "BENCHING")))
