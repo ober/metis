@@ -6,8 +6,9 @@
 (defvar *h* (make-hash-table :test 'equalp))
 
 #+allegro (setf excl:*tenured-bytes-limit* 52428800)
-;;#+allegro (setf excl:*global-gc-behavior* :auto)
+#+allegro (setf excl:*global-gc-behavior* :auto)
 #+lispworks (setq sys:*stack-overflow-behaviour* nil)
+
 ;;(declaim (optimize (speed 3) (safety 0) (space 0)))
 (defvar *mytasks* (list))
 
@@ -42,6 +43,16 @@
 	t
 	nil)))
 
+(defun have-we-seen-this-file (file)
+  (format t ".")
+  (let ((them (load-file-values)))
+    ;;(maphash #'(lambda (k v) (format t "~a => ~a~%" k v)) them)
+    ;;(format t "them: file:~A type:~A val:~A~%" (type-of (file-namestring file)) (type-of them) (gethash (file-namestring file) them))
+    ;;(inspect them)
+    (if (gethash (file-namestring file) them)
+	t
+	nil)))
+
 (defun have-we-seen-this-file-preload (file)
   (format t ".")
   (let ((them (load-file-values)))
@@ -65,21 +76,6 @@
 (defun walk-ct (path fn)
   (walk-directory path fn))
 
-(defun have-we-seen-this-file (x)
-  (format t ".")
-  (if (db-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
-      t
-      nil))
-
-(defun file-has-been-processed (x)
-  (db-do-query
-   (format nil "insert into files(value) values ('~A')" (file-namestring x)))
-  (setf (gethash (file-namestring x) *h*) t))
-
-(defun file-has-been-processed-preload (x)
-  (db-do-query
-   (format nil "insert into files(value) values ('~A')" (file-namestring x))))
-
 (defun sync-ct-file (x)
   (process-ct-file x))
 
@@ -89,8 +85,8 @@
 
 (defun process-ct-file (x)
   (when (equal (pathname-type x) "gz")
-    (unless (have-we-seen-this-file-hash x)
-      (file-has-been-processed x)
+    (unless (db-have-we-seen-this-file x)
+      (db-mark-file-processed x)
       (format t "N")
       ;;(format t "New:~A~%" (file-namestring x))
       (parse-ct-contents x))))

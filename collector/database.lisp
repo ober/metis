@@ -6,10 +6,23 @@
 (defun db-ensure-connection (db)
   (psql-ensure-connection (db)))
 
-
 (defun db-create-tables ()
   (psql-create-table))
 
+(defun db-have-we-seen-this-file (x)
+  (format t ".")
+  (if (db-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
+      t
+      nil))
+
+(defun db-mark-file-processed (x)
+  (db-do-query
+   (format nil "insert into files(value) values ('~A')" (file-namestring x)))
+  (setf (gethash (file-namestring x) *h*) t))
+
+(defun db-mark-file-processed-preload (x)
+  (db-do-query
+   (format nil "insert into files(value) values ('~A')" (file-namestring x))))
 
 (defun psql-do-query (query)
   ;;(format t "db-hit:~A~%" query)
@@ -74,7 +87,7 @@
 (defun load-file-values ()
   (unless *files*
     (progn
-      (setf *files* (psql-do-query "select value from files"))
+      (setf *files* (db-do-query "select value from files"))
       (mapcar #'(lambda (x)
                   (setf (gethash (car x) *h*) t))
 	      *files*)))
