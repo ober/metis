@@ -1,13 +1,13 @@
 (in-package :ctcl)
 
 (defun db-do-query (query)
-  (psql-do-query(query)))
+  (psql-do-query query))
 
 (defun db-ensure-connection (db)
-  (psql-ensure-connection (db)))
+  (psql-ensure-connection db))
 
 (defun db-create-tables ()
-  (psql-create-table))
+  (psql-create-tables))
 
 (defun db-have-we-seen-this-file (x)
   (format t ".")

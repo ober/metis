@@ -28,15 +28,16 @@
   ;;(load "collector/load.lisp")
   (princ "XXX: Ensuring connections")
   (db-ensure-connection "metis-test")
-  ;;(princ "XXX: Dropping tables")
+  (princ "XXX: Dropping tables")
   (db-create-tables)
   (princ "XXX: Running Test")
   #+sbcl
-  (time (sb-sprof:with-profiling (:report :flat) (do-bench)))
+  (sb-sprof:with-profiling (:report :flat) (do-bench))
   #+lispworks
-  (progn
-    (hcl:set-up-profiler :package '(ctcl))
-    (hcl:profile (cloudtrail-report-async "10" "~/test-ct/")))
+  (extended-time (cloudtrail-report-async "10" "~/test-ct/"))
+  ;;  (progn
+;;    (hcl:set-up-profiler :package '(ctcl))
+;;    (hcl:profile (cloudtrail-report-async "10" "~/test-ct/")))
   #+allegro
   (progn
     (setf excl:*tenured-bytes-limit* 524288000)

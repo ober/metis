@@ -12,54 +12,10 @@
 ;;(declaim (optimize (speed 3) (safety 0) (space 0)))
 (defvar *mytasks* (list))
 
-;; (defun print-cloudtrail-report ()
-;;   (format t "|event-time|user-identity|event-name|user-agent|hostname|~%")
-;;   (format t "|----------|-------------|----------|----------|--------|~%")
-;;   (walk-directory *cloudtrail-reports*
-;; 		  (lambda (x)
-;; 		    (when (equal (pathname-type x) "gz")
-;; 		      (setq records (cdr (elt (read-json-gzip-file x) 0)))
-;; 		      ;;(let* ((records (cdr (elt (read-json-gzip-file x) 0))))
-;; 		      (dolist (x records)
-;; 			(let* ((event-time (cdr-assoc :EVENT-TIME x))
-;; 			       (user-identity
-;; 				(cdr-assoc :ACCESS-KEY-ID
-;; 					   (cdr-assoc :USER-IDENTITY x)))
-;; 			       (event-name (cdr-assoc :EVENT-NAME x))
-;; 			       (user-agent (cdr-assoc :USER-AGENT x))
-;; 			       (ip (cdr-assoc :SOURCE-+IP+-ADDRESS x))
-;; 			       (hostname (get-hostname-by-ip ip)))
-;; 			  (format t "|~A|~A|~A|~A|~A|~%" event-time user-identity event-name user-agent (or hostname ip))))))))
-
-
-
-(defun have-we-seen-this-file-hash (file)
-  (format t ".")
-  (let ((them (load-file-values)))
-    ;;(maphash #'(lambda (k v) (format t "~a => ~a~%" k v)) them)
-    ;;(format t "them: file:~A type:~A val:~A~%" (type-of (file-namestring file)) (type-of them) (gethash (file-namestring file) them))
-    ;;(inspect them)
-    (if (gethash (file-namestring file) them)
-	t
-	nil)))
-
 (defun have-we-seen-this-file (file)
   (format t ".")
   (let ((them (load-file-values)))
-    ;;(maphash #'(lambda (k v) (format t "~a => ~a~%" k v)) them)
-    ;;(format t "them: file:~A type:~A val:~A~%" (type-of (file-namestring file)) (type-of them) (gethash (file-namestring file) them))
-    ;;(inspect them)
     (if (gethash (file-namestring file) them)
-	t
-	nil)))
-
-(defun have-we-seen-this-file-preload (file)
-  (format t ".")
-  (let ((them (load-file-values)))
-    ;;(format t "XXX: type of ~A size:~A~%" (type-of them) (length them))
-    (if (> (length (member
-                    (file-namestring file) them :test
-                    (lambda (x y) (string= (flatten y) x)))) 0)
 	t
 	nil)))
 
@@ -85,7 +41,7 @@
 
 (defun process-ct-file (x)
   (when (equal (pathname-type x) "gz")
-    (unless (db-have-we-seen-this-file x)
+    (unless (have-we-seen-this-file x)
       (db-mark-file-processed x)
       (format t "N")
       ;;(format t "New:~A~%" (file-namestring x))

@@ -10,7 +10,7 @@ lispworks:
 
 sbcl:
 	@ mkdir -p dist/sbcl
-	@ cat deliver.lisp|sbcl --dynamic-space-size 2048
+	@ cat deliver.lisp|sbcl --dynamic-space-size 20480
 ccl:
 	@ mkdir -p dist/ccl || true
 	@ cat deliver.lisp|ccl64
