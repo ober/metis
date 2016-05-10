@@ -1,7 +1,5 @@
 (in-package :ctcl)
 
-
-
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
   (let ((benching (get-env "BENCHING")))
     (if (string= benching "yes")
@@ -22,11 +20,19 @@
 
 (defun read-json-gzip-file (file)
   (with-input-from-string
-      (s (apply #'concatenate 'string
-		(gzip-stream:with-open-gzip-file (in file)
-		  (loop for l = (read-line in nil nil)
-		     while l collect l))))
+      (s
+       (uiop:run-program
+	(format nil "zcat ~A" file)
+	:output :string))
     (cl-json:decode-json s)))
+
+;; (defun read-json-gzip-file (file)
+;;   (with-input-from-string
+;;       (s (apply #'concatenate 'string
+;; 		(gzip-stream:with-open-gzip-file (in file)
+;; 		  (loop for l = (read-line in nil nil)
+;; 		     while l collect l))))
+;;     (cl-json:decode-json s)))
 
 (defun cdr-assoc (item a-list &rest keys)
   (cdr (apply #'assoc item a-list keys)))
@@ -46,15 +52,40 @@
         ,store-var)
      `(cdr (assoc ,item-var ,a-list-var ,@ keys)))))
 
+(defclass queue ()
+  ((list :initform nil)
+   (tail :initform nil)))
+
+(defmethod print-object ((queue queue) stream)
+  (print-unreadable-object (queue stream :type t)
+    (with-slots (list tail) queue
+      (cond ((cddddr list)
+	     ;; at least five elements, so print ellipsis
+	     (format stream "(~{~S ~}... ~S)"
+		     (subseq list 0 3) (first tail)))
+	    ;; otherwise print whole list
+	    (t (format stream "~:S" list))))))
+
+(defmethod dequeue ((queue queue))
+  (with-slots (list) queue
+    (pop list)))
+
+(defmethod enqueue (new-item (queue queue))
+  (with-slots (list tail) queue
+    (let ((new-tail (list new-item)))
+      (cond ((null list) (setf list new-tail))
+	    (t (setf (cdr tail) new-tail)))
+      (setf tail new-tail)))
+  queue)
 
 (defun get-env (var)
-#+sbcl
-(sb-posix:getenv var)
-#+clozure
+  #+sbcl
+  (sb-posix:getenv var)
+  #+clozure
   (ccl:getenv var)
-#+allegro
+  #+allegro
   (sys:getenv var)
-#+lispworks
+  #+lispworks
   (lw:environment-variable var))
 
 

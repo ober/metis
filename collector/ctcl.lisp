@@ -30,38 +30,7 @@
 ;; 			       (hostname (get-hostname-by-ip ip)))
 ;; 			  (format t "|~A|~A|~A|~A|~A|~%" event-time user-identity event-name user-agent (or hostname ip))))))))
 
-(fare-memoization:define-memo-function get-id-or-insert-psql (table value)
-  (let ((id
-	 (flatten
-	  (psql-do-query
-	   (format nil "select id from ~A where value = '~A'" table value)))))
-    (if (not id)
-	(progn
-	  (psql-do-query (format nil "insert into ~A(value) values('~A')" table value))
-	  (setq id (car (car (psql-do-query (format nil "select id from ~A where value = '~A'" table value)))))
-	  id)
-	id)))
 
-(defun normalize-insert (event-time user-name user-key event-name user-agent source-host)
-  (let* ((event-time-id (get-id-or-insert-psql "event_times" event-time))
-	 (user-name-id (get-id-or-insert-psql "user_names" user-name))
-	 (user-key-id (get-id-or-insert-psql "user_keys" user-key))
-	 ;;(user-identity-id (get-id-or-insert-psql "user_identitys " user-identity))
-	 (event-name-id (get-id-or-insert-psql "event_names" event-name))
-	 (user-agent-id (get-id-or-insert-psql "user_agents" user-agent))
-	 (source-host-id (get-id-or-insert-psql "source_hosts" source-host)))
-    (psql-do-query
-     (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
-	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
-
-(defun load-file-values ()
-  (unless *files*
-    (progn
-      (setf *files* (psql-do-query "select value from files"))
-      (mapcar #'(lambda (x)
-                  (setf (gethash (car x) *h*) t))
-	      *files*)))
-  *h*)
 
 (defun have-we-seen-this-file-hash (file)
   (format t ".")
@@ -92,37 +61,23 @@
            (setf (car node) (caar node)))
           (t (setf node (cdr node))))))
 
-(defun psql-create-table (table)
-  (psql-do-query (format nil "create table if not exists ~A(id serial, value text)" table))
-  (psql-do-query (format nil "create unique index ~A_idx1 on ~A(id)" table table))
-  (psql-do-query (format nil "create unique index ~A_idx2 on ~A(value)" table table)))
-
-(defun create-tables-psql ()
-  (let ((tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys )))
-    (ignore-errors
-      (mapcar #'psql-drop-table tables)
-      (psql-do-query "drop table if exists log"))
-    (mapcar #'psql-create-table tables))
-  (psql-do-query "delete from metrics")
-  (psql-do-query "create table if not exists log(id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)")
-  (psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;"))
 
 (defun walk-ct (path fn)
   (walk-directory path fn))
 
 (defun have-we-seen-this-file (x)
   (format t ".")
-  (if (psql-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
+  (if (db-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
       t
       nil))
 
 (defun file-has-been-processed (x)
-  (psql-do-query
+  (db-do-query
    (format nil "insert into files(value) values ('~A')" (file-namestring x)))
   (setf (gethash (file-namestring x) *h*) t))
 
 (defun file-has-been-processed-preload (x)
-  (psql-do-query
+  (db-do-query
    (format nil "insert into files(value) values ('~A')" (file-namestring x))))
 
 (defun sync-ct-file (x)
@@ -136,7 +91,8 @@
   (when (equal (pathname-type x) "gz")
     (unless (have-we-seen-this-file-hash x)
       (file-has-been-processed x)
-      (format t "New:~A~%" (file-namestring x))
+      (format t "N")
+      ;;(format t "New:~A~%" (file-namestring x))
       (parse-ct-contents x))))
 
 (defun parse-ct-contents (x)
@@ -153,12 +109,12 @@
 	     (user-key (cdr-assoc :ACCESS-KEY-ID user-identity)))
 	(normalize-insert event-time user-name user-key event-name user-agent (or hostname ip))))))
 
-(defun cloudtrail-report-to-psql-sync (path)
+(defun cloudtrail-report-sync (path)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
 	     #'sync-ct-file)))
 
-(defun cloudtrail-report-to-psql-async (workers path)
+(defun cloudtrail-report-async (workers path)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (let ((cloudtrail-reports (or path "~/CT")))

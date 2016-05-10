@@ -16,5 +16,5 @@
     #+sbcl (sb-ext::exit)
     #+lispworks (quit)
     #+clozure (ccl::quit)
-    #+cmucl (quit)
+    #+cmucl (quit)))
 
