@@ -1,0 +1,6 @@
+#+abcl (load "collector/abcl.lisp")
+#+allegro (load "collector/allegro.lisp")
+#+clozure (load "collector/clozure.lisp")
+#+cmucl (load "collector/cmucl.lisp")
+#+lispworks (load "collector/lispworks.lisp")
+#+sbcl (load "collector/sbcl.lisp")

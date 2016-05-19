@@ -8,6 +8,10 @@ lispworks:
 	@ mkdir -p dist/lispworks
 	@ ~/lw-console -build deliver.lisp
 
+ecl:
+	@ mkdir -p dist/ecl
+	@ cat collector/deliver-ecl.lisp|ecl 
+
 sbcl:
 	@ mkdir -p dist/sbcl
 	@ cat deliver.lisp|sbcl --dynamic-space-size 20480

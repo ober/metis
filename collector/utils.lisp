@@ -1,7 +1,7 @@
 (in-package :ctcl)
 
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
-  (let ((benching (get-env "BENCHING")))
+  (let ((benching (uiop:getenv "BENCHING")))
     (if (string= benching "yes")
 	(progn 
 	  (format t "Benching is set to yes. Disabling dns lookups!:~A~%" benching)
@@ -18,6 +18,7 @@
 	  #+clozure
 	  (ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip)))))))
 
+#-clozure
 (defun read-json-gzip-file (file)
   (with-input-from-string
       (s
@@ -26,13 +27,16 @@
 	:output :string))
     (cl-json:decode-json s)))
 
-;; (defun read-json-gzip-file (file)
-;;   (with-input-from-string
-;;       (s (apply #'concatenate 'string
-;; 		(gzip-stream:with-open-gzip-file (in file)
-;; 		  (loop for l = (read-line in nil nil)
-;; 		     while l collect l))))
-;;     (cl-json:decode-json s)))
+#+clozure
+(defun read-json-gzip-file (file)
+  (with-input-from-string
+      (s (apply #'concatenate 'string
+		(gzip-stream:with-open-gzip-file (in file)
+		  (loop for l = (read-line in nil nil)
+		     while l collect l))))
+    (cl-json:decode-json s)))
+
+
 
 (defun cdr-assoc (item a-list &rest keys)
   (cdr (apply #'assoc item a-list keys)))
@@ -70,6 +74,10 @@
   (with-slots (list) queue
     (pop list)))
 
+(defmethod queue-length ((queue queue))
+  (with-slots (list) queue
+    (list-length list)))
+
 (defmethod enqueue (new-item (queue queue))
   (with-slots (list tail) queue
     (let ((new-tail (list new-item)))
@@ -78,14 +86,14 @@
       (setf tail new-tail)))
   queue)
 
-(defun get-env (var)
-  #+sbcl
-  (sb-posix:getenv var)
-  #+clozure
-  (ccl:getenv var)
-  #+allegro
-  (sys:getenv var)
-  #+lispworks
-  (lw:environment-variable var))
-
-
+;; (defun file-at-once (filespec &rest open-args)
+;;   (with-open-stream (stream (apply #’open filespec
+;; 				     open-args))
+;;     (let* ((buffer
+;; 	    (make-array (file-length stream)
+;; 			:element-type
+;; 			(stream-element-type stream)
+;; 			:fill-pointer t))
+;; 	   (position (read-sequence buffer stream)))
+;;       (setf (fill-pointer buffer) position)
+;;       buffer)))
