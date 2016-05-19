@@ -1,4 +1,5 @@
 (in-package :ctcl)
+(defparameter *q* (make-instance 'queue))
 
 #+sbcl
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -24,8 +25,6 @@
 
 #-allegro
 (defun main ()
-  (defparameter *q* (make-instance 'queue))
-  ;;
   (format t "XXX: ~A~%" (type-of (argv)))
   (let* ((args (argv))
 	 (verb (nth 1 args))
@@ -42,15 +41,13 @@
 	   (format t "Function is (s) for single threaded, and (a) for multithreaded~%")
 	   (format t "ex: ~A a 10 ~~/CT/ # Would run 10 works on ~~/CT/~%" (nth 0 args))
 	   (format t "ex: ~A s ~~CT/ # Would run 10 works on ~~/CT/~%" (nth 0 args))))))
-  (cl-store:store *q* "~/q.store"))
+ (cl-store:store *q* "~/q.store"))
 
 #+allegro
 (in-package :cl-user)
 
 #+allegro
 (defun main (app verb workers dir)
-  (defparameter *q* (make-instance 'queue))
-
   (format t "Got: app:~A verb:~A workers:~A dir:~A~%" app verb workers dir)
   (cond
     ((equal "s" verb) (profile (ctcl::cloudtrail-report-sync dir)))

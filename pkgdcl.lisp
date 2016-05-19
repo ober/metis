@@ -3,7 +3,7 @@
 (load "version.lisp")
 
 (defpackage :ctcl
-  (:use :cl :rucksack :fare-memoization :cl-fad :gzip-stream :cl-json )
+  (:use :cl :fare-memoization :cl-fad :gzip-stream :cl-json )
   #+allegro (:use :prof )
   )
 

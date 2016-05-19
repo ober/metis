@@ -5,6 +5,8 @@
 (load (compile-file "pkgdcl.lisp"))
 (princ "database")
 (load (compile-file "collector/database.lisp"))
+(princ "bench")
+(load (compile-file "collector/bench.lisp"))
 ;; (princ "rucksack")
 ;; (load (compile-file "collector/rucksack.lisp"))
 (princ "utils")
