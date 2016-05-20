@@ -2,10 +2,10 @@
 (in-package :ctcl)
 
 (defun do-bench ()
+  (declare (optimize (safety 3) (speed 0) (debug 3)))
   (cloudtrail-report-async "10" "~/test-ct/"))
 
 (defun run-bench () 
-  ;;(declare (optimize (safety 3) (speed 0) (debug 3)))
   ;;(load "collector/load.lisp")
   ;;(princ "XXX: Ensuring connections")
   ;;(db-ensure-connection "metis-test")
@@ -23,7 +23,7 @@
   #+allegro
   (progn
     (setf excl:*tenured-bytes-limit* 524288000)
-    (prof::with-profiling (:type :space) (do-bench))
+    (prof::with-profiling (:type :space) (ctcl::do-bench))
     (prof::show-flat-profile))
   #+(or clozure abcl ecl) (progn (do-bench))
 
