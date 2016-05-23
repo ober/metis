@@ -35,7 +35,7 @@
       ((equal "a" verb)(time (cloudtrail-report-async workers dir)))
       ((equal "s" verb)(time (cloudtrail-report-sync dir)))
       ((equal "r" verb)(time (run-bench)))
-      ((equal "t" verb)(time (time-bench)))
+      ((equal "t" verb)(time (do-bench)))
       (t (progn
 	   (format t "Usage: <~A> <function> <args>~%" (nth 0 args))
 	   (format t "Function is (s) for single threaded, and (a) for multithreaded~%")
@@ -53,6 +53,6 @@
     ((equal "s" verb) (profile (ctcl::cloudtrail-report-sync dir)))
     ((equal "a" verb) (profile (ctcl::cloudtrail-report-async workers dir)))
     ((equal "r" verb)(time (ctcl::run-bench)))
-    ((equal "t" verb)(time (ctcl::time-bench)))
+    ((equal "t" verb)(time (ctcl::do-bench)))
     (t (format t "Usage <~A> <p or s> <directory of logs>" app)))
   (cl-store:store *q* "~/q.store"))

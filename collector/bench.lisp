@@ -6,11 +6,11 @@
   (cloudtrail-report-async "10" "~/test-ct/"))
 
 (defun run-bench () 
-  ;;(load "collector/load.lisp")
+  (load "collector/load.lisp")
   ;;(princ "XXX: Ensuring connections")
-  ;;(db-ensure-connection "metis-test")
+  (db-ensure-connection "metis-test")
   ;;(princ "XXX: Dropping tables")
-  ;;(db-create-tables)
+  (db-create-tables)
   (princ "XXX: Running Test")
   #+sbcl (time (do-bench))
   
@@ -27,8 +27,8 @@
     (prof::show-flat-profile))
   #+(or clozure abcl ecl) (progn (do-bench))
 
-  (format t "results: size:~A" (queue-length *q*))  
-  (cl-store:store *q* "~/q.store")
+  ;;(format t "results: size:~A" (queue-length *q*))  
+  ;;(cl-store:store *q* "~/q.store")
   )
 
 ;;(run-bench)

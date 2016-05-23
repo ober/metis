@@ -1,5 +1,5 @@
 #-cmucl (load "~/quicklisp/setup.lisp")
-(ql:quickload '(:fare-memoization :cl-fad :gzip-stream :cl-json :pcall))
+(ql:quickload '(:fare-memoization :cl-fad :gzip-stream :cl-json :pcall :postmodern))
 
 (princ "pkgdcl")
 (load (compile-file "pkgdcl.lisp"))
