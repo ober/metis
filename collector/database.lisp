@@ -1,12 +1,15 @@
 (in-package :ctcl)
 
+(defparameter *DB* nil)
+
 (defvar dbtype "postgres")
 
 (defun db-do-query (query)
   (psql-do-query query))
 
 (defun db-ensure-connection (db)
-  (psql-ensure-connection db))
+  (setq *DB* db)
+  (psql-ensure-connection))
 
 (defun db-create-tables ()
   (psql-create-tables))
@@ -28,10 +31,11 @@
 
 (defun psql-do-query (query)
   ;;(format t "db-hit:~A~%" query)
-  (let ((database "metis")
-	(user-name "metis")
+  (let ((database (or ctcl::*DB* "metis"))
+	(user-name "meis")
 	(password "metis")
 	(host "localhost"))
+    (format t "DB:~A~%" database)
     (ignore-errors
       (postmodern:with-connection `(,database ,user-name ,password ,host :pooled-p t)
 	(postmodern:query query)))))
@@ -40,9 +44,9 @@
   (ignore-errors
     (psql-do-query (format nil "drop table if exists ~A cascade" table))))
 
-(defun psql-ensure-connection (db)
+(defun psql-ensure-connection ()
   (unless postmodern:*database*
-    (setf postmodern:*database* (postmodern:connect db "metis" "metis" "localhost" :pooled-p t))))
+    (setf postmodern:*database* (postmodern:connect (or ctcl::*DB* "metis") "metis" "metis" "localhost" :pooled-p t))))
 
 (defun psql-create-tables ()
   (let ((tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys )))
@@ -62,7 +66,7 @@
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
   (let ((id
 	 (flatten
-	  (psql-do-query
+	  (psql-do-query 
 	   (format nil "select id from ~A where value = '~A'" table value)))))
     (if (not id)
 	(progn
@@ -80,7 +84,7 @@
        (event-name-id (get-id-or-insert-psql "event_names" event-name))
        (user-agent-id (get-id-or-insert-psql "user_agents" user-agent))
        (source-host-id (get-id-or-insert-psql "source_hosts" source-host)))
-    (psql-do-query
+    (psql-do-query 
      (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
 	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
 

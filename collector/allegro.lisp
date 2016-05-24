@@ -1,2 +1,7 @@
 (setf excl:*tenured-bytes-limit* 52428800)
-(setf excl:*global-gc-behavior* :auto)
+;;o(setf excl:*global-gc-behavior* :auto)
+(setq excl:*record-source-file-info* nil)
+(setq excl:*load-source-file-info* nil)
+(setq excl:*record-xref-info* nil)
+(setq excl:*load-xref-info* nil)
+(setq excl:*global-gc-behavior* nil)

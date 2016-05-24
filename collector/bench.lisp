@@ -6,7 +6,7 @@
   (cloudtrail-report-async "10" "~/test-ct/"))
 
 (defun run-bench () 
-  (load "collector/load.lisp")
+  ;;(load "collector/load.lisp")
   ;;(princ "XXX: Ensuring connections")
   (db-ensure-connection "metis-test")
   ;;(princ "XXX: Dropping tables")
