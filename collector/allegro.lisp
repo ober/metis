@@ -5,3 +5,6 @@
 (setq excl:*record-source-file-info* nil)
 (setq excl:*record-xref-info* nil)
 ;;(setf excl:*global-gc-behavior* :auto)
+#+allegro
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (require :acldns))

@@ -35,7 +35,7 @@
 	(user-name "meis")
 	(password "metis")
 	(host "localhost"))
-    (format t "DB:~A~%" database)
+    ;;(format t "DB:~A~%" database)
     (ignore-errors
       (postmodern:with-connection `(,database ,user-name ,password ,host :pooled-p t)
 	(postmodern:query query)))))
