@@ -25,6 +25,6 @@
 (progn
   ;;(require :prof)
   ;;(require :profiler)
-  (let ((lfiles '("pkgdcl.lisp" "allegro-prof.lisp" "collector/utils.lisp" "collector/ctcl.lisp" "collector/database.lisp" "collector/main.lisp" "collector/bench.lisp")))
+  (let ((lfiles '("pkgdcl.lisp" "allegro-prof.lisp" "collector/utils.lisp" "collector/ctcl.lisp" "collector/database.lisp" "collector/main.lisp" "collector/bench.lisp"))
     (mapcar #'compile-file lfiles)
-    (generate-executable "metis" '("pkgdcl.fasl" "collector/utils.fasl" "collector/database.fasl" "collector/ctcl.fasl" "collector/main.fasl" "collector/bench.fasl))))
+    (generate-executable "metis" '("pkgdcl.fasl" "collector/utils.fasl" "collector/database.fasl" "collector/ctcl.fasl" "collector/main.fasl" "collector/bench.fasl")))))
