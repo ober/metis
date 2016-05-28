@@ -1,4 +1,4 @@
-(asdf:operate 'asdf:load-op 'metis)
+(ql:quickload :metis)
 #+(or ccl clisp ecl)
 (ql:quickload "trivial-dump-core")
 
