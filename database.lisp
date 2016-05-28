@@ -11,7 +11,6 @@
   (psql-do-query query))
 
 (defun db-ensure-connection (db)
-
   (setq *DB* db)
   (psql-ensure-connection))
 
@@ -88,17 +87,21 @@
 	id)))
 
 (defun normalize-insert (event-time user-name user-key event-name user-agent source-host)
-  (let*
-      ((event-time-id (get-id-or-insert-psql "event_times" event-time))
-       (user-name-id (get-id-or-insert-psql "user_names" user-name))
-       (user-key-id (get-id-or-insert-psql "user_keys" user-key))
-       ;;(user-identity-id (get-id-or-insert-psql "user_identitys " user-identity))
-       (event-name-id (get-id-or-insert-psql "event_names" event-name))
-       (user-agent-id (get-id-or-insert-psql "user_agents" user-agent))
-       (source-host-id (get-id-or-insert-psql "source_hosts" source-host)))
-    (psql-do-query 
-     (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
-	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
+    (if (string= *BENCHING* "yes")
+	(progn 
+	  (format t "B"))
+	(progn
+	  (let*
+	      ((event-time-id (get-id-or-insert-psql "event_times" event-time))
+	       (user-name-id (get-id-or-insert-psql "user_names" user-name))
+	       (user-key-id (get-id-or-insert-psql "user_keys" user-key))
+	       ;;(user-identity-id (get-id-or-insert-psql "user_identitys " user-identity))
+	       (event-name-id (get-id-or-insert-psql "event_names" event-name))
+	       (user-agent-id (get-id-or-insert-psql "user_agents" user-agent))
+	       (source-host-id (get-id-or-insert-psql "source_hosts" source-host)))
+	    (psql-do-query 
+	     (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
+		     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))))
 
 (defun load-file-values ()
   (unless *files*

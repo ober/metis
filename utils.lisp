@@ -1,10 +1,9 @@
 (in-package :metis)
 
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
-  (let ((benching (uiop:getenv "BENCHING")))
-    (if (string= benching "yes")
+    (if (string= *BENCHING* "yes")
 	(progn 
-	  (format t "Benching is set to yes. Disabling dns lookups!:~A~%" benching)
+	  (format t "D")
 	  "bogus.host.com")
 	(progn
 	  #+allegro
@@ -16,7 +15,7 @@
 	  #+lispworks
 	  (comm:get-host-entry ip :fields '(:name))
 	  #+clozure
-	  (ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip)))))))
+	  (ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip))))))
 
 #-clozure
 (defun read-json-gzip-file (file)

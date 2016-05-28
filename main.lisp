@@ -16,6 +16,7 @@
 
 #-allegro
 (defun main ()
+  (defvar *BENCHING* "no")
   (format t "XXX: ~A~%" (type-of (argv)))
   (let* ((args (argv))
 	 (verb (nth 1 args))
@@ -38,6 +39,7 @@
 
 #+allegro
 (defun main (app verb workers dir)
+  (defvar *BENCHING* "no")
   (format t "Got: app:~A verb:~A workers:~A dir:~A~%" app verb workers dir)
   (cond
     ((equal "s" verb) (time (metis::cloudtrail-report-sync dir)))
