@@ -1,8 +1,7 @@
 (defpackage :metis/version
-  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
-  (:import-from :yason)
-  (:export #:get-hostname-by-ip
-	   #:read-json-gzip-file))
+  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json))
+
+
    
 (in-package :metis/version)
 

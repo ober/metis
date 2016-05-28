@@ -1,4 +1,4 @@
-(defpackage :metis/ctcl
+(defpackage :metis/utils
   (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
   (:export #:get-hostname-by-ip
 	   #:read-json-gzip-file))

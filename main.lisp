@@ -5,8 +5,6 @@
    
 (in-package :metis/main)
 
-(defparameter *q* (make-instance 'queue))
-
 (defun argv ()
   (or
    #+clisp (ext:argv)

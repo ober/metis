@@ -1,24 +1,24 @@
 (defpackage :metis/ctcl
-  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
-  (:import-from :yason)
+  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json )
+  (:import-from :pcall)
   (:export 
-	   #:have-we-seen-this-file 
-	   #:flatten 
-	   #:walk-ct 
-	   #:sync-ct-file 
-	   #:async-ct-file 
-	   #:process-ct-file 
-	   #:parse-ct-contents 
-	   #:parse-ct-contents 
-	   #:cloudtrail-report-sync 
-	   #:cloudtrail-report-async ))
+   #:have-we-seen-this-file 
+   #:flatten 
+   #:walk-ct 
+   #:sync-ct-file 
+   #:async-ct-file 
+   #:process-ct-file 
+   #:parse-ct-contents 
+   #:parse-ct-contents 
+   #:cloudtrail-report-sync 
+   #:cloudtrail-report-async ))
 
 (in-package :metis/ctcl)
 
 (defvar *pcallers* 5)
 (defvar *files* nil)
 (defvar *h* (make-hash-table :test 'equalp))
-(defparameter *q* (make-instance 'queue))
+;;(defparameter *q* (make-instance ':queue))
 
 ;;(declaim (optimize (speed 3) (safety 0) (space 0)))
 (defvar *mytasks* (list))
@@ -113,6 +113,6 @@
     (let ((cloudtrail-reports (or path "~/CT")))
       (walk-ct cloudtrail-reports
 	       #'async-ct-file))
-;;    (ignore-errors
+    ;;    (ignore-errors
     (mapc #'pcall:join *mytasks*)))
 ;;)
