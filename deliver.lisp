@@ -1,4 +1,12 @@
-(load "collector/load.lisp")
+(defpackage :docker/misc
+  (:use :common-lisp :docker/request)
+  (:import-from :uiop #:copy-stream-to-stream)
+  (:import-from #:yason)
+  (:export #:info
+           #:version
+           #:ping
+           #:monitor-events))
+
 
 #+(or ccl clisp ecl)
 (ql:quickload "trivial-dump-core")
@@ -25,6 +33,6 @@
 (progn
   ;;(require :prof)
   ;;(require :profiler)
-  (let ((lfiles '("pkgdcl.lisp" "allegro-prof.lisp" "collector/utils.lisp" "collector/ctcl.lisp" "collector/database.lisp" "collector/main.lisp" "collector/bench.lisp"))
+  (let ((lfiles '("pkgdcl.lisp" "allegro-prof.lisp" "collector/utils.lisp" "collector/ctcl.lisp" "collector/database.lisp" "collector/main.lisp" "collector/bench.lisp")))
     (mapcar #'compile-file lfiles)
-    (generate-executable "metis" '("pkgdcl.fasl" "collector/utils.fasl" "collector/database.fasl" "collector/ctcl.fasl" "collector/main.fasl" "collector/bench.fasl")))))
+    (generate-executable "metis" '("pkgdcl.fasl" "collector/utils.fasl" "collector/database.fasl" "collector/ctcl.fasl" "collector/main.fasl" "collector/bench.fasl"))))

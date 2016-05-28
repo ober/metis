@@ -1,4 +1,9 @@
-(in-package :ctcl)
+(defpackage :metis/ctcl
+  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
+  (:export #:get-hostname-by-ip
+	   #:read-json-gzip-file))
+   
+(in-package :metis/utils)
 
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
   (let ((benching (uiop:getenv "BENCHING")))

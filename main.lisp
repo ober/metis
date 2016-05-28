@@ -1,4 +1,10 @@
-(in-package :ctcl)
+(defpackage :metis/main
+  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
+  (:export #:argv
+	   #:main))
+   
+(in-package :metis/main)
+
 (defparameter *q* (make-instance 'queue))
 
 (defun argv ()
@@ -31,8 +37,8 @@
 	   (format t "Usage: <~A> <function> <args>~%" (nth 0 args))
 	   (format t "Function is (s) for single threaded, and (a) for multithreaded~%")
 	   (format t "ex: ~A a 10 ~~/CT/ # Would run 10 works on ~~/CT/~%" (nth 0 args))
-	   (format t "ex: ~A s ~~CT/ # Would run 10 works on ~~/CT/~%" (nth 0 args))))))
- (cl-store:store *q* "~/q.store"))
+	   (format t "ex: ~A s ~~CT/ # Would run 10 works on ~~/CT/~%" (nth 0 args)))))))
+  ;;(cl-store:store *q* "~/q.store"))
 
 #+allegro
 (in-package :cl-user)
@@ -41,8 +47,8 @@
 (defun main (app verb workers dir)
   (format t "Got: app:~A verb:~A workers:~A dir:~A~%" app verb workers dir)
   (cond
-    ((equal "s" verb) (profile (ctcl::cloudtrail-report-sync dir)))
-    ((equal "a" verb) (profile (ctcl::cloudtrail-report-async workers dir)))
+    ((equal "s" verb) (time (ctcl::cloudtrail-report-sync dir)))
+    ((equal "a" verb) (time (ctcl::cloudtrail-report-async workers dir)))
     ((equal "r" verb)(time (ctcl::run-bench)))
-    (t (format t "Usage <~A> <p or s> <directory of logs>" app)))
-  (cl-store:store *q* "~/q.store"))
+    (t (format t "Usage <~A> <p or s> <directory of logs>" app))))
+;;(cl-store:store *q* "~/q.store"))

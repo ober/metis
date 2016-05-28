@@ -1,9 +1,10 @@
-(load (merge-pathnames "~/quicklisp/setup.lisp" *default-pathname-defaults*))
-(ql:quickload '(:fare-memoization :cl-fad :gzip-stream :cl-json :s-sql :pcall :uiop :cl-store :postmodern))
-(load "version.lisp")
-
-(defpackage :ctcl
-  (:use :cl :fare-memoization :cl-fad :gzip-stream :cl-json )
-  #+allegro (:use :prof )
-  )
+(uiop/package:define-package :metis/all
+    (:nicknames :metis)
+  (:use :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
+  (:use-reexport :metis/version
+		 :metis/bench
+		 :metis/ctcl
+		 :metis/database
+		 :metis/main
+		 :metis/utils))
 

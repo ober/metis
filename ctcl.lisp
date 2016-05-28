@@ -1,6 +1,20 @@
-(in-package :ctcl)
+(defpackage :metis/ctcl
+  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
+  (:import-from :yason)
+  (:export 
+	   #:have-we-seen-this-file 
+	   #:flatten 
+	   #:walk-ct 
+	   #:sync-ct-file 
+	   #:async-ct-file 
+	   #:process-ct-file 
+	   #:parse-ct-contents 
+	   #:parse-ct-contents 
+	   #:cloudtrail-report-sync 
+	   #:cloudtrail-report-async ))
 
-(defvar *database* "metis-test")
+(in-package :metis/ctcl)
+
 (defvar *pcallers* 5)
 (defvar *files* nil)
 (defvar *h* (make-hash-table :test 'equalp))
@@ -14,7 +28,7 @@
   (let ((them (load-file-values)))
     (if (gethash (file-namestring file) them)
   	t
-  	nil)))
+	nil)))
 
 (defun flatten (obj)
   (do* ((result (list obj))
@@ -93,6 +107,7 @@
 	     #'sync-ct-file)))
 
 (defun cloudtrail-report-async (workers path)
+  (psql-create-tables)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (let ((cloudtrail-reports (or path "~/CT")))

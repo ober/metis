@@ -1,18 +1,44 @@
-(in-package :ctcl)
+(defpackage :metis/database
+  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
+  (:import-from :yason)
+  (:export    #:db-do-query 
+	      #:db-ensure-connection 
+	      #:db-create-tables 
+	      #:db-recreate-tables 
+	      #:db-have-we-seen-this-file 
+	      #:db-mark-file-processed 
+	      #:db-mark-file-processed-preload 
+	      #:psql-do-query 
+	      #:psql-drop-table 
+	      #:psql-ensure-connection 
+	      #:psql-recreate-tables 
+	      #:psql-create-tables 
+	      #:psql-create-table 
+	      #:normalize-insert 
+	      #:load-file-values))
+
+   
+(in-package :metis/database)
 
 (defparameter *DB* nil)
 
 (defvar dbtype "postgres")
 
+
+
 (defun db-do-query (query)
   (psql-do-query query))
 
 (defun db-ensure-connection (db)
+
   (setq *DB* db)
   (psql-ensure-connection))
 
 (defun db-create-tables ()
   (psql-create-tables))
+
+(defun db-recreate-tables ()
+  (psql-recreate-tables))
 
 (defun db-have-we-seen-this-file (x)
   (format t ".")
@@ -30,12 +56,10 @@
    (format nil "insert into files(value) values ('~A')" (file-namestring x))))
 
 (defun psql-do-query (query)
-  ;;(format t "db-hit:~A~%" query)
   (let ((database (or ctcl::*DB* "metis"))
 	(user-name "meis")
 	(password "metis")
 	(host "localhost"))
-    ;;(format t "DB:~A~%" database)
     (ignore-errors
       (postmodern:with-connection `(,database ,user-name ,password ,host :pooled-p t)
 	(postmodern:query query)))))
@@ -48,7 +72,7 @@
   (unless postmodern:*database*
     (setf postmodern:*database* (postmodern:connect (or ctcl::*DB* "metis") "metis" "metis" "localhost" :pooled-p t))))
 
-(defun psql-create-tables ()
+(defun psql-recreate-tables ()
   (let ((tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys )))
     (ignore-errors
       (mapcar #'psql-drop-table tables)
@@ -58,6 +82,13 @@
   (psql-do-query "create table if not exists log(id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)")
   (psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;"))
 
+(defun psql-create-tables ()
+  (let ((tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys )))
+    (ignore-errors
+      (mapcar #'psql-create-table tables))
+    (psql-do-query "create table if not exists log(id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)")
+    (psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;")))
+
 (defun psql-create-table (table)
   (psql-do-query (format nil "create table if not exists ~A(id serial, value text)" table))
   (psql-do-query (format nil "create unique index ~A_idx1 on ~A(id)" table table))
@@ -65,7 +96,7 @@
 
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
   (let ((id
-	 (flatten
+	 (ctcl::flatten
 	  (psql-do-query 
 	   (format nil "select id from ~A where value = '~A'" table value)))))
     (if (not id)
@@ -93,6 +124,6 @@
     (progn
       (setf *files* (db-do-query "select value from files"))
       (mapcar #'(lambda (x)
-                  (setf (gethash (car x) *h*) t))
+		  (setf (gethash (car x) *h*) t))
 	      *files*)))
   *h*)
