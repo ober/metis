@@ -18,7 +18,6 @@
   (db-recreate-tables)
   (princ "XXX: Running Test")
   #+sbcl (time (do-bench))
-  
   ;; (progn
   ;; 	(sb-sprof:with-profiling (:report :flat) (do-bench)))
   #+lispworks  (hcl:extended-time (do-bench))

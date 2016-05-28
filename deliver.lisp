@@ -1,38 +1,28 @@
-(defpackage :docker/misc
-  (:use :common-lisp :docker/request)
-  (:import-from :uiop #:copy-stream-to-stream)
-  (:import-from #:yason)
-  (:export #:info
-           #:version
-           #:ping
-           #:monitor-events))
-
-
+(asdf:operate 'asdf:load-op 'metis)
 #+(or ccl clisp ecl)
 (ql:quickload "trivial-dump-core")
 
 #+sbcl
-(sb-ext:save-lisp-and-die "dist/sbcl/metis" :executable t :toplevel 'ctcl::main :save-runtime-options t)
+(sb-ext:save-lisp-and-die "dist/sbcl/metis" :executable t :toplevel 'metis/main:main :save-runtime-options t)
 ;;(sb-ext:save-lisp-and-die "dist/sbcl/metis" :compression 5 :executable t :toplevel 'ctcl::main :save-runtime-options t)
 
 #+(or ccl ccl64 )
-(trivial-dump-core:save-executable "dist/ccl/metis" #'ctcl::main)
+(trivial-dump-core:save-executable "dist/ccl/metis" #'metis/main:main)
 
 #+cmucl
 ;;(save-lisp :executable t
-(trivial-dump-core:save-executable "dist/cmucl/metis" #'ctcl::main)
+(trivial-dump-core:save-executable "dist/cmucl/metis" #'metis/main:main)
 
 #+clisp
-(ext:saveinitmem "dist/clisp/metis" :init-function #'ctcl::main :executable t :quiet t)
-;;(trivial-dump-core:save-executable "dist/clisp/metis" #'ctcl::main)
+(ext:saveinitmem "dist/clisp/metis" :init-function #'metis/main:main :executable t :quiet t)
 
 #+lispworks
-(deliver 'ctcl::main "dist/lispworks/metis" 0 :multiprocessing t :keep-eval t :keep-fasl-dump t :keep-editor t :keep-foreign-symbols t :keep-function-name t :keep-gc-cursor t :keep-keyword-names t :keep-lisp-reader t :keep-macros t :keep-modules t :keep-top-level t :license-info nil  :keep-walker t :KEEP-PRETTY-PRINTER t)
+(deliver 'metis/main:main "dist/lispworks/metis" 0 :multiprocessing t :keep-eval t :keep-fasl-dump t :keep-editor t :keep-foreign-symbols t :keep-function-name t :keep-gc-cursor t :keep-keyword-names t :keep-lisp-reader t :keep-macros t :keep-modules t :keep-top-level t :license-info nil  :keep-walker t :KEEP-PRETTY-PRINTER t)
 
 #+allegro
 (progn
   ;;(require :prof)
   ;;(require :profiler)
-  (let ((lfiles '("pkgdcl.lisp" "allegro-prof.lisp" "collector/utils.lisp" "collector/ctcl.lisp" "collector/database.lisp" "collector/main.lisp" "collector/bench.lisp")))
+  (let ((lfiles '("pkgdcl.lisp" "allegro-prof.lisp" "utils.lisp" "ctcl.lisp" "database.lisp" "main.lisp" "bench.lisp")))
     (mapcar #'compile-file lfiles)
-    (generate-executable "metis" '("pkgdcl.fasl" "collector/utils.fasl" "collector/database.fasl" "collector/ctcl.fasl" "collector/main.fasl" "collector/bench.fasl"))))
+    (generate-executable "metis" '("pkgdcl.fasl" "utils.fasl" "database.fasl" "ctcl.fasl" "main.fasl" "bench.fasl"))))

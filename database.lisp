@@ -20,7 +20,7 @@
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
-(defvar *mytasks* (list))
+
 (defvar *pcallers* 5)
 (defparameter *DB* nil)
 (defvar dbtype "postgres")

@@ -1,6 +1,7 @@
 (defpackage :metis/ctcl
   (:use :common-lisp :common-lisp :metis/database :metis/utils :fare-memoization :cl-fad :gzip-stream :cl-json )
-   (:export 
+  (:import-from :metis/database)
+  (:export 
    #:have-we-seen-this-file 
    #:walk-ct 
    #:sync-ct-file 
@@ -11,11 +12,8 @@
    #:cloudtrail-report-async ))
 
 (in-package :metis/ctcl)
+(defvar *mytasks* (list))
 
-
-;;(defparameter *q* (make-instance ':queue))
-
-;;(declaim (optimize (speed 3) (safety 0) (space 0)))
 (defun have-we-seen-this-file (file)
   (format t ".")
   (let ((them (load-file-values)))
