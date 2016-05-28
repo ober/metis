@@ -1,5 +1,5 @@
 (defpackage :metis/bench
-  (:use :common-lisp :metis/main :metis/ctcl :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
+  (:use :common-lisp :metis/ctcl :metis/database :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
   (:import-from :yason)
   (:export #:do-bench
 	   #:run-bench))

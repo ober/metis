@@ -1,5 +1,5 @@
 (defpackage :metis/database
-  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json :postmodern)
+  (:use :common-lisp :common-lisp :metis/utils :fare-memoization :cl-fad :gzip-stream :cl-json :postmodern)
   (:import-from :yason)
   (:export    #:db-do-query 
 	      #:db-ensure-connection 
@@ -16,19 +16,15 @@
 	      #:psql-create-table 
 	      #:normalize-insert 
 	      #:load-file-values))
-
-
-   
 (in-package :metis/database)
 
-
 ;;(defparameter *q* (make-instance 'queue))
+(defvar *h* (make-hash-table :test 'equalp))
+(defvar *mytasks* (list))
+(defvar *pcallers* 5)
 (defparameter *DB* nil)
-
 (defvar dbtype "postgres")
-
-
-
+(defvar *files* nil)
 (defun db-do-query (query)
   (psql-do-query query))
 
@@ -59,7 +55,7 @@
    (format nil "insert into files(value) values ('~A')" (file-namestring x))))
 
 (defun psql-do-query (query)
-  (let ((database (or metis/ctcl::*DB* "metis"))
+  (let ((database (or *DB* "metis"))
 	(user-name "meis")
 	(password "metis")
 	(host "localhost"))
@@ -73,7 +69,7 @@
 
 (defun psql-ensure-connection ()
   (unless postmodern:*database*
-    (setf postmodern:*database* (postmodern:connect (or metis/ctcl::*DB* "metis") "metis" "metis" "localhost" :pooled-p t))))
+    (setf postmodern:*database* (postmodern:connect (or *DB* "metis") "metis" "metis" "localhost" :pooled-p t))))
 
 (defun psql-recreate-tables ()
   (let ((tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys )))
@@ -99,7 +95,7 @@
 
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
   (let ((id
-	 (metis/ctcl::flatten
+	 (flatten
 	  (psql-do-query 
 	   (format nil "select id from ~A where value = '~A'" table value)))))
     (if (not id)

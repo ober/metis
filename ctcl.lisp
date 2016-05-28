@@ -1,43 +1,27 @@
 (defpackage :metis/ctcl
-  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json )
-  (:import-from :pcall)
-  (:export 
+  (:use :common-lisp :common-lisp :metis/database :metis/utils :fare-memoization :cl-fad :gzip-stream :cl-json )
+   (:export 
    #:have-we-seen-this-file 
-   #:flatten 
    #:walk-ct 
    #:sync-ct-file 
    #:async-ct-file 
    #:process-ct-file 
-   #:parse-ct-contents 
    #:parse-ct-contents 
    #:cloudtrail-report-sync 
    #:cloudtrail-report-async ))
 
 (in-package :metis/ctcl)
 
-(defvar *pcallers* 5)
-(defvar *files* nil)
-(defvar *h* (make-hash-table :test 'equalp))
+
 ;;(defparameter *q* (make-instance ':queue))
 
 ;;(declaim (optimize (speed 3) (safety 0) (space 0)))
-(defvar *mytasks* (list))
-
 (defun have-we-seen-this-file (file)
   (format t ".")
   (let ((them (load-file-values)))
     (if (gethash (file-namestring file) them)
   	t
 	nil)))
-
-(defun flatten (obj)
-  (do* ((result (list obj))
-        (node result))
-       ((null node) (delete nil result))
-    (cond ((consp (car node))
-           (when (cdar node) (push (cdar node) (cdr node)))
-           (setf (car node) (caar node)))
-          (t (setf node (cdr node))))))
 
 (defun walk-ct (path fn)
   (walk-directory path fn))
@@ -87,7 +71,7 @@
 ;;   (enqueue (cdr (elt (read-json-gzip-file x) 0)) *q*))
 
 (defun parse-ct-contents (x)
-  (let ((records (cdr (elt (read-json-gzip-file x) 0))))
+  (let ((records (cdr (elt (metis/utils:read-json-gzip-file x) 0))))
     (dolist (x records)
       (let* ((event-time (cdr-assoc :EVENT-TIME x))
 	     ;;(user-identity (cdr-assoc :ACCESS-KEY-ID (cdr-assoc :USER-IDENTITY x)))

@@ -1,6 +1,8 @@
 (defpackage :metis/utils
   (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
   (:export #:get-hostname-by-ip
+	   #:cdr-assoc
+	   #:flatten
 	   #:read-json-gzip-file))
    
 (in-package :metis/utils)
@@ -40,8 +42,6 @@
 		  (loop for l = (read-line in nil nil)
 		     while l collect l))))
     (cl-json:decode-json s)))
-
-
 
 (defun cdr-assoc (item a-list &rest keys)
   (cdr (apply #'assoc item a-list keys)))
@@ -102,3 +102,12 @@
 ;; 	   (position (read-sequence buffer stream)))
 ;;       (setf (fill-pointer buffer) position)
 ;;       buffer)))
+
+(defun flatten (obj)
+  (do* ((result (list obj))
+        (node result))
+       ((null node) (delete nil result))
+    (cond ((consp (car node))
+           (when (cdar node) (push (cdar node) (cdr node)))
+           (setf (car node) (caar node)))
+          (t (setf node (cdr node))))))
