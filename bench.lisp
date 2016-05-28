@@ -1,11 +1,4 @@
-(defpackage :metis/bench
-  (:use :common-lisp :metis/ctcl :metis/database :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json)
-  (:import-from :yason)
-  (:export #:do-bench
-	   #:run-bench))
-
-
-(in-package :metis/bench)
+(in-package :metis)
 
 (defun do-bench ()
   (declare (optimize (safety 3) (speed 0) (debug 3)))

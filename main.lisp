@@ -1,9 +1,4 @@
-(defpackage :metis/main
-  (:use :common-lisp :common-lisp :metis/ctcl :metis/bench :fare-memoization :cl-fad :gzip-stream :cl-json)
-  (:export #:argv
-	   #:main))
-   
-(in-package :metis/main)
+(in-package :metis)
 
 (defun argv ()
   (or
@@ -45,8 +40,8 @@
 (defun main (app verb workers dir)
   (format t "Got: app:~A verb:~A workers:~A dir:~A~%" app verb workers dir)
   (cond
-    ((equal "s" verb) (time (metis/ctcl:cloudtrail-report-sync dir)))
-    ((equal "a" verb) (time (metis/ctcl:cloudtrail-report-async workers dir)))
-    ((equal "r" verb)(time (metis/bench:run-bench)))
+    ((equal "s" verb) (time (metis::cloudtrail-report-sync dir)))
+    ((equal "a" verb) (time (metis::cloudtrail-report-async workers dir)))
+    ((equal "r" verb)(time (metis::run-bench)))
     (t (format t "Usage <~A> <p or s> <directory of logs>" app))))
 ;;(cl-store:store *q* "~/q.store"))

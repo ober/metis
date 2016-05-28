@@ -1,9 +1,4 @@
-(defpackage :metis/version
-  (:use :common-lisp :common-lisp :fare-memoization :cl-fad :gzip-stream :cl-json))
-
-
-   
-(in-package :metis/version)
+(in-package :metis)
 
 #+abcl (progn)
 

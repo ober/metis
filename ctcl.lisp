@@ -1,17 +1,5 @@
-(defpackage :metis/ctcl
-  (:use :common-lisp :common-lisp :metis/database :metis/utils :fare-memoization :cl-fad :gzip-stream :cl-json )
-  (:import-from :metis/database)
-  (:export 
-   #:have-we-seen-this-file 
-   #:walk-ct 
-   #:sync-ct-file 
-   #:async-ct-file 
-   #:process-ct-file 
-   #:parse-ct-contents 
-   #:cloudtrail-report-sync 
-   #:cloudtrail-report-async ))
+(in-package :metis)
 
-(in-package :metis/ctcl)
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
@@ -22,7 +10,7 @@
 	nil)))
 
 (defun walk-ct (path fn)
-  (walk-directory path fn))
+  (cl-fad:walk-directory path fn))
 
 (defun sync-ct-file (x)
   (process-ct-file x))
@@ -69,7 +57,7 @@
 ;;   (enqueue (cdr (elt (read-json-gzip-file x) 0)) *q*))
 
 (defun parse-ct-contents (x)
-  (let ((records (cdr (elt (metis/utils:read-json-gzip-file x) 0))))
+  (let ((records (cdr (elt (read-json-gzip-file x) 0))))
     (dolist (x records)
       (let* ((event-time (cdr-assoc :EVENT-TIME x))
 	     ;;(user-identity (cdr-assoc :ACCESS-KEY-ID (cdr-assoc :USER-IDENTITY x)))

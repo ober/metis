@@ -1,22 +1,4 @@
-(defpackage :metis/database
-  (:use :common-lisp :common-lisp :metis/utils :fare-memoization :cl-fad :gzip-stream :cl-json :postmodern)
-  (:import-from :yason)
-  (:export    #:db-do-query 
-	      #:db-ensure-connection 
-	      #:db-create-tables 
-	      #:db-recreate-tables 
-	      #:db-have-we-seen-this-file 
-	      #:db-mark-file-processed 
-	      #:db-mark-file-processed-preload 
-	      #:psql-do-query 
-	      #:psql-drop-table 
-	      #:psql-ensure-connection 
-	      #:psql-recreate-tables 
-	      #:psql-create-tables 
-	      #:psql-create-table 
-	      #:normalize-insert 
-	      #:load-file-values))
-(in-package :metis/database)
+(in-package :metis)
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
