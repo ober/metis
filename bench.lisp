@@ -6,7 +6,7 @@
 
 (defun run-bench () 
   ;;(princ "XXX: Ensuring connections")
-  (db-ensure-connection "metis-test")
+  (db-ensure-connection "metistest")
   ;;(princ "XXX: Dropping tables")
   (db-recreate-tables)
   (princ "XXX: Running Test")
