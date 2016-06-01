@@ -2,13 +2,13 @@
 
 (defun do-bench ()
   (declare (optimize (safety 3) (speed 0) (debug 3)))
-  (cloudtrail-report-async "10" "~/test-ct/"))
+  (cloudtrail-report-async "1" "~/test-ct/"))
 
 (defun run-bench () 
   ;;(princ "XXX: Ensuring connections")
   (db-ensure-connection "metistest")
   ;;(princ "XXX: Dropping tables")
-  (db-recreate-tables)
+  (db-recreate-tables "metistest")
   (princ "XXX: Running Test")
   #+sbcl (time (do-bench))
   ;; (progn

@@ -7,7 +7,7 @@
   (:use :cl )
   (:export
    #:main
-   #:do-bench))
+   #:run-bench))
 
 
 

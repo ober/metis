@@ -4,22 +4,20 @@
 (defvar *h* (make-hash-table :test 'equalp))
 
 (defvar *pcallers* 5)
-(defparameter *DB* nil)
 (defvar dbtype "postgres")
 (defvar *files* nil)
 (defun db-do-query (query)
   (psql-do-query query))
 
 (defun db-ensure-connection (db)
+  (psql-ensure-connection db))
 
-  (setq *DB* db)
-  (psql-ensure-connection))
+(defun db-create-tables (&optional db)
+  (psql-create-tables db))
 
-(defun db-create-tables ()
-  (psql-create-tables))
-
-(defun db-recreate-tables ()
-  (psql-recreate-tables))
+(defun db-recreate-tables (db)
+  (format t "A----------------")
+  (psql-recreate-tables db))
 
 (defun db-have-we-seen-this-file (x)
   (format t ".")
@@ -36,50 +34,64 @@
   (db-do-query
    (format nil "insert into files(value) values ('~A')" (file-namestring x))))
 
-(defun psql-do-query (query)
-  (let ((database (or *DB* "metis"))
-	(user-name "meis")
+(defun psql-do-query (query &optional DB)
+  (let ((database (or DB "metis"))
+	(user-name "metis")
 	(password "metis")
 	(host "localhost"))
-    (ignore-errors
-      (postmodern:with-connection `(,database ,user-name ,password ,host :pooled-p t)
-	(postmodern:query query)))))
+    ;;(ignore-errors
+    (postmodern:with-connection
+	`(,database ,user-name ,password ,host :pooled-p t)
+      (postmodern:query query))))
 
-(defun psql-drop-table (table)
-  (ignore-errors
-    (psql-do-query (format nil "drop table if exists ~A cascade" table))))
+(defun psql-drop-table (table &optional db)
+  (let ((database (or db "metis")))
+    (format t "dt: ~A db:~A~%" table db)
+    (psql-do-query (format nil "drop table if exists ~A cascade" table) database)))
 
-(defun psql-ensure-connection ()
+(defun psql-ensure-connection (&optional db)
   (unless postmodern:*database*
-    (setf postmodern:*database* (postmodern:connect (or *DB* "metis") "metis" "metis" "localhost" :pooled-p t))))
+    (setf postmodern:*database*
+	  (postmodern:connect
+	   (or db "metis")
+	   "metis" "metis" "localhost" :pooled-p t))))
 
-(defun psql-recreate-tables ()
-  (let ((tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys )))
-    (ignore-errors
-      (mapcar #'psql-drop-table tables)
-      (psql-do-query "drop table if exists log"))
-    (mapcar #'psql-create-table tables))
-  (psql-do-query "delete from metrics")
-  (psql-do-query "create table if not exists log(id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)")
-  (psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;"))
+(defun psql-recreate-tables (&optional db)
+  (let ((database (or db "metis"))
+	(tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys )))
+    (mapcar
+     #'(lambda (x)
+	 (psql-drop-table x database)) tables)
+    (psql-do-query "drop table if exists log" database)
+    (mapcar
+     #'(lambda (x)
+	 (psql-create-table x database)) tables)
+    (psql-do-query "create table if not exists log(id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)" database)
+    (psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;" database)))
 
-(defun psql-create-tables ()
-  (let ((tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys )))
-    (ignore-errors
-      (mapcar #'psql-create-table tables))
-    (psql-do-query "create table if not exists log(id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)")
-    (psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;")))
+(defun psql-create-tables (&optional db)
+  (let ((tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys ))
+	(database (or db "metis")))
+    (mapcar #'(lambda (x)
+		(psql-create-table x db)) tables)
+    (psql-do-query "create table if not exists log(id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)" database)
+    (psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;" database)))
 
-(defun psql-create-table (table)
-  (psql-do-query (format nil "create table if not exists ~A(id serial, value text)" table))
-  (psql-do-query (format nil "create unique index ~A_idx1 on ~A(id)" table table))
-  (psql-do-query (format nil "create unique index ~A_idx2 on ~A(value)" table table)))
+(defun psql-create-table (table &optional db)
+  (let ((database (or db "metis")))
+    (format t "ct:~A db:~A~%" table database)
+    (psql-do-query (format nil "create table if not exists ~A(id serial, value text)" table) database)
+    (psql-do-query (format nil "create unique index concurrently if not exists ~A_idx1 on ~A(id)" table table) database)
+    (psql-do-query (format nil "create unique index concurrently if not exists ~A_idx2 on ~A(value)" table table) database)))
 
+;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
   (let ((id
 	 (flatten
 	  (psql-do-query 
 	   (format nil "select id from ~A where value = '~A'" table value)))))
+    (if (listp id)
+	(setf id (car id)))
     (if (not id)
 	(progn
 	  (psql-do-query (format nil "insert into ~A(value) values('~A')" table value))
