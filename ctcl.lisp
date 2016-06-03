@@ -9,6 +9,12 @@
   	t
 	nil)))
 
+(defun have-we-seen-this-value (var value)
+  (let ((them (load-values var)))
+    (if (gethash var them)
+  	t
+	nil)))
+
 (defun walk-ct (path fn)
   (cl-fad:walk-directory path fn))
 

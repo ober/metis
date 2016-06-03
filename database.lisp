@@ -6,39 +6,28 @@
 (defvar *pcallers* 5)
 (defvar dbtype "postgres")
 (defvar *files* nil)
-(defun db-do-query (query)
-  (psql-do-query query))
-
-(defun db-ensure-connection (db)
-  (psql-ensure-connection db))
-
-(defun db-create-tables (&optional db)
-  (psql-create-tables db))
-
-(defun db-recreate-tables (db)
-  (format t "A----------------")
-  (psql-recreate-tables db))
 
 (defun db-have-we-seen-this-file (x)
   (format t ".")
-  (if (db-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
+  (if (psql-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
       t
       nil))
 
 (defun db-mark-file-processed (x)
-  (db-do-query
+  (psql-do-query
    (format nil "insert into files(value) values ('~A')" (file-namestring x)))
   (setf (gethash (file-namestring x) *h*) t))
 
 (defun db-mark-file-processed-preload (x)
-  (db-do-query
+  (psql-do-query
    (format nil "insert into files(value) values ('~A')" (file-namestring x))))
 
-(defun psql-do-query (query &optional DB)
-  (let ((database (or DB "metis"))
+(defun psql-do-query (query &optional db)
+  (let ((database (or db "metis"))
 	(user-name "metis")
 	(password "metis")
 	(host "localhost"))
+    (format t "~A ~A~%" query database)
     ;;(ignore-errors
     (postmodern:with-connection
 	`(,database ,user-name ,password ,host :pooled-p t)
@@ -115,8 +104,11 @@
 (defun load-file-values ()
   (unless *files*
     (progn
-      (setf *files* (db-do-query "select value from files"))
+      (setf *files* (psql-do-query "select value from files"))
       (mapcar #'(lambda (x)
 		  (setf (gethash (car x) *h*) t))
 	      *files*)))
   *h*)
+
+
+
