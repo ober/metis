@@ -18,16 +18,16 @@
 	  #+clozure
 	  (ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip)))))))
 
-#-clozure
-(defun read-json-gzip-file (file)
-  (with-input-from-string
-      (s
-       (uiop:run-program
-	(format nil "zcat ~A" file)
-	:output :string))
-    (cl-json:decode-json s)))
+;; #-clozure
+;; (defun read-json-gzip-file (file)
+;;   (with-input-from-string
+;;       (s
+;;        (uiop:run-program
+;; 	(format nil "zcat ~A" file)
+;; 	:output :string))
+;;     (cl-json:decode-json s)))
 
-#+clozure
+;;#+clozure
 (defun read-json-gzip-file (file)
   (with-input-from-string
       (s (apply #'concatenate 'string

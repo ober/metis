@@ -4,6 +4,7 @@
   (setf debugg t)
   (setf *DB* "metistest")
   ;;(declare (optimize (safety 3) (speed 0) (debug 3)))
+  (defparameter BENCHING t)
   (cloudtrail-report-async "8" "~/test-ct/"))
 
 

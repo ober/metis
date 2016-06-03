@@ -27,7 +27,7 @@
 	(user-name "metis")
 	(password "metis")
 	(host "localhost"))
-    (format t "~A ~A~%" query database)
+    ;;(format t "~A ~A~%" query database)
     ;;(ignore-errors
     (postmodern:with-connection
 	`(,database ,user-name ,password ,host :pooled-p t)
@@ -75,7 +75,7 @@
 
 ;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
-#+debugg  (format t "gioip: table:~A value:~A" table value)
+;;  (format t "gioip: table:~A value:~A" table value)
   (let ((id
 	 (flatten
 	  (psql-do-query 
@@ -84,7 +84,8 @@
 	(setf id (car id)))
     (if (not id)
 	(progn
-	  (psql-do-query (format nil "insert into ~A(value) values('~A')" table value))
+	  (ignore-errors
+	    (psql-do-query (format nil "insert into ~A(value) values('~A')" table value)))
 	  (setq id (car (car (psql-do-query (format nil "select id from ~A where value = '~A'" table value)))))
 	  id)
 	id)))
@@ -103,14 +104,12 @@
 	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
 
 (defun load-file-values ()
-  (format t "lfv: db:~A files:~A~%" *DB* *files*)
   (unless *files*
-    (progn
-      (setf *files*
+    (setf *files*
 	    (psql-do-query "select value from files" *DB*))
       (mapcar #'(lambda (x)
 		  (setf (gethash (car x) *h*) t))
-	      *files*)))
+	      *files*))
   *h*)
 
 
