@@ -1,14 +1,16 @@
 (in-package :metis)
 
 (defun do-bench ()
-  (declare (optimize (safety 3) (speed 0) (debug 3)))
-  (cloudtrail-report-async "1" "~/test-ct/"))
+  (setf debugg t)
+  (setf *DB* "metistest")
+  ;;(declare (optimize (safety 3) (speed 0) (debug 3)))
+  (cloudtrail-report-async "8" "~/test-ct/"))
+
 
 (defun run-bench () 
-  ;;(princ "XXX: Ensuring connections")
-  (db-ensure-connection "metistest")
+  (psql-ensure-connection "metistest")
   ;;(princ "XXX: Dropping tables")
-  (db-recreate-tables "metistest")
+  (psql-recreate-tables "metistest")
   (princ "XXX: Running Test")
   #+sbcl (time (do-bench))
   ;; (progn
@@ -24,7 +26,6 @@
     ;;(prof::with-profiling (:type :space) (ctcl::do-bench))
     ;;(prof::show-flat-profile))
   #+(or clozure abcl ecl) (time (do-bench))
-
   ;;(format t "results: size:~A" (queue-length *q*))  
   ;;(cl-store:store *q* "~/q.store")
   )
