@@ -2,7 +2,7 @@
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
-
+(defvar *DB* nil)
 (defvar *pcallers* 5)
 (defvar dbtype "postgres")
 (defvar *files* nil)
@@ -23,7 +23,7 @@
    (format nil "insert into files(value) values ('~A')" (file-namestring x))))
 
 (defun psql-do-query (query &optional db)
-  (let ((database (or db "metis"))
+  (let ((database (or *DB* db "metis"))
 	(user-name "metis")
 	(password "metis")
 	(host "localhost"))
@@ -75,6 +75,7 @@
 
 ;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
+#+debugg  (format t "gioip: table:~A value:~A" table value)
   (let ((id
 	 (flatten
 	  (psql-do-query 
@@ -102,13 +103,14 @@
 	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
 
 (defun load-file-values ()
+  (format t "lfv: db:~A files:~A~%" *DB* *files*)
   (unless *files*
     (progn
-      (setf *files* (psql-do-query "select value from files"))
+      (setf *files*
+	    (psql-do-query "select value from files" *DB*))
       (mapcar #'(lambda (x)
 		  (setf (gethash (car x) *h*) t))
 	      *files*)))
   *h*)
-
 
 
