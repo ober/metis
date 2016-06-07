@@ -81,7 +81,7 @@
 	   (car
 	    (psql-do-query
 	     (format nil "select id from ~A where value = '~A'" table value)))))))
-    (format t "gioip: table:~A value:~A id:~A~%" table value id)
+    ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
     (if (listp id)
 	(car id)
 	id)))
