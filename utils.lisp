@@ -1,7 +1,7 @@
 (in-package :metis)
 
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
-  (let ((benching (uiop:getenv "BENCHING")))
+  (let ((benching (or BENCHING (uiop:getenv "BENCHING"))))
     (if (string= benching "yes")
 	(progn 
 	  (format t "Benching is set to yes. Disabling dns lookups!:~A~%" benching)
@@ -19,22 +19,22 @@
 	  (ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip)))))))
 
 ;; #-clozure
-;; (defun read-json-gzip-file (file)
-;;   (with-input-from-string
-;;       (s
-;;        (uiop:run-program
-;; 	(format nil "zcat ~A" file)
-;; 	:output :string))
-;;     (cl-json:decode-json s)))
-
-;;#+clozure
 (defun read-json-gzip-file (file)
   (with-input-from-string
-      (s (apply #'concatenate 'string
-		(gzip-stream:with-open-gzip-file (in file)
-		  (loop for l = (read-line in nil nil)
-		     while l collect l))))
+      (s
+       (uiop:run-program
+	(format nil "zcat ~A" file)
+	:output :string))
     (cl-json:decode-json s)))
+
+;;#+clozure
+;; (defun read-json-gzip-file (file)
+;;   (with-input-from-string
+;;       (s (apply #'concatenate 'string
+;; 		(gzip-stream:with-open-gzip-file (in file)
+;; 		  (loop for l = (read-line in nil nil)
+;; 		     while l collect l))))
+;;     (cl-json:decode-json s)))
 
 (defun cdr-assoc (item a-list &rest keys)
   (cdr (apply #'assoc item a-list keys)))
