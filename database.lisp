@@ -74,18 +74,16 @@
 
 ;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
-;;  (format t "gioip: table:~A value:~A" table value)
+  (psql-do-query (format nil "insert into ~A(value)  select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
   (let ((id
 	 (flatten
-	  (psql-do-query 
-	   (format nil "select id from ~A where value = '~A'" table value)))))
+	  (car
+	   (car
+	    (psql-do-query
+	     (format nil "select id from ~A where value = '~A'" table value)))))))
+    (format t "gioip: table:~A value:~A id:~A~%" table value id)
     (if (listp id)
-	(setf id (car id)))
-    (if (not id)
-	(progn
-	    (psql-do-query (format nil "insert into ~A(value) values('~A')" table value))
-	  (setq id (car (car (psql-do-query (format nil "select id from ~A where value = '~A'" table value)))))
-	  id)
+	(car id)
 	id)))
 
 (defun normalize-insert (event-time user-name user-key event-name user-agent source-host)
