@@ -89,6 +89,5 @@
     (let ((cloudtrail-reports (or path "~/CT")))
       (walk-ct cloudtrail-reports
 	       #'async-ct-file))
-    ;;    (ignore-errors
     (mapc #'pcall:join *mytasks*)))
-;;)
+

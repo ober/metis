@@ -28,7 +28,6 @@
 	(password "metis")
 	(host "localhost"))
     ;;(format t "~A ~A~%" query database)
-    ;;(ignore-errors
     (postmodern:with-connection
 	`(,database ,user-name ,password ,host :pooled-p t)
       (postmodern:query query))))
@@ -84,8 +83,7 @@
 	(setf id (car id)))
     (if (not id)
 	(progn
-	  (ignore-errors
-	    (psql-do-query (format nil "insert into ~A(value) values('~A')" table value)))
+	    (psql-do-query (format nil "insert into ~A(value) values('~A')" table value))
 	  (setq id (car (car (psql-do-query (format nil "select id from ~A where value = '~A'" table value)))))
 	  id)
 	id)))

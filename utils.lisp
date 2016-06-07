@@ -10,9 +10,9 @@
 	  #+allegro
 	  (socket:ipaddr-to-hostname ip)
 	  #+sbcl
-	  (ignore-errors (sb-bsd-sockets:host-ent-name
-			  (sb-bsd-sockets:get-host-by-address
-			   (sb-bsd-sockets:make-inet-address ip))))
+	  (sb-bsd-sockets:host-ent-name
+	   (sb-bsd-sockets:get-host-by-address
+	    (sb-bsd-sockets:make-inet-address ip)))
 	  #+lispworks
 	  (comm:get-host-entry ip :fields '(:name))
 	  #+clozure

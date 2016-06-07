@@ -42,6 +42,6 @@
   (cond
     ((equal "s" verb) (time (metis::cloudtrail-report-sync dir)))
     ((equal "a" verb) (time (metis::cloudtrail-report-async workers dir)))
-    ((equal "r" verb)(time (metis::run-bench)))
+    ((equal "r" verb)(time (metis:run-bench)))
     (t (format t "Usage <~A> <p or s> <directory of logs>" app))))
 ;;(cl-store:store *q* "~/q.store"))
