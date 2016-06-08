@@ -1,22 +1,22 @@
 /*
- ** $Header: /hope/lwhope1-cam/hope.0/compound/23/LISPexamples/RCS/android:OthelloDemo:src:com:lispworks:example:othellodemo:Othello.java,v 1.12.1.1 2014/05/27 20:55:54 davef Exp $
+ ** $Header: /hope/lwhope1-cam/hope.0/compound/23/LISPexamples/RCS/android:MetisDemo:src:com:lispworks:example:metisdemo:Metis.java,v 1.12.1.1 2014/05/27 20:55:54 davef Exp $
  **
  ** Copyright (c) 1987--2015 LispWorks Ltd. All rights reserved.
  */
-package com.lispworks.example.othellodemo;
+package com.lispworks.example.metisdemo;
 
-// A board for playing Othello.
+// A board for playing Metis.
 // This just displays the board and interact with the user. The
 // actual playing, i.e. deciding what effect touching a square has, 
 // which squares to draw in what colour, and (if the computer plays) decide 
 ///on computer moves, is done by an 
-// "Othello Server", which needs to implement an OthelloServer interface
+// "Metis Server", which needs to implement an MetisServer interface
 // to get called, and call some methods in this class. The server
 // is then called whenever the user touch the board, and needs to decide
 // how to update the board.
 // The code here also contains an implementation of the interface which
 // just calls directly into Lisp, using the functions that are defined in 
-// (example-file "android/android-othello-user"). 
+// (example-file "android/android-metis-user"). 
 
 // Because the board just displays and reports touches to the server,
 // the actual game that is played is defined by the server, rather than by the board.
@@ -31,19 +31,19 @@ import android.content.*;
 import android.view.*;
 import android.util.*;
 
-public class Othello extends Activity {
+public class Metis extends Activity {
 	static final int WHITE = 1; // these two need to match the definitions in
-								// (example-file "android/android-othello-user")
+								// (example-file "android/android-metis-user")
 	static final int BLACK = 2;
-	final static int OTHELLO_SERVER_TYPE_JAVA = 0;
-	final static int OTHELLO_SERVER_TYPE_FULL_PROXY = 1; // These two need to match what CREATE-LISP-OTHELLO-SERVER
-	final static int OTHELLO_SERVER_TYPE_LAZY_PROXY = 2; // in (example-file "android/android-othello-user") expects
+	final static int METIS_SERVER_TYPE_JAVA = 0;
+	final static int METIS_SERVER_TYPE_FULL_PROXY = 1; // These two need to match what CREATE-LISP-METIS-SERVER
+	final static int METIS_SERVER_TYPE_LAZY_PROXY = 2; // in (example-file "android/android-metis-user") expects
 
-	static int mServerType = OTHELLO_SERVER_TYPE_JAVA;
+	static int mServerType = METIS_SERVER_TYPE_JAVA;
 
-	static LinearLayout mOthelloGrid; // On API 14 that can be a GridLayout, but
+	static LinearLayout mMetisGrid; // On API 14 that can be a GridLayout, but
 										// we want to support API 10
-	static OthelloServer mOthelloServer = null;
+	static MetisServer mMetisServer = null;
 	static TextView mTextView;
 	static Vibrator mVibrator;
 	static SubMenu mServerMenu = null;
@@ -60,7 +60,7 @@ public class Othello extends Activity {
 	}
 
 	public static void change(int index, int what) {
-		ImageView iv = (ImageView) (((LinearLayout) mOthelloGrid
+		ImageView iv = (ImageView) (((LinearLayout) mMetisGrid
 				.getChildAt(index >> 3)).getChildAt(index & 7));
 		int id = what_to_id(what);
 		iv.setImageResource(id);
@@ -69,7 +69,7 @@ public class Othello extends Activity {
 
 	// Interface that the "server" needs to implement.
 	// We have a default implemenation below that calls into lisp
-	public interface OthelloServer {
+	public interface MetisServer {
 		void init(boolean reset);
 
 		void playSquare(int square);
@@ -81,16 +81,16 @@ public class Othello extends Activity {
 
 	// End of public interface
 
-	// A default implementation of the OthelloServer. Assumes that Lisp is
+	// A default implementation of the MetisServer. Assumes that Lisp is
 	// loaded  and got the functions defined (example-file
-	// "android/android-othello-user")
-	class JavaOthelloServer implements OthelloServer {
+	// "android/android-metis-user")
+	class JavaMetisServer implements MetisServer {
 		public void init(boolean reset) {
-			com.lispworks.LispCalls.callVoidV("init-othello", reset);
+			com.lispworks.LispCalls.callVoidV("init-metis", reset);
 		}
 
 		public void playSquare(int square) {
-			com.lispworks.LispCalls.callVoidV("othello-clicked", square);
+			com.lispworks.LispCalls.callVoidV("metis-clicked", square);
 		}
 
 		public int undoMove() {
@@ -103,7 +103,7 @@ public class Othello extends Activity {
 	}
 
 	// Use this when lisp goes wrong, to ensure that we don't try to call into
-	class ErrorOthelloServer implements OthelloServer {
+	class ErrorMetisServer implements MetisServer {
 		public void init(boolean reset) {
 			showLispPanel();
 		}
@@ -132,7 +132,7 @@ public class Othello extends Activity {
 		}
 
 		public void onClick(View view) {
-			mOthelloServer.playSquare(mIndex);
+			mMetisServer.playSquare(mIndex);
 		}
 	}
 
@@ -154,7 +154,7 @@ public class Othello extends Activity {
 	public void computerPlays(View view) {
 		CheckBox cb = (CheckBox) view;
 		boolean checked = cb.isChecked();
-		mOthelloServer.setComputerPlays(checked);
+		mMetisServer.setComputerPlays(checked);
 	}
 
 	
@@ -166,7 +166,7 @@ public class Othello extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		boolean with_lisp = LispPanel.canEvaluate();
-		int id = with_lisp ? R.menu.othello_menu : R.menu.othello_menu_no_lisp;
+		int id = with_lisp ? R.menu.metis_menu : R.menu.metis_menu_no_lisp;
 		inflater.inflate(id, menu);
 
 		if (with_lisp) {
@@ -175,9 +175,9 @@ public class Othello extends Activity {
 
                        	// set proxy item to indicate the right server
 			int itemId = R.id.menu_javaserver;
-			if (mServerType == OTHELLO_SERVER_TYPE_FULL_PROXY)
+			if (mServerType == METIS_SERVER_TYPE_FULL_PROXY)
 				itemId = R.id.menu_proxyfull;
-			else if (mServerType == OTHELLO_SERVER_TYPE_LAZY_PROXY)
+			else if (mServerType == METIS_SERVER_TYPE_LAZY_PROXY)
 				itemId = R.id.menu_proxylazy;
 			MenuItem serverMi = mServerMenu.findItem(itemId);
 			serverMi.setChecked(true);
@@ -193,10 +193,10 @@ public class Othello extends Activity {
 		case R.id.menu_restart:
 			resetAllSquares(); // the server expects clean board when "init" is
 								// called
-			mOthelloServer.init(true); // true means restart the game.
+			mMetisServer.init(true); // true means restart the game.
 			return true;
 		case R.id.menu_undo:
-			mOthelloServer.undoMove();
+			mMetisServer.undoMove();
 			return true;
 		case R.id.menu_lisp_panel:
 		case R.id.menu_output:
@@ -206,13 +206,13 @@ public class Othello extends Activity {
 			startActivityForResult(LispPanel.createIntentForHistory(), 1);
 			return true;
 		case R.id.menu_proxyfull:
-			setupServer(OTHELLO_SERVER_TYPE_FULL_PROXY);
+			setupServer(METIS_SERVER_TYPE_FULL_PROXY);
 			return true;
 		case R.id.menu_proxylazy:
-			setupServer(OTHELLO_SERVER_TYPE_LAZY_PROXY);
+			setupServer(METIS_SERVER_TYPE_LAZY_PROXY);
 			return true;
 		case R.id.menu_javaserver:
-			setupServer(OTHELLO_SERVER_TYPE_JAVA);
+			setupServer(METIS_SERVER_TYPE_JAVA);
 			return true;
 
 		default:
@@ -224,10 +224,10 @@ public class Othello extends Activity {
 	
 	// Internal bits
 
-	// setupServer - sets the server that decides what happens on the Othello
+	// setupServer - sets the server that decides what happens on the Metis
 	// board to an
-	// an interface OthelloServer. The interface can be either a Java class
-	// LispOthelloServer which is defined above
+	// an interface MetisServer. The interface can be either a Java class
+	// LispMetisServer which is defined above
 	// to implement the methods by direct calls to lisp, or a lisp proxy which
 	// is defined in Lisp.
 	// The proxies in lisp are either "full", defining a function for each
@@ -235,39 +235,39 @@ public class Othello extends Activity {
 	// or "lazy", which defines only the default function which is called for
 	// all the methods.
 	// The lisp function and the proxies are defined in (example-file
-	// "android/android-othello-user")
+	// "android/android-metis-user")
 	void setupServer(int which) {
 		if (com.lispworks.Manager.status() != com.lispworks.Manager.STATUS_READY) {
-			mOthelloServer = new ErrorOthelloServer();
+			mMetisServer = new ErrorMetisServer();
 			return;
 		}
 		mServerType = which; // remember it
 		int id = R.id.menu_javaserver;
 		switch (which) {
-		case OTHELLO_SERVER_TYPE_JAVA:
-			mOthelloServer = new JavaOthelloServer();
+		case METIS_SERVER_TYPE_JAVA:
+			mMetisServer = new JavaMetisServer();
 			break; // / Use the Java proxy defined above
 
 		// demonstrate creating the proxy by calling a lisp function that
 		// creates it by using make-lisp-proxy
-		case OTHELLO_SERVER_TYPE_FULL_PROXY: {
+		case METIS_SERVER_TYPE_FULL_PROXY: {
 			Object obj = com.lispworks.LispCalls.callObjectV(
-					"CREATE-LISP-OTHELLO-SERVER", which);
+					"CREATE-LISP-METIS-SERVER", which);
 			if (obj != null) // In case of error, Lisp should have already
 								// reported it.
-				mOthelloServer = (OthelloServer) obj;
+				mMetisServer = (MetisServer) obj;
 			id = R.id.menu_proxyfull;
 		}
 			;
 			break;
 
 		// demonstrate creating the proxy by passing its name to createLispProxy
-		case OTHELLO_SERVER_TYPE_LAZY_PROXY: {
+		case METIS_SERVER_TYPE_LAZY_PROXY: {
 			Object obj = com.lispworks.LispCalls
-					.createLispProxy("LISP-OTHELLO-SERVER-LAZY");
+					.createLispProxy("LISP-METIS-SERVER-LAZY");
 			if (obj != null) // In case of error, Lisp should have already
 								// reported it.
-				mOthelloServer = (OthelloServer) obj;
+				mMetisServer = (MetisServer) obj;
 			id = R.id.menu_proxylazy;
 		}
 			;
@@ -283,23 +283,23 @@ public class Othello extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		mOthelloServer = new ErrorOthelloServer(); // in case it goes wrong Ensure we have a server.
+		mMetisServer = new ErrorMetisServer(); // in case it goes wrong Ensure we have a server.
 		Intent in = getIntent();
 		Bundle extras = in.getExtras();
 		if (extras != null)
-			mServerType = extras.getInt("OthelloServerType", mServerType);
+			mServerType = extras.getInt("MetisServerType", mServerType);
 
 		Context co = getApplicationContext();
 
 		// set the layout and initial some statics.
-		setContentView(R.layout.othello);
+		setContentView(R.layout.metis);
 
-		SquareLayout sl = (SquareLayout) findViewById(R.id.othello_grid);
-		mOthelloGrid = new LinearLayout(co);
-		mOthelloGrid.setOrientation(LinearLayout.VERTICAL);
-		sl.addView(mOthelloGrid);
+		SquareLayout sl = (SquareLayout) findViewById(R.id.metis_grid);
+		mMetisGrid = new LinearLayout(co);
+		mMetisGrid.setOrientation(LinearLayout.VERTICAL);
+		sl.addView(mMetisGrid);
 	
-		mTextView = (TextView) findViewById(R.id.OthelloState);
+		mTextView = (TextView) findViewById(R.id.MetisState);
 		mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
 		// Fill the the grid with 64 ImageView objects corresponding to the
@@ -314,7 +314,7 @@ public class Othello extends Activity {
 		for (int index = 0; index < 64; index++) {
 			if (0 == (index & 7)) {
 				currentLine = new LinearLayout(co);
-				mOthelloGrid.addView(currentLine, vertical_stretch_lp);
+				mMetisGrid.addView(currentLine, vertical_stretch_lp);
 			}
 			ImageView iv = new ImageView(co);
 			SquareListener li = new SquareListener(index);
@@ -339,11 +339,11 @@ public class Othello extends Activity {
 			setupServer(mServerType);
 			// tell the server to get going. Passing false tells
 			// the server to continue existing game if there is any.
-			mOthelloServer.init(false);
+			mMetisServer.init(false);
 
 			break;
 		case com.lispworks.Manager.STATUS_ERROR: // give up
-			mOthelloServer = new ErrorOthelloServer();
+			mMetisServer = new ErrorMetisServer();
 
 			com.lispworks.Manager.addMessage("Failed to initialize LispWorks("
 					+ com.lispworks.Manager.init_result_code() + ") : "

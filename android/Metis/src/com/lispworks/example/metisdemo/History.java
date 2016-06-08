@@ -1,5 +1,5 @@
 /*
- ** $Header: /hope/lwhope1-cam/hope.0/compound/23/LISPexamples/RCS/android:OthelloDemo:src:com:lispworks:example:othellodemo:History.java,v 1.3.1.1 2014/05/27 20:55:55 davef Exp $
+ ** $Header: /hope/lwhope1-cam/hope.0/compound/23/LISPexamples/RCS/android:MetisDemo:src:com:lispworks:example:metisdemo:History.java,v 1.3.1.1 2014/05/27 20:55:55 davef Exp $
  **
  ** Copyright (c) 1987--2015 LispWorks Ltd. All rights reserved.
  */
@@ -10,7 +10,7 @@
 // Gets an ArrayList<String> of items inside the intent as "extra" withname "HistroyItems"
 // This is assumed to be called by StartActivityForresult. 
 
-package com.lispworks.example.othellodemo;
+package com.lispworks.example.metisdemo;
 
 import android.app.ListActivity;
 import android.os.Bundle;
@@ -51,7 +51,7 @@ public class History extends ListActivity {
 	}
 	
 	
-  // Options meu, so users can go to Othello
+  // Options meu, so users can go to Metis
 	public boolean onCreateOptionsMenu(Menu menu) {
 		 getMenuInflater().inflate(R.menu.others_menu, menu);
 		return true;
@@ -62,7 +62,7 @@ public class History extends ListActivity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.menu_main:
-			android.content.Intent in = LispPanel.createIntent("Othello");
+			android.content.Intent in = LispPanel.createIntent("Metis");
 			startActivity( in);
 			return true;
 			default:			return super.onOptionsItemSelected(item);

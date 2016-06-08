@@ -1,10 +1,10 @@
 /*
- ** $Header: /hope/lwhope1-cam/hope.0/compound/23/LISPexamples/RCS/android:OthelloDemo:src:com:lispworks:example:othellodemo:LispPanel.java,v 1.6.1.2 2014/11/19 16:03:20 martin Exp $
+ ** $Header: /hope/lwhope1-cam/hope.0/compound/23/LISPexamples/RCS/android:MetisDemo:src:com:lispworks:example:metisdemo:LispPanel.java,v 1.6.1.2 2014/11/19 16:03:20 martin Exp $
  **
  ** Copyright (c) 1987--2015 LispWorks Ltd. All rights reserved.
  */
 
-package com.lispworks.example.othellodemo;
+package com.lispworks.example.metisdemo;
 
 import android.app.Activity;
 import android.widget.TextView;
@@ -45,7 +45,7 @@ public class LispPanel extends Activity {
 						+ "                                                          () 'loop-executing-events))))",
 
 				"(mp:process-send loop-executing-events-process '(mp:get-current-process)) ; Prints the process object of the event executing process",
-				"(othello-user-change-a-square 5 2); change a square 5 in the Othello board to black",
+				"(metis-user-change-a-square 5 2); change a square 5 in the Metis board to black",
 				";; Start a background \"computation\" which reports its result continuously\n"
 						+ "(mp:process-run-function \"multiplier\" () \n    #'(lambda() \n     (setq *finish-multiply* nil)\n    (dotimes (x 100)"
 						+ "\n        (sleep 1)\n        (when *finish-multiply* (return))\n        (lw-ji:format-to-java-host \"~%~d * ~d = ~d\" x x (* x x))))))",
@@ -64,7 +64,7 @@ public class LispPanel extends Activity {
 
 	// Test if can evaluate stuff. Here we simply tests if the function
 	// eval-for-android
-	// (defined in the examples file andorid/android-othello-user.lisp) is
+	// (defined in the examples file andorid/android-metis-user.lisp) is
 	// defined. It will
 	// be undefined if the symbol is shakem.
 
@@ -232,7 +232,7 @@ public class LispPanel extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.menu_main:
-			android.content.Intent in = createIntent("Othello");
+			android.content.Intent in = createIntent("Metis");
 			startActivity( in);
 			return true;
 			default:			return super.onOptionsItemSelected(item);

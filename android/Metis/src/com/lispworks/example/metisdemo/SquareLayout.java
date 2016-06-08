@@ -1,9 +1,9 @@
 /*
- ** $Header: /hope/lwhope1-cam/hope.0/compound/23/LISPexamples/RCS/android:OthelloDemo:src:com:lispworks:example:othellodemo:SquareLayout.java,v 1.1.1.1 2014/05/27 20:55:55 davef Exp $
+ ** $Header: /hope/lwhope1-cam/hope.0/compound/23/LISPexamples/RCS/android:MetisDemo:src:com:lispworks:example:metisdemo:SquareLayout.java,v 1.1.1.1 2014/05/27 20:55:55 davef Exp $
  **
  ** Copyright (c) 1987--2015 LispWorks Ltd. All rights reserved.
  */
-package com.lispworks.example.othellodemo;
+package com.lispworks.example.metisdemo;
 
 import android.content.Context;
 import android.util.AttributeSet;
