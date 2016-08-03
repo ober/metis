@@ -27,6 +27,6 @@
 
 #+allegro
 (progn
-  (let ((lfiles '("package.lisp" "utils.lisp" "ctcl.lisp" "database.lisp" "main.lisp" "bench.lisp")))
+  (let ((lfiles '("package.lisp" "utils.lisp" "flows.lisp" "ctcl.lisp" "database.lisp" "main.lisp" "bench.lisp")))
     (mapcar #'compile-file lfiles)
-    (cl-user::generate-executable "metis" '("package.fasl" "utils.fasl" "database.fasl" "ctcl.fasl" "main.fasl" "bench.fasl"))))
+    (cl-user::generate-executable "metis" '("package.fasl" "utils.fasl" "database.fasl" "flows.fasl" "ctcl.fasl" "main.fasl" "bench.fasl"))))

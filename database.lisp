@@ -43,6 +43,7 @@
 	   (or db "metis")
 	   "metis" "metis" "localhost" :pooled-p t))))
 
+
 (defun psql-recreate-tables (&optional db)
   (let ((database (or db "metis"))
 	(tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys )))
@@ -53,7 +54,8 @@
     (mapcar
      #'(lambda (x)
 	 (psql-create-table x database)) tables)
-    (psql-do-query "create table if not exists log(id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)" database)
+    (psql-do-query "create table if not exists log (id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)" database)
+    (psql-do-query "create table if not exists flows (id serial, version integer, account_id integer, interface_id integer, srcaddr integer, dstaddr integer, srcport integer, dstport integer, protocol integer, packets integer, bytez integer, start integer, endt integer, action integer, status integer)" database)
     (psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;" database)))
 
 (defun psql-create-tables (&optional db)
