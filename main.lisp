@@ -14,7 +14,6 @@
    nil))
 
 
-#-allegro
 (defun main ()
   (format t "XXX: ~A~%" (type-of (argv)))
   (let* ((args (argv))
@@ -38,10 +37,11 @@
 
 #+allegro
 (defun main (app verb workers dir)
-  (format t "Got: app:~A verb:~A workers:~A dir:~A~%" app verb workers dir)
-  (cond
-    ((equal "s" verb) (time (metis::cloudtrail-report-sync dir)))
-    ((equal "a" verb) (time (metis::cloudtrail-report-async workers dir)))
-    ((equal "r" verb)(time (metis:run-bench)))
-    (t (format t "Usage <~A> <p or s> <directory of logs>" app))))
+  (metis::main))
+  ;; (format t "Got: app:~A verb:~A workers:~A dir:~A~%" app verb workers dir)
+  ;; (cond
+  ;;   ((equal "s" verb) (time (metis::cloudtrail-report-sync dir)))
+  ;;   ((equal "a" verb) (time (metis::cloudtrail-report-async workers dir)))
+  ;;   ((equal "r" verb)(time (metis:run-bench)))
+  ;;   (t (format t "Usage <~A> <p or s> <directory of logs>" app))))
 ;;(cl-store:store *q* "~/q.store"))

@@ -3,13 +3,16 @@
 #+abcl (progn)
 
 #+allegro (progn
-	    ;;(setf excl:*tenured-bytes-limit* 52428800)
+
 	    (setq excl:*global-gc-behavior* nil)
 	    (setq excl:*load-source-file-info* nil)
 	    (setq excl:*load-xref-info* nil)
 	    (setq excl:*record-source-file-info* nil)
 	    (setq excl:*record-xref-info* nil)
+	    ;;(setq excl:*tenured-bytes-limit* 5242880000)
 	    ;;(setf excl:*global-gc-behavior* :auto)
+	    ;;(setq *GLOBAL-GC-BEHAVIOR* nil)
+	    ;;(setq excl:*global-gc-behavior* nil)
 	    (eval-when (:compile-toplevel :load-toplevel :execute)
 	      (require :acldns)))
 #+clozure (progn
@@ -31,4 +34,3 @@
 #+sbcl (progn
 	 (eval-when (:compile-toplevel :load-toplevel :execute)
 	   (require :sb-sprof)))
-

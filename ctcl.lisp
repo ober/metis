@@ -3,7 +3,7 @@
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
-  (format t ".")
+  ;;(format t ".")
   (let ((them (load-file-values)))
     (if (gethash (file-namestring file) them)
   	t
@@ -23,13 +23,13 @@
 
 (defun async-ct-file (x)
   (push (pcall:pexec
-	 (funcall #'process-ct-file x)) *mytasks*))
+	  (funcall #'process-ct-file x)) *mytasks*))
 
 (defun process-ct-file (x)
   (when (equal (pathname-type x) "gz")
     (unless (have-we-seen-this-file x)
       (db-mark-file-processed x)
-      (format t "N")
+      ;;(format t "n")
       ;;(format t "New:~A~%" (file-namestring x))
       (parse-ct-contents x))))
 
@@ -63,7 +63,11 @@
 ;;   (enqueue (cdr (elt (read-json-gzip-file x) 0)) *q*))
 
 (defun parse-ct-contents (x)
-  (let ((records (cdr (elt (read-json-gzip-file x) 0))))
+  (format t "+")
+  (let* ((records (cdr (elt (read-json-gzip-file x) 0)))
+	 (num (length records))
+	 (btime (get-internal-real-time)))
+    ;;(format t "wtf: records:~A~%" (length records))
     (dolist (x records)
       (let* ((event-time (cdr-assoc :EVENT-TIME x))
 	     ;;(user-identity (cdr-assoc :ACCESS-KEY-ID (cdr-assoc :USER-IDENTITY x)))
@@ -74,8 +78,12 @@
 	     (user-identity (cdr-assoc :USER-IDENTITY x))
 	     (user-name (cdr-assoc :USER-NAME user-identity))
 	     (user-key (cdr-assoc :ACCESS-KEY-ID user-identity)))
-	(normalize-insert event-time user-name user-key event-name user-agent (or hostname ip))))))
-
+	(normalize-insert event-time user-name user-key event-name user-agent (or hostname ip))))
+    (let* ((etime (get-internal-real-time))
+	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second))))
+      (if (and (> delta 0) (> num 99))
+	  (let ((rps (/ (float num) (float delta))))
+	    (format t "~%rps:~A rows:~A delta:~A" rps num delta))))))
 
 (defun cloudtrail-report-sync (path)
   (let ((cloudtrail-reports (or path "~/CT")))
@@ -90,4 +98,3 @@
       (walk-ct cloudtrail-reports
 	       #'async-ct-file))
     (mapc #'pcall:join *mytasks*)))
-

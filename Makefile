@@ -10,11 +10,11 @@ lispworks:
 
 ecl:
 	@ mkdir -p dist/ecl
-	@ cat collector/deliver-ecl.lisp|ecl 
+	@ cat collector/deliver-ecl.lisp|ecl
 
 sbcl:
 	@ mkdir -p dist/sbcl
-	@ cat deliver.lisp|sbcl --dynamic-space-size 20480
+	@ cat deliver.lisp|sbcl --dynamic-space-size 204800
 ccl:
 	@ mkdir -p dist/ccl || true
 	@ cat deliver.lisp|ccl64

@@ -27,7 +27,6 @@
 	(user-name "metis")
 	(password "metis")
 	(host "localhost"))
-    ;;(format t "~A ~A~%" query database)
     (postmodern:with-connection
 	`(,database ,user-name ,password ,host :pooled-p t)
       (postmodern:query query))))
@@ -95,17 +94,15 @@
        (event-name-id (get-id-or-insert-psql "event_names" event-name))
        (user-agent-id (get-id-or-insert-psql "user_agents" user-agent))
        (source-host-id (get-id-or-insert-psql "source_hosts" source-host)))
-    (psql-do-query 
+    (psql-do-query
      (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
 	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
 
 (defun load-file-values ()
   (unless *files*
     (setf *files*
-	    (psql-do-query "select value from files" *DB*))
-      (mapcar #'(lambda (x)
-		  (setf (gethash (car x) *h*) t))
-	      *files*))
+	  (psql-do-query "select value from files" *DB*))
+    (mapcar #'(lambda (x)
+		(setf (gethash (car x) *h*) t))
+	    *files*))
   *h*)
-
-
