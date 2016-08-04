@@ -41,9 +41,9 @@
 	  (split-sequence:split-sequence #\linefeed
 					 (uiop:run-program (format nil "zcat ~A" file) :output :string))))
 
-
 (defun process-vf-line (line)
-  )
+  (format t "got line:~A~%" line))
+ (version, account_id, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, end, action, status = line.split()
 
 	 ;; 	 (num (length records))
     ;; 	 (btime (get-internal-real-time)))
