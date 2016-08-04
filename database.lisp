@@ -100,10 +100,10 @@
      (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
 	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
 
-(defun load-file-values ()
+(defun load-file-values (table)
   (unless *files*
     (setf *files*
-	  (psql-do-query "select value from files" *DB*))
+	  (psql-do-query (format nil "select value from ~A" table) *DB*))
     (mapcar #'(lambda (x)
 		(setf (gethash (car x) *h*) t))
 	    *files*))

@@ -4,7 +4,7 @@
 
 (defun have-we-seen-this-file (file)
   ;;(format t ".")
-  (let ((them (load-file-values)))
+  (let ((them (load-file-values "files")))
     (if (gethash (file-namestring file) them)
   	t
 	nil)))
@@ -14,6 +14,9 @@
 ;;     (if (gethash var them)
 ;;   	t
 ;; 	nil)))
+
+(defun pp (fn)
+  (format t "~A~%" fn))
 
 (defun walk-ct (path fn)
   (cl-fad:walk-directory path fn))
