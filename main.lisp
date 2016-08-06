@@ -23,6 +23,8 @@
     (cond
       ((equal "main" verb) (main))
       ((equal "a" verb)(time (cloudtrail-report-async workers dir)))
+      ((equal "v" verb)(time (vpc-flows-report-async workers dir)))
+      ((equal "b" verb)(time (bench-vpc-flows-report-async workers dir)))
       ((equal "s" verb)(time (cloudtrail-report-sync dir)))
       ((equal "r" verb)(time (run-bench)))
       (t (progn
@@ -37,11 +39,14 @@
 
 #+allegro
 (defun main (app verb workers dir)
-  (metis::main))
-  ;; (format t "Got: app:~A verb:~A workers:~A dir:~A~%" app verb workers dir)
-  ;; (cond
-  ;;   ((equal "s" verb) (time (metis::cloudtrail-report-sync dir)))
-  ;;   ((equal "a" verb) (time (metis::cloudtrail-report-async workers dir)))
-  ;;   ((equal "r" verb)(time (metis:run-bench)))
-  ;;   (t (format t "Usage <~A> <p or s> <directory of logs>" app))))
+  ;;(let ((args '(verb workers dir)))
+  ;;(metis::main)))
+  (format t "Got: app:~A verb:~A workers:~A dir:~A~%" app verb workers dir)
+  (cond
+      ((equal "a" verb)(time (cloudtrail-report-async workers dir)))
+      ((equal "v" verb)(time (vpc-flows-report-async workers dir)))
+      ((equal "b" verb)(time (bench-vpc-flows-report-async workers dir)))
+      ((equal "s" verb)(time (cloudtrail-report-sync dir)))
+      ((equal "r" verb)(time (run-bench)))
+      (t (format t "Usage <~A> <p or s> <directory of logs>" app))))
 ;;(cl-store:store *q* "~/q.store"))
