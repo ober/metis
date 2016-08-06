@@ -7,7 +7,7 @@
   :license "MIT"
   :class :package-inferred-system
   :defsystem-depends-on (:asdf-package-system)
-  :depends-on (:quicklisp :fare-memoization :cl-fad :gzip-stream :cl-json :pcall :postmodern :bt-semaphore)
+  :depends-on (:quicklisp :fare-memoization :cl-fad :gzip-stream :cl-json :pcall :postmodern :split-sequence)
   :components (
 	       (:file "package")
 	       (:file "ctcl" :depends-on ("package" "utils" "database"))
@@ -18,4 +18,3 @@
 	       (:file "main" :depends-on ("package" "ctcl" "utils" "database"))
 	       (:file "pkgdcl" :depends-on ("package" "ctcl" "utils" "database"))
 	       ))
-
