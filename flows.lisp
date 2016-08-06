@@ -2,7 +2,6 @@
 (ql:quickload :split-sequence)
 (defvar *mytasks* (list))
 
-
 (defparameter flow_tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs starts :endfs :actions :statuss :flow_files))
 
 (defun load-file-flow-values ()
@@ -14,11 +13,6 @@
 	    *files*))
   *h*)
 
-(defun flows-have-we-seen-this-file (file)
-  (let ((them (load-file-flow-values)))
-    (if (gethash (file-namestring file) them)
-  	t
-	nil)))
 
 (defun bench-vpc-flows-report-async (workers path)
   (recreate-flow-tables)
@@ -28,7 +22,7 @@
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (walk-ct path #'async-vf-file)
-    (mapc #'pcall:join *mytasks*)))
+    (ignore-errors (mapc #'pcall:join *mytasks*))))
 
 (defun async-vf-file (x)
   (push (pcall:pexec
@@ -39,10 +33,25 @@
    (format nil "zcat ~A" file)
    :output :string))
 
+(defun get-full-filename (x)
+  (let* ((split (split-sequence:split-sequence #\/ (directory-namestring x)))
+  	 (length (list-length split))
+  	 (dir1 (nth (- length 2) split))
+  	 (dir2 (nth (- length 3) split)))
+    	 (format nil "~A/~A/~A" dir2 dir1 (file-namestring x))))
+
+(defun flows-have-we-seen-this-file (file)
+  (let ((fullname (get-full-filename file))
+	(them (load-file-flow-values)))
+    (if (gethash (get-full-filename file) them)
+  	t
+	nil)))
+
 (defun flow-mark-file-processed (x)
-  (psql-do-query
-   (format nil "insert into flow_files(value) values ('~A')" (file-namestring x)))
-  (setf (gethash (file-namestring x) *h*) t))
+  (let ((fullname (get-full-filename x)))
+    (psql-do-query
+     (format nil "insert into flow_files(value) values ('~A')" fullname))
+    (setf (gethash (file-namestring x) *h*) t)))
 
 (defun process-vf-file (file)
   (format t ".")
