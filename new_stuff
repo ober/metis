@@ -2,3 +2,9 @@ create table conversations(id serial, srcaddr_id int not null, dstaddr_id int no
 create unique index conversations_idx on conversations(srcaddr_id, dstaddr_id, sport_id, dport_id);
 create table ips(id serial, addr inet not null);
 create unique index ips_idx on ips(addr);
+
+
+
+create table conversations(id serial, srcaddr_id int references ips(id),  dstaddr_id int references ips(id), sport_id int references ports(id), dport_id int references ports(id ));
+create table ports(id serial unique, port int unique not null);
+create table ips(id serial unique, addr inet not null);
