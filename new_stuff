@@ -1,0 +1,4 @@
+create table conversations(id serial, srcaddr_id int not null, dstaddr_id int not null, sport_id int not null, dport_id int not null);
+create unique index conversations_idx on conversations(srcaddr_id, dstaddr_id, sport_id, dport_id);
+create table ips(id serial, addr inet not null);
+create unique index ips_idx on ips(addr);
