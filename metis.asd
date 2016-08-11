@@ -15,7 +15,7 @@
 	       (:file "version" :depends-on ("package"))
 	       (:file "bench" :depends-on ("package" "ctcl"))
 	       (:file "database" :depends-on ("package"))
-	       (:file "main" :depends-on ("package" "ctcl" "utils" "database"))
 	       (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))
+	       (:file "main" :depends-on ("package" "ctcl" "utils" "database" "flows"))
 	       (:file "pkgdcl" :depends-on ("package" "ctcl" "utils" "database"))
 	       ))

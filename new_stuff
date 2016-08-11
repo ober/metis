@@ -3,8 +3,16 @@ create unique index conversations_idx on conversations(srcaddr_id, dstaddr_id, s
 create table ips(id serial, addr inet not null);
 create unique index ips_idx on ips(addr);
 
-
-
 create table conversations(id serial unique, srcaddr_id int references ips(id),  dstaddr_id int references ips(id), sport_id int references ports(id), dport_id int references ports(id ));
 create table ports(id serial unique, value int unique not null);
 create table ips(id serial unique, value inet unique not null);
+
+(psql-do-query "create or replace view flow as select event_names.value as event,
+event_times.value as etime,
+source_hosts.value as source,
+user_agents.value as agent,
+user_names.value as name,
+user_keys.value as key
+from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys
+where
+event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;" database)))
