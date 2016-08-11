@@ -43,7 +43,7 @@
 (defun flows-have-we-seen-this-file (file)
   (let ((fullname (get-full-filename file))
 	(them (load-file-flow-values)))
-    (if (gethash (get-full-filename file) them)
+    (if (gethash fullname them)
   	t
 	nil)))
 
@@ -70,7 +70,7 @@
     (if (= 15 length)
 	(destructuring-bind (date version account_id interface_id srcaddr dstaddr srcport dstport protocol packets bytez start end action status)
 	    tokens
-	  (insert-flows date version account_id interface_id srcaddr dstaddr srcport dstport protocol packets bytez start end action status)))))
+	  (insert-flows date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start end action status)))))
 
 
 (defun to-epoch (date)
@@ -80,9 +80,9 @@
 (defun insert-flows( date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let*
       ((date-id (get-id-or-insert-psql "dates" (to-epoch date)))
-       (conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
-       (version-id (get-id-or-insert-psql "versions" version))
-       (account_id-id (get-id-or-insert-psql "account_ids" account_id))
+       ;;(conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
+       ;;(version-id (get-id-or-insert-psql "versions" version))
+       ;;(account_id-id (get-id-or-insert-psql "account_ids" account_id))
        (interface_id-id (get-id-or-insert-psql "interface_ids" interface_id))
        (srcaddr-id (get-id-or-insert-psql "srcaddrs" srcaddr))
        (dstaddr-id (get-id-or-insert-psql "dstaddrs" dstaddr))
@@ -99,26 +99,26 @@
     (psql-do-query
      (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')" date-id interface_id-id srcaddr-id dstaddr-id srcport-id dstport-id protocol-id packets-id bytez-id start-id endf-id action-id status-id))))
 
-(fare-memoization:define-memo-function create-conversation(srcaddr dstaddr srcport dstport)
-  "Create or return the id of the conversation of the passed arguments"
-  (let ((srcaddr-id (get-id-or-insert-psql "ips" srcaddr))
-	(dstaddr-id (get-id-or-insert-psql "ips" dstaddr))
-	(sport-id (get-id-or-insert-psql "ports" sport))
-	(dport-id (get-id-or-insert-psql "ports" dstport)))
+;; (fare-memoization:define-memo-function create-conversation(srcaddr dstaddr srcport dstport)
+;;   "Create or return the id of the conversation of the passed arguments"
+;;   (let ((srcaddr-id (get-id-or-insert-psql "ips" srcaddr))
+;; 	(dstaddr-id (get-id-or-insert-psql "ips" dstaddr))
+;; 	(sport-id (get-id-or-insert-psql "ports" sport))
+;; 	(dport-id (get-id-or-insert-psql "ports" dstport)))
 
-    ;;(psql-do-query (format nil "insert into ~A(value)  select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
-    (psql-do-query (format nil "insert into conversations(srcaddr_id, dstaddr_id, sport_id, dport_id) select '~A' where not exists (select * from conversations where srcaddr_id = '~A' and dstaddr_id = '~A' and sport_id = '~A' and dport_id = '~A')" table value table value))
-    (let ((id
-	   (flatten
-	    (car
-	     (car
-	      (psql-do-query
-	       (format nil "select id from ~A where value = '~A'" table value)))))))
-    ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
-      (if (listp id)
-	  (car id)
-	  id)))
-  )
+;;     ;;(psql-do-query (format nil "insert into ~A(value)  select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
+;;     (psql-do-query (format nil "insert into conversations(srcaddr_id, dstaddr_id, sport_id, dport_id) select '~A' where not exists (select * from conversations where srcaddr_id = '~A' and dstaddr_id = '~A' and sport_id = '~A' and dport_id = '~A')" table value table value))
+;;     (let ((id
+;; 	   (flatten
+;; 	    (car
+;; 	     (car
+;; 	      (psql-do-query
+;; 	       (format nil "select id from ~A where value = '~A'" table value)))))))
+;;     ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
+;;       (if (listp id)
+;; 	  (car id)
+;; 	  id)))
+;;   )
 
 (defun recreate-flow-tables(&optional db)
   (let ((database (or db "metis")))
