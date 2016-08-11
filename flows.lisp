@@ -71,17 +71,22 @@
 	    tokens
 	  (insert-flows date version account_id interface_id srcaddr dstaddr srcport dstport protocol packets bytez start end action status)))))
 
+
+(defun to-epoch (date)
+  (local-time:timestamp-to-unix (local-time:universal-to-timestamp (cl-date-time-parser:PARSE-DATE-TIME date))))
+
+
 (defun insert-flows( date version account_id interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let*
-      (
-       (date-id (get-id-or-insert-psql "dates" date))
-       (version-id (get-id-or-insert-psql "versions" version))
-       (account_id-id (get-id-or-insert-psql "account_ids" account_id))
-       (interface_id-id (get-id-or-insert-psql "interface_ids" interface_id))
-       (srcaddr-id (get-id-or-insert-psql "srcaddrs" srcaddr))
-       (dstaddr-id (get-id-or-insert-psql "dstaddrs" dstaddr))
-       (srcport-id (get-id-or-insert-psql "srcports" srcport))
-       (dstport-id (get-id-or-insert-psql "dstports" dstport))
+      ((date-id (get-id-or-insert-psql "dates" date))
+       (conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
+       ;;(version-id (get-id-or-insert-psql "versions" version))
+       ;;(account_id-id (get-id-or-insert-psql "account_ids" account_id))
+       ;;(interface_id-id (get-id-or-insert-psql "interface_ids" interface_id))
+       ;;(srcaddr-id (get-id-or-insert-psql "srcaddrs" srcaddr))
+       ;;(dstaddr-id (get-id-or-insert-psql "dstaddrs" dstaddr))
+       ;;(srcport-id (get-id-or-insert-psql "srcports" srcport))
+       ;;(dstport-id (get-id-or-insert-psql "dstports" dstport))
        (protocol-id (get-id-or-insert-psql "protocols" protocol))
        (packets-id (get-id-or-insert-psql "packetss" packets))
        (bytez-id (get-id-or-insert-psql "bytezs" bytez))
@@ -91,20 +96,28 @@
        (status-id (get-id-or-insert-psql "statuss" status)))
 
     (psql-do-query
-     (format nil "insert into raw(date, version, account_id, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')"
-	     date-id version-id account_id-id interface_id-id srcaddr-id dstaddr-id srcport-id dstport-id protocol-id packets-id bytez-id start-id endf-id action-id status-id))))
+     (format nil "insert into raw(date, version, account_id, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')" date-id version-id account_id-id interface_id-id srcaddr-id dstaddr-id srcport-id dstport-id protocol-id packets-id bytez-id start-id endf-id action-id status-id))))
 
-(defun create-conversation(srcaddr dstaddr sport dstport)
+(fare-memoization:define-memo-function create-conversation(srcaddr dstaddr srcport dstport)
   "Create or return the id of the conversation of the passed arguments"
-  (psql-do-query "select id from conversations")
+  (let ((srcaddr-id (get-id-or-insert-psql "ips" srcaddr))
+	(dstaddr-id (get-id-or-insert-psql "ips" dstaddr))
+	(sport-id (get-id-or-insert-psql "ports" sport))
+	(dport-id (get-id-or-insert-psql "ports" dstport)))
 
-
-
-
+    ;;(psql-do-query (format nil "insert into ~A(value)  select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
+    (psql-do-query (format nil "insert into conversations(srcaddr_id, dstaddr_id, sport_id, dport_id) select '~A' where not exists (select * from conversations where srcaddr_id = '~A' and dstaddr_id = '~A' and sport_id = '~A' and dport_id = '~A')" table value table value))
+    (let ((id
+	   (flatten
+	    (car
+	     (car
+	      (psql-do-query
+	       (format nil "select id from ~A where value = '~A'" table value)))))))
+    ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
+      (if (listp id)
+	  (car id)
+	  id)))
   )
-
-
-
 
 (defun recreate-flow-tables(&optional db)
   (let ((database (or db "metis")))
