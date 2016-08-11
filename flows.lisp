@@ -1,5 +1,5 @@
 (in-package :metis)
-(ql:quickload :split-sequence :cl-date-time-parser)
+(ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
 
 (defparameter flow_tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow_files))
@@ -18,6 +18,7 @@
   (time (vpc-flows-report-async workers path)))
 
 (defun vpc-flows-report-async (workers path)
+  (format t "vfra: workers:~A path:~A~%" workers path)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (walk-ct path #'async-vf-file)
@@ -76,7 +77,7 @@
   (local-time:timestamp-to-unix (local-time:universal-to-timestamp (cl-date-time-parser:PARSE-DATE-TIME date))))
 
 
-(defun insert-flows( date version account_id interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
+(defun insert-flows( date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let*
       ((date-id (get-id-or-insert-psql "dates" (to-epoch date)))
        (conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
@@ -96,7 +97,7 @@
        (status-id (get-id-or-insert-psql "statuss" status)))
 
     (psql-do-query
-     (format nil "insert into raw(date, version, account_id, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')" date-id version-id account_id-id interface_id-id srcaddr-id dstaddr-id srcport-id dstport-id protocol-id packets-id bytez-id start-id endf-id action-id status-id))))
+     (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')" date-id interface_id-id srcaddr-id dstaddr-id srcport-id dstport-id protocol-id packets-id bytez-id start-id endf-id action-id status-id))))
 
 (fare-memoization:define-memo-function create-conversation(srcaddr dstaddr srcport dstport)
   "Create or return the id of the conversation of the passed arguments"
@@ -132,5 +133,5 @@
     (mapcar
      #'(lambda (x)
 	 (psql-create-table x db)) flow_tables)
-  (psql-do-query "create table if not exists raw(id serial, date integer, version integer, account_id integer, interface_id integer, srcaddr integer, dstaddr integer, srcport integer, dstport integer, protocol integer, packets integer, bytez integer, start integer, endf integer, action integer, status integer)" database)
-  (psql-do-query "create or replace view flows as select dates.value as date, versions.value as version, account_ids.value as account_id, interface_ids.value as interface_id, srcaddrs.value as srcaddr, dstaddrs.value as dstaddr, srcports.value as srcport, dstports.value as dstport, protocols.value as protocol, packetss.value as packets, bytezs.value as bytez, starts.value as start, endfs.value as endf, actions.value as action, statuss.value as status from raw, dates, versions, account_ids, interface_ids, srcaddrs, dstaddrs, srcports, dstports, protocols, packetss, bytezs, starts, endfs, actions, statuss where dates.id = raw.date and versions.id = raw.version and account_ids.id = raw.account_id and interface_ids.id = raw.interface_id and srcaddrs.id = raw.srcaddr and dstaddrs.id = raw.dstaddr and protocols.id = raw.protocol and packetss.id = raw.packets and bytezs.id = raw.bytez and starts.id = raw.start and endfs.id = raw.endf and actions.id = raw.action and statuss.id = raw.status" database)))
+  (psql-do-query "create table if not exists raw(id serial, date integer, interface_id integer, srcaddr integer, dstaddr integer, srcport integer, dstport integer, protocol integer, packets integer, bytez integer, start integer, endf integer, action integer, status integer)" database)
+  (psql-do-query "create or replace view flows as select dates.value as date, interface_ids.value as interface_id, srcaddrs.value as srcaddr, dstaddrs.value as dstaddr, srcports.value as srcport, dstports.value as dstport, protocols.value as protocol, packetss.value as packets, bytezs.value as bytez, starts.value as start, endfs.value as endf, actions.value as action, statuss.value as status from raw, dates, interface_ids, srcaddrs, dstaddrs, srcports, dstports, protocols, packetss, bytezs, starts, endfs, actions, statuss where dates.id = raw.date and interface_ids.id = raw.interface_id and srcaddrs.id = raw.srcaddr and dstaddrs.id = raw.dstaddr and protocols.id = raw.protocol and packetss.id = raw.packets and bytezs.id = raw.bytez and starts.id = raw.start and endfs.id = raw.endf and actions.id = raw.action and statuss.id = raw.status" database)))
