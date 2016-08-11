@@ -5,6 +5,6 @@ create unique index ips_idx on ips(addr);
 
 
 
-create table conversations(id serial, srcaddr_id int references ips(id),  dstaddr_id int references ips(id), sport_id int references ports(id), dport_id int references ports(id ));
-create table ports(id serial unique, port int unique not null);
-create table ips(id serial unique, addr inet not null);
+create table conversations(id serial unique, srcaddr_id int references ips(id),  dstaddr_id int references ips(id), sport_id int references ports(id), dport_id int references ports(id ));
+create table ports(id serial unique, value int unique not null);
+create table ips(id serial unique, value inet unique not null);
