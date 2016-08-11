@@ -2,7 +2,7 @@
 (ql:quickload :split-sequence)
 (defvar *mytasks* (list))
 
-(defparameter flow_tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs starts :endfs :actions :statuss :flow_files))
+(defparameter flow_tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow_files))
 
 (defun load-file-flow-values ()
   (unless *files*
@@ -12,7 +12,6 @@
 		(setf (gethash (car x) *h*) t))
 	    *files*))
   *h*)
-
 
 (defun bench-vpc-flows-report-async (workers path)
   (recreate-flow-tables)
@@ -94,6 +93,17 @@
     (psql-do-query
      (format nil "insert into raw(date, version, account_id, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')"
 	     date-id version-id account_id-id interface_id-id srcaddr-id dstaddr-id srcport-id dstport-id protocol-id packets-id bytez-id start-id endf-id action-id status-id))))
+
+(defun create-conversation(srcaddr dstaddr sport dstport)
+  "Create or return the id of the conversation of the passed arguments"
+  (psql-do-query "select id from conversations")
+
+
+
+
+  )
+
+
 
 
 (defun recreate-flow-tables(&optional db)
