@@ -23,7 +23,7 @@
    (format nil "insert into files(value) values ('~A')" (file-namestring x))))
 
 (defun psql-do-query (query &optional db)
-  (let ((database (or *DB* db "metis"))
+  (let ((database (or db "metis"))
 	(user-name "metis")
 	(password "metis")
 	(host "localhost"))
@@ -73,7 +73,8 @@
 
 ;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
-  (psql-do-query (format nil "insert into ~A(value)  select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
+  (setf *print-circle* nil)
+  (psql-do-query (format nil "insert into ~A(value) select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
   (let ((id
 	 (flatten
 	  (car
