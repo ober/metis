@@ -45,7 +45,7 @@
   (cond
       ((equal "a" verb)(time (cloudtrail-report-async workers dir)))
       ((equal "v" verb)(time (vpc-flows-report-async workers dir)))
-      ((equal "b" verb)(time (bench-vpc-flows-report-async workers dir)))
+      ((equal "b" verb)(time (metis::bench-vpc-flows-report-async workers dir)))
       ((equal "s" verb)(time (cloudtrail-report-sync dir)))
       ((equal "r" verb)(time (run-bench)))
       (t (format t "Usage <~A> <p or s> <directory of logs>" app))))

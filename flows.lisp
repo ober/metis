@@ -16,7 +16,9 @@
 
 (defun bench-vpc-flows-report-async (workers path)
   (recreate-flow-tables)
-  (let ((btime (get-internal-real-time)))
+  (defvar benching t)
+  (let ((btime (get-internal-real-time))
+	(benching t))
     #+sbcl
     (progn
       (sb-sprof:with-profiling (:report :flat) (vpc-flows-report-async workers path)))
@@ -37,7 +39,6 @@
      ;;(let ((rps (/ (float rows) (float delta))))
       ;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
       (format t "~%delta~A rows:~A files:~A" delta (caar rows) (caar files)))))
-	;;	(format t "~%rps:~A rows:~A delta:~A" rps num delta))))))
 
 
 (defun vpc-flows-report-async (workers path)
@@ -53,8 +54,8 @@
 	       (format t "~%here:~A" (type-of x))
 	       (pcall:join x))
 	     (format t "~%not ~A" (type-of x))
-	 ))
-       *mytasks*)))
+	     ))
+     *mytasks*)))
 
 (defun async-vf-file (x)
   (push (pcall:pexec
@@ -110,32 +111,44 @@
 	    tokens
 	  (insert-flows date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start end action status)))))
 
-
 (defun to-epoch (date)
   (local-time:timestamp-to-unix (local-time:universal-to-timestamp (cl-date-time-parser:parse-date-time date))))
 
 
 (defun insert-flows( date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
-  (let*
-      ((date-id (get-index-value "dates" (to-epoch date)))
-       ;;(conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
-       ;;(version-id (get-index-value "versions" version))
-       ;;(account_id-id (get-index-value "account_ids" account_id))
-       (interface_id-id (get-index-value "interface_ids" interface_id))
-       (srcaddr-id (get-index-value "srcaddrs" srcaddr))
-       (dstaddr-id (get-index-value "dstaddrs" dstaddr))
-       (srcport-id (get-index-value "srcports" srcport))
-       (dstport-id (get-index-value "dstports" dstport))
-       (protocol-id (get-index-value "protocols" protocol))
-       (packets-id (get-index-value "packetss" packets))
-       (bytez-id (get-index-value "bytezs" bytez))
-       (start-id (get-index-value "starts" start))
-       (endf-id (get-index-value "endfs" endf))
-       (action-id (get-index-value "actions" action))
-       (status-id (get-index-value "statuss" status)))
-    ;;))
-    (psql-do-query
-     (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')" date-id interface_id-id srcaddr-id dstaddr-id srcport-id dstport-id protocol-id packets-id bytez-id start-id endf-id action-id status-id))))
+  (unless (boundp 'benching)
+    (let*
+	((date-id (get-index-value "dates" (to-epoch date)))
+	 ;;(conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
+	 ;;(version-id (get-index-value "versions" version))
+	 ;;(account_id-id (get-index-value "account_ids" account_id))
+	 (interface_id-id (get-index-value "interface_ids" interface_id))
+	 (srcaddr-id (get-index-value "srcaddrs" srcaddr))
+	 (dstaddr-id (get-index-value "dstaddrs" dstaddr))
+	 (srcport-id (get-index-value "srcports" srcport))
+	 (dstport-id (get-index-value "dstports" dstport))
+	 (protocol-id (get-index-value "protocols" protocol))
+	 (packets-id (get-index-value "packetss" packets))
+	 (bytez-id (get-index-value "bytezs" bytez))
+	 (start-id (get-index-value "starts" start))
+	 (endf-id (get-index-value "endfs" endf))
+	 (action-id (get-index-value "actions" action))
+	 (status-id (get-index-value "statuss" status)))
+      (psql-do-query
+       (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')"
+	       date-id
+	       interface_id-id
+	       srcaddr-id
+	       dstaddr-id
+	       srcport-id
+	       dstport-id
+	       protocol-id
+	       packets-id
+	       bytez-id
+	       start-id
+	       endf-id
+	       action-id
+	       status-id)))))
 
 ;; (fare-memoization:define-memo-function create-conversation(srcaddr dstaddr srcport dstport)
 ;;   "Create or return the id of the conversation of the passed arguments"
