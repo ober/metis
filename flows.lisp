@@ -64,7 +64,6 @@
     (setf (gethash (file-namestring x) *h*) t)))
 
 (defun process-vf-file (file)
-  (format t "~A~%" file)
   (when (equal (pathname-type file) "gz")
     (unless (flows-have-we-seen-this-file file)
       (format t "+")
