@@ -13,19 +13,48 @@
 	    *files*))
   *h*)
 
+
 (defun bench-vpc-flows-report-async (workers path)
   (recreate-flow-tables)
-  (time (vpc-flows-report-async workers path)))
+  (let ((btime (get-internal-real-time)))
+    #+sbcl
+    (progn
+      (sb-sprof:with-profiling (:report :flat) (vpc-flows-report-async workers path)))
+    #+lispworks
+    (progn
+      (hcl:set-up-profiler :package '(metis))
+      (hcl:profile (vpc-flows-report-async workers path)))
+    #+allegro
+    (progn
+      (prof::with-profiling (:type :space) (vpc-flows-report-async workers path))
+      (prof::show-flat-profile))
+    #+(or clozure abcl ecl) (time (vpc-flows-report-async workers path))
+    (let* ((etime (get-internal-real-time))
+	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
+	   (files (psql-do-query "select count(*) from flow_files"))
+	   (rows (psql-do-query "select count(*) from raw")))
+;;      (if (and delta rows)
+     ;;(let ((rps (/ (float rows) (float delta))))
+      ;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
+      (format t "~%delta~A rows:~A files:~A" delta (caar rows) (caar files)))))
+	;;	(format t "~%rps:~A rows:~A delta:~A" rps num delta))))))
+
 
 (defun vpc-flows-report-async (workers path)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (walk-ct path #'async-vf-file)
-    ;;    (ignore-errors
-      (mapc #'pcall:join *mytasks*)
-      ;;)
-    )
-  )
+    ;;        (ignore-errors
+    ;;(mapc #'pcall:join *mytasks*)))
+    (mapc
+     #'(lambda (x)
+	 (if (typep x 'pcall::task)
+	     (progn
+	       (format t "~%here:~A" (type-of x))
+	       (pcall:join x))
+	     (format t "~%not ~A" (type-of x))
+	 ))
+       *mytasks*)))
 
 (defun async-vf-file (x)
   (push (pcall:pexec
@@ -88,22 +117,22 @@
 
 (defun insert-flows( date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let*
-      ((date-id (get-id-or-insert-psql "dates" (to-epoch date)))
+      ((date-id (get-index-value "dates" (to-epoch date)))
        ;;(conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
-       ;;(version-id (get-id-or-insert-psql "versions" version))
-       ;;(account_id-id (get-id-or-insert-psql "account_ids" account_id))
-       (interface_id-id (get-id-or-insert-psql "interface_ids" interface_id))
-       (srcaddr-id (get-id-or-insert-psql "srcaddrs" srcaddr))
-       (dstaddr-id (get-id-or-insert-psql "dstaddrs" dstaddr))
-       (srcport-id (get-id-or-insert-psql "srcports" srcport))
-       (dstport-id (get-id-or-insert-psql "dstports" dstport))
-       (protocol-id (get-id-or-insert-psql "protocols" protocol))
-       (packets-id (get-id-or-insert-psql "packetss" packets))
-       (bytez-id (get-id-or-insert-psql "bytezs" bytez))
-       (start-id (get-id-or-insert-psql "starts" start))
-       (endf-id (get-id-or-insert-psql "endfs" endf))
-       (action-id (get-id-or-insert-psql "actions" action))
-       (status-id (get-id-or-insert-psql "statuss" status)))
+       ;;(version-id (get-index-value "versions" version))
+       ;;(account_id-id (get-index-value "account_ids" account_id))
+       (interface_id-id (get-index-value "interface_ids" interface_id))
+       (srcaddr-id (get-index-value "srcaddrs" srcaddr))
+       (dstaddr-id (get-index-value "dstaddrs" dstaddr))
+       (srcport-id (get-index-value "srcports" srcport))
+       (dstport-id (get-index-value "dstports" dstport))
+       (protocol-id (get-index-value "protocols" protocol))
+       (packets-id (get-index-value "packetss" packets))
+       (bytez-id (get-index-value "bytezs" bytez))
+       (start-id (get-index-value "starts" start))
+       (endf-id (get-index-value "endfs" endf))
+       (action-id (get-index-value "actions" action))
+       (status-id (get-index-value "statuss" status)))
     ;;))
     (psql-do-query
      (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')" date-id interface_id-id srcaddr-id dstaddr-id srcport-id dstport-id protocol-id packets-id bytez-id start-id endf-id action-id status-id))))

@@ -86,6 +86,12 @@
 	(car id)
 	id)))
 
+(defun get-index-value (table value)
+  (let ((one (ignore-errors (get-id-or-insert-psql table value))))
+    (unless (typep one 'integer)
+      (setf one (get-id-or-insert-psql table value)))
+    one))
+
 (defun normalize-insert (event-time user-name user-key event-name user-agent source-host)
   (let*
       ((event-time-id (get-id-or-insert-psql "event_times" event-time))
