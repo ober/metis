@@ -7,7 +7,7 @@
 (defun load-file-flow-values ()
   (unless *files*
     (setf *files*
-	  (psql-do-query "select value from flow_files" *DB*))
+	  (psql-do-query "select value from flow_files"))
     (mapcar #'(lambda (x)
 		(setf (gethash (car x) *h*) t))
 	    *files*))
@@ -18,11 +18,14 @@
   (time (vpc-flows-report-async workers path)))
 
 (defun vpc-flows-report-async (workers path)
-  (format t "vfra: workers:~A path:~A~%" workers path)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (walk-ct path #'async-vf-file)
-    (ignore-errors (mapc #'pcall:join *mytasks*))))
+    ;;    (ignore-errors
+      (mapc #'pcall:join *mytasks*)
+      ;;)
+    )
+  )
 
 (defun async-vf-file (x)
   (push (pcall:pexec
@@ -47,6 +50,13 @@
   	t
 	nil)))
 
+(defun flows-get-hash (hash file)
+  (let ((fullname (get-full-filename file))
+	(them (load-file-flow-values)))
+    (if (gethash fullname them)
+  	t
+	nil)))
+
 (defun flow-mark-file-processed (x)
   (let ((fullname (get-full-filename x)))
     (psql-do-query
@@ -54,7 +64,7 @@
     (setf (gethash (file-namestring x) *h*) t)))
 
 (defun process-vf-file (file)
-  (format t ".")
+  (format t "~A~%" file)
   (when (equal (pathname-type file) "gz")
     (unless (flows-have-we-seen-this-file file)
       (format t "+")
@@ -74,7 +84,7 @@
 
 
 (defun to-epoch (date)
-  (local-time:timestamp-to-unix (local-time:universal-to-timestamp (cl-date-time-parser:PARSE-DATE-TIME date))))
+  (local-time:timestamp-to-unix (local-time:universal-to-timestamp (cl-date-time-parser:parse-date-time date))))
 
 
 (defun insert-flows( date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
@@ -95,7 +105,7 @@
        (endf-id (get-id-or-insert-psql "endfs" endf))
        (action-id (get-id-or-insert-psql "actions" action))
        (status-id (get-id-or-insert-psql "statuss" status)))
-
+    ;;))
     (psql-do-query
      (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')" date-id interface_id-id srcaddr-id dstaddr-id srcport-id dstport-id protocol-id packets-id bytez-id start-id endf-id action-id status-id))))
 
