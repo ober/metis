@@ -16,3 +16,14 @@ user_keys.value as key
 from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys
 where
 event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;" database)))
+
+
+
+
+endpoint table
+unique index on host and port
+host fk -> port fk
+create table endpoints(id serial unique, host int references ips(id),  port int references ports(id));
+create unique index endpoints_idx on endpoints(host,port);
+
+conversation(id serial unique,
