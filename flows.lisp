@@ -30,7 +30,7 @@
 	    (db.ac::open-file-database "flow-db" :if-does-not-exist :create :if-exists :supersede)
 	    )
 
-(defparameter flow_tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow_files))
+(defparameter flow_tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow_files :ips :ports))
 
 (defun load-file-flow-values ()
   (unless *files*
@@ -220,8 +220,8 @@
     (mapcar
      #'(lambda (x)
 	 (psql-drop-table x database)) flow_tables)
-    (psql-do-query "drop table if exists raw" database)
-    (psql-do-query "drop table if exists endpoints" database)
+    (psql-do-query "drop table if exists raw cascade" database)
+    (psql-do-query "drop table if exists endpoints cascade" database)
     (create-flow-tables)))
 
 (defun create-flow-tables (&optional db)
