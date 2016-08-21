@@ -1,6 +1,34 @@
 (in-package :metis)
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
+#+allegro (progn
+	    (defclass flow ()
+	      ((date :initarg :date :reader date :index :any-unique)
+	       (version :initarg :version :reader version)
+	       (account_id :initarg :account_id :reader account_id)
+	       (interface_id :initarg :interface_id :reader interface_id)
+	       (srcaddr :initarg :srcaddr :reader srcaddr)
+	       (dstaddr :initarg :dstaddr :reader dstaddr)
+	       (srcport :initarg :srcport :reader srcport :index :any)
+	       (dstport :initarg :dstport :reader dstport)
+	       (protocol :initarg :protocol :reader protocol)
+	       (packets :initarg :packets :reader packets)
+	       (bytez :initarg :bytez :reader bytez)
+	       (start :initarg :start :reader start)
+	       (endf :initarg :endf :reader endf)
+	       (action :initarg :action :reader action)
+	       (status :initarg :status :reader status))
+	       (:metaclass persistent-class))
+
+	    (defclass flow_files ()
+	      ((file :initarg nil :reader file :index :any-unique))
+	       (:metaclass persistent-class))
+
+	    (defmethod print-object ((flow flow) stream)
+	      (format stream "#<flow ~s srcport ~s>" (date flow) (srcport flow)))
+
+	    (db.ac::open-file-database "flow-db" :if-does-not-exist :create :if-exists :supersede)
+	    )
 
 (defparameter flow_tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow_files))
 
@@ -16,7 +44,7 @@
 
 (defun bench-vpc-flows-report-async (workers path)
   (recreate-flow-tables)
-  (defvar benching t)
+  ;;(defvar benching t)
   (let ((btime (get-internal-real-time))
 	(benching t))
     #+sbcl
@@ -74,11 +102,16 @@
     	 (format nil "~A/~A/~A" dir2 dir1 (file-namestring x))))
 
 (defun flows-have-we-seen-this-file (file)
-  (let ((fullname (get-full-filename file))
-	(them (load-file-flow-values)))
-    (if (gethash fullname them)
-  	t
-	nil)))
+  #+allegro (progn
+	      (if (retrieve-from-index 'flow_files 'file file)
+		  t
+		  nil))
+  #-allegro (progn
+	      (let ((fullname (get-full-filename file))
+		    (them (load-file-flow-values)))
+		(if (gethash fullname them)
+		    t
+		    nil))))
 
 (defun flows-get-hash (hash file)
   (let ((fullname (get-full-filename file))
@@ -88,10 +121,14 @@
 	nil)))
 
 (defun flow-mark-file-processed (x)
-  (let ((fullname (get-full-filename x)))
-    (psql-do-query
-     (format nil "insert into flow_files(value) values ('~A')" fullname))
-    (setf (gethash (file-namestring x) *h*) t)))
+  #+allegro (progn
+	      (make-instance 'flow_files :file (format nil "~A" x))
+	      )
+  #-allegro (progn
+	      (let ((fullname (get-full-filename x)))
+		(psql-do-query
+		 (format nil "insert into flow_files(value) values ('~A')" fullname))
+		(setf (gethash (file-namestring x) *h*) t))))
 
 (defun process-vf-file (file)
   (when (equal (pathname-type file) "gz")
@@ -116,39 +153,46 @@
 
 
 (defun insert-flows( date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
-  (unless (boundp 'benching)
-    (let*
-	((date-id (get-index-value "dates" (to-epoch date)))
-	 ;;(conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
-	 ;;(version-id (get-index-value "versions" version))
-	 ;;(account_id-id (get-index-value "account_ids" account_id))
-	 (interface_id-id (get-index-value "interface_ids" interface_id))
-	 (srcaddr-id (get-index-value "srcaddrs" srcaddr))
-	 (dstaddr-id (get-index-value "dstaddrs" dstaddr))
-	 (srcport-id (get-index-value "srcports" srcport))
-	 (dstport-id (get-index-value "dstports" dstport))
-	 (protocol-id (get-index-value "protocols" protocol))
-	 (packets-id (get-index-value "packetss" packets))
-	 (bytez-id (get-index-value "bytezs" bytez))
-	 (start-id (get-index-value "starts" start))
-	 (endf-id (get-index-value "endfs" endf))
-	 (action-id (get-index-value "actions" action))
-	 (status-id (get-index-value "statuss" status)))
-      (psql-do-query
-       (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')"
-	       date-id
-	       interface_id-id
-	       srcaddr-id
-	       dstaddr-id
-	       srcport-id
-	       dstport-id
-	       protocol-id
-	       packets-id
-	       bytez-id
-	       start-id
-	       endf-id
-	       action-id
-	       status-id)))))
+  #+allegro
+  (progn
+    (make-instance 'flow date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
+    )
+
+  #-allegro
+  (progn
+    (unless (boundp 'benching)
+      (let*
+	  ((date-id (get-index-value "dates" (to-epoch date)))
+	   ;;(conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
+	   ;;(version-id (get-index-value "versions" version))
+	   ;;(account_id-id (get-index-value "account_ids" account_id))
+	   (interface_id-id (get-index-value "interface_ids" interface_id))
+	   (srcaddr-id (get-index-value "srcaddrs" srcaddr))
+	   (dstaddr-id (get-index-value "dstaddrs" dstaddr))
+	   (srcport-id (get-index-value "srcports" srcport))
+	   (dstport-id (get-index-value "dstports" dstport))
+	   (protocol-id (get-index-value "protocols" protocol))
+	   (packets-id (get-index-value "packetss" packets))
+	   (bytez-id (get-index-value "bytezs" bytez))
+	   (start-id (get-index-value "starts" start))
+	   (endf-id (get-index-value "endfs" endf))
+	   (action-id (get-index-value "actions" action))
+	   (status-id (get-index-value "statuss" status)))
+	(psql-do-query
+	 (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')"
+		 date-id
+		 interface_id-id
+		 srcaddr-id
+		 dstaddr-id
+		 srcport-id
+		 dstport-id
+		 protocol-id
+		 packets-id
+		 bytez-id
+		 start-id
+		 endf-id
+		 action-id
+		 status-id))))))
 
 ;; (fare-memoization:define-memo-function create-conversation(srcaddr dstaddr srcport dstport)
 ;;   "Create or return the id of the conversation of the passed arguments"
@@ -177,6 +221,7 @@
      #'(lambda (x)
 	 (psql-drop-table x database)) flow_tables)
     (psql-do-query "drop table if exists raw" database)
+    (psql-do-query "drop table if exists endpoints" database)
     (create-flow-tables)))
 
 (defun create-flow-tables (&optional db)
