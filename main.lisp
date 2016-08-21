@@ -39,6 +39,7 @@
 
 #+allegro
 (defun main (app verb workers dir)
+  #+allegro (db.ac:open-network-database "localhost" 2222)
   ;;(let ((args '(verb workers dir)))
   ;;(metis::main)))
   (format t "Got: app:~A verb:~A workers:~A dir:~A~%" app verb workers dir)
@@ -47,6 +48,7 @@
       ((equal "v" verb)(time (metis::vpc-flows-report-async workers dir)))
       ((equal "b" verb)(time (metis::bench-vpc-flows-report-async workers dir)))
       ((equal "s" verb)(time (cloudtrail-report-sync dir)))
+      ((equal "f" verb)(time (metis::find-by-field workers dir)))
       ((equal "r" verb)(time (run-bench)))
       (t (format t "Usage <~A> <p or s> <directory of logs>" app))))
 ;;(cl-store:store *q* "~/q.store"))

@@ -5,13 +5,12 @@
 #+allegro (progn
 	    (defclass conversation ()
 	      ((name :initarg :name :reader name :index :any-unique))
-	      (:metaclass persistent-class))
-
+	      (:metaclass db.ac:persistent-class))
 
 	    (defclass flow ()
-	      ((date :initarg :date :reader date :index)
-	       (version :initarg :version )
-	       (account_id :initarg :account_id)
+	      ((date :initarg :date :index)
+	       (version :initarg version )
+	       (account_id :initarg account_id)
 	       (interface_id :initarg :interface_id :index)
 	       (srcaddr :initarg :srcaddr :index)
 	       (dstaddr :initarg :dstaddr :index)
@@ -24,18 +23,17 @@
 	       (endf :initarg :endf)
 	       (action :initarg :action)
 	       (status :initarg :status))
-	       (:metaclass persistent-class))
+	      (:metaclass db.ac:persistent-class))
 
 	    (defclass flow_files ()
 	      ((name :initarg :name :index :any-unique))
-	       (:metaclass persistent-class))
+	      (:metaclass db.ac:persistent-class)))
 
-	    ;; (defmethod print-object ((flow flow) stream)
-	    ;;   (format stream "#<flow ~s srcport ~s>" (date flow) (srcport flow)))
-
-	    )
+;; (defmethod print-object ((flow flow) stream)
+;;   (format stream "#<date:~s srcaddr:~s dstaddr:~s srcport:~s dstport:~s>" flow-date flow-srcaddr flow-dstaddr flow-srcport flow-dstport)))
 
 (defparameter flow_tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow_files :ips :ports))
+
 
 (defun load-file-flow-values ()
   (unless *files*
@@ -69,13 +67,14 @@
 	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
 	   (files (psql-do-query "select count(*) from flow_files"))
 	   (rows (psql-do-query "select count(*) from raw")))
-;;      (if (and delta rows)
-     ;;(let ((rps (/ (float rows) (float delta))))
+      ;;      (if (and delta rows)
+      ;;(let ((rps (/ (float rows) (float delta))))
       ;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
       (format t "~%delta~A rows:~A files:~A" delta (caar rows) (caar files)))))
 
 (defun vpc-flows-report-async (workers path)
-  #+allegro (db.ac::open-file-database "flow-db" :if-does-not-exist :create :if-exists :supersede)
+  ;;  #+allegro (db.ac::open-file-database "flow-db" :if-does-not-exist :create :if-exists :supersede)
+  #+allegro (db.ac:open-network-database "localhost" 2222)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (walk-ct path #'async-vf-file)
@@ -90,7 +89,10 @@
 	     (format t "~%not ~A" (type-of x))
 	     ))
      *mytasks*))
-  #+allegro (db.ac:close-database)
+  #+allegro (progn
+	      (db.ac:commit)
+	      (db.ac:close-database))
+
   )
 
 (defun async-vf-file (x)
@@ -104,12 +106,18 @@
 
 (defun get-full-filename (x)
   (let* ((split (split-sequence:split-sequence #\/ (directory-namestring x)))
-  	 (length (list-length split))
-  	 (dir1 (nth (- length 2) split))
-  	 (dir2 (nth (- length 3) split)))
-    	 (format nil "~A/~A/~A" dir2 dir1 (file-namestring x))))
+	 (length (list-length split))
+	 (dir1 (nth (- length 2) split))
+	 (dir2 (nth (- length 3) split)))
+    (format nil "~A/~A/~A" dir2 dir1 (file-namestring x))))
+
+(defun find-by-field (class field value)
+  (format t "~A" (retrieve-from-index 'flow_files 'name value)))
+
+;;  (format t "fuck: ~A~%" (flows-have-we-seen-this-file file)))
 
 (defun flows-have-we-seen-this-file (file)
+  (format t "seen? ~A~%" file)
   #+allegro (progn
 	      (if (retrieve-from-index 'flow_files 'name (format nil "~A" file))
 		  t
@@ -125,11 +133,12 @@
   (let ((fullname (get-full-filename file))
 	(them (load-file-flow-values)))
     (if (gethash fullname them)
-  	t
+	t
 	nil)))
 
 (defun flow-mark-file-processed (x)
   #+allegro (progn
+	      (format t "mark-file: ~A" x)
 	      (make-instance 'flow_files :name (format nil "~A" x))
 	      )
   #-allegro (progn
@@ -138,16 +147,30 @@
 		 (format nil "insert into flow_files(value) values ('~A')" fullname))
 		(setf (gethash (file-namestring x) *h*) t))))
 
+;; (defun process-vf-file (file)
+;;   (when (equal (pathname-type file) "gz")
+;;     (unless (flows-have-we-seen-this-file file)
+;;       (format t "+")
+;;       #+allegro (db.ac:commit)
+;;       (flow-mark-file-processed file)
+;;       (mapcar #'process-vf-line
+;; 	      (split-sequence:split-sequence
+;; 	       #\linefeed
+;; 	       (uiop:run-program (format nil "zcat ~A" file) :output :string))))))
+
 (defun process-vf-file (file)
+
   (when (equal (pathname-type file) "gz")
     (unless (flows-have-we-seen-this-file file)
       (format t "+")
-      #+allegro (db.ac:commit)
+
       (flow-mark-file-processed file)
-      (mapcar #'process-vf-line
-	      (split-sequence:split-sequence
-	       #\linefeed
-	       (uiop:run-program (format nil "zcat ~A" file) :output :string))))))
+      (gzip-stream:with-open-gzip-file (in file)
+	(loop
+	   for line = (read-line in nil nil)
+	   while line
+	   collect (process-vf-line line)))))
+  #+allegro (db.ac:commit))
 
 (defun process-vf-line (line)
   (let* ((tokens (split-sequence:split-sequence #\Space line))
