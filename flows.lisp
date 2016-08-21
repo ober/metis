@@ -72,9 +72,7 @@
 ;;      (if (and delta rows)
      ;;(let ((rps (/ (float rows) (float delta))))
       ;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
-      (format t "~%delta~A rows:~A files:~A" delta (caar rows) (caar files))))
-  #+allegro (db.ac:close-database)
-  )
+      (format t "~%delta~A rows:~A files:~A" delta (caar rows) (caar files)))))
 
 (defun vpc-flows-report-async (workers path)
   #+allegro (db.ac::open-file-database "flow-db" :if-does-not-exist :create :if-exists :supersede)
@@ -91,7 +89,9 @@
 	       (pcall:join x))
 	     (format t "~%not ~A" (type-of x))
 	     ))
-     *mytasks*)))
+     *mytasks*))
+  #+allegro (db.ac:close-database)
+  )
 
 (defun async-vf-file (x)
   (push (pcall:pexec
