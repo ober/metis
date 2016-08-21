@@ -49,10 +49,6 @@
 
 (defun bench-vpc-flows-report-async (workers path)
   (recreate-flow-tables)
-  #+allegro
-  (progn
-    (db.ac::open-file-database "flow-db" :if-does-not-exist :create :if-exists :supersede))
-
 
   ;;(defvar benching t)
   (let ((btime (get-internal-real-time))
@@ -81,6 +77,7 @@
   )
 
 (defun vpc-flows-report-async (workers path)
+  #+allegro (db.ac::open-file-database "flow-db" :if-does-not-exist :create :if-exists :supersede)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (walk-ct path #'async-vf-file)
