@@ -1,33 +1,38 @@
 (in-package :metis)
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
+
 #+allegro (progn
+	    (defclass conversation ()
+	      ((name :initarg :name :reader name :index :any-unique))
+	      (:metaclass persistent-class))
+
+
 	    (defclass flow ()
-	      ((date :initarg :date :reader date :index :any-unique)
-	       (version :initarg :version :reader version)
-	       (account_id :initarg :account_id :reader account_id)
-	       (interface_id :initarg :interface_id :reader interface_id)
-	       (srcaddr :initarg :srcaddr :reader srcaddr)
-	       (dstaddr :initarg :dstaddr :reader dstaddr)
-	       (srcport :initarg :srcport :reader srcport :index :any)
-	       (dstport :initarg :dstport :reader dstport)
-	       (protocol :initarg :protocol :reader protocol)
-	       (packets :initarg :packets :reader packets)
-	       (bytez :initarg :bytez :reader bytez)
-	       (start :initarg :start :reader start)
-	       (endf :initarg :endf :reader endf)
-	       (action :initarg :action :reader action)
-	       (status :initarg :status :reader status))
+	      ((date :initarg :date :reader date :index)
+	       (version :initarg :version )
+	       (account_id :initarg :account_id)
+	       (interface_id :initarg :interface_id :index)
+	       (srcaddr :initarg :srcaddr :index)
+	       (dstaddr :initarg :dstaddr :index)
+	       (srcport :initarg :srcport :index)
+	       (dstport :initarg :dstport :index)
+	       (protocol :initarg :protocol)
+	       (packets :initarg :packets)
+	       (bytez :initarg :bytez)
+	       (start :initarg :start)
+	       (endf :initarg :endf)
+	       (action :initarg :action)
+	       (status :initarg :status))
 	       (:metaclass persistent-class))
 
 	    (defclass flow_files ()
-	      ((file :initarg nil :reader file :index :any-unique))
+	      ((name :initarg :name :index :any-unique))
 	       (:metaclass persistent-class))
 
-	    (defmethod print-object ((flow flow) stream)
-	      (format stream "#<flow ~s srcport ~s>" (date flow) (srcport flow)))
+	    ;; (defmethod print-object ((flow flow) stream)
+	    ;;   (format stream "#<flow ~s srcport ~s>" (date flow) (srcport flow)))
 
-	    (db.ac::open-file-database "flow-db" :if-does-not-exist :create :if-exists :supersede)
 	    )
 
 (defparameter flow_tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow_files :ips :ports))
@@ -44,6 +49,11 @@
 
 (defun bench-vpc-flows-report-async (workers path)
   (recreate-flow-tables)
+  #+allegro
+  (progn
+    (db.ac::open-file-database "flow-db" :if-does-not-exist :create :if-exists :supersede))
+
+
   ;;(defvar benching t)
   (let ((btime (get-internal-real-time))
 	(benching t))
@@ -66,8 +76,9 @@
 ;;      (if (and delta rows)
      ;;(let ((rps (/ (float rows) (float delta))))
       ;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
-      (format t "~%delta~A rows:~A files:~A" delta (caar rows) (caar files)))))
-
+      (format t "~%delta~A rows:~A files:~A" delta (caar rows) (caar files))))
+  #+allegro (db.ac:close-database)
+  )
 
 (defun vpc-flows-report-async (workers path)
   (let ((workers (parse-integer workers)))
@@ -103,7 +114,7 @@
 
 (defun flows-have-we-seen-this-file (file)
   #+allegro (progn
-	      (if (retrieve-from-index 'flow_files 'file file)
+	      (if (retrieve-from-index 'flow_files 'name (format nil "~A" file))
 		  t
 		  nil))
   #-allegro (progn
@@ -122,7 +133,7 @@
 
 (defun flow-mark-file-processed (x)
   #+allegro (progn
-	      (make-instance 'flow_files :file (format nil "~A" x))
+	      (make-instance 'flow_files :name (format nil "~A" x))
 	      )
   #-allegro (progn
 	      (let ((fullname (get-full-filename x)))
@@ -134,6 +145,7 @@
   (when (equal (pathname-type file) "gz")
     (unless (flows-have-we-seen-this-file file)
       (format t "+")
+      #+allegro (db.ac:commit)
       (flow-mark-file-processed file)
       (mapcar #'process-vf-line
 	      (split-sequence:split-sequence
@@ -155,7 +167,7 @@
 (defun insert-flows( date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   #+allegro
   (progn
-    (make-instance 'flow date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
+    (make-instance 'flow :date date :interface_id interface_id :srcaddr srcaddr :dstaddr dstaddr :srcport srcport :dstport dstport :protocol protocol :packets packets :bytez bytez :start start :endf endf :action action :status status)
     )
 
   #-allegro
