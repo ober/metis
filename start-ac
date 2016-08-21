@@ -1,0 +1,1 @@
+echo '(ql:quickload :metis)(require :acache "acache-3.0.6.fasl")(db.ac:start-server "/home/jaimef/ac" 2222 :if-does-not-exist :create :if-exists :supersede)'|allegro
