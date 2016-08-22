@@ -38,7 +38,7 @@
 (in-package :cl-user)
 
 #+allegro
-(defun main (app verb a b c d)
+(defun main (app verb a &optional b c d)
   #+allegro (db.ac:open-network-database "localhost" 2222)
   ;;(let ((args '(verb workers dir)))
   ;;(metis::main)))
