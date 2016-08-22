@@ -110,9 +110,12 @@
 	 (dir2 (nth (- length 3) split)))
     (format nil "~A/~A/~A" dir2 dir1 (file-namestring x))))
 
-(defun find-by-field (class field value)
-  ;;(describe #'date))
-  (format t "xxx: date:~A ~%" (retrieve-from-index 'flow 'srcport "53")))
+(defmacro find-by-field (class field value)
+  `(let ((myclass (intern (string-upcase class)))
+	(myfield (intern field)))
+    (mapcar #'(lambda (x)
+		(format t "xxx: ~A ~%" x))
+	    (retrieve-from-index 'metis::flow (quote ,field) "53" :all t))))
 
 (defun flows-have-we-seen-this-file (file)
   (format t "seen? ~A~%" file)
