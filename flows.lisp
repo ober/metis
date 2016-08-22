@@ -8,14 +8,14 @@
 	      (:metaclass db.ac:persistent-class))
 
 	    (defclass flow ()
-	      ((date :initarg :date :index)
+	      ((date :initarg :date :index :any :accessor date)
 	       (version :initarg version )
 	       (account_id :initarg account_id)
-	       (interface_id :initarg :interface_id :index)
-	       (srcaddr :initarg :srcaddr :index)
-	       (dstaddr :initarg :dstaddr :index)
-	       (srcport :initarg :srcport :index)
-	       (dstport :initarg :dstport :index)
+	       (interface_id :initarg :interface_id :index :any)
+	       (srcaddr :initarg :srcaddr :index :any :accessor srcaddr)
+	       (dstaddr :initarg :dstaddr :index :any :accessor dstaddr)
+	       (srcport :initarg :srcport :index :any :accessor srcport)
+	       (dstport :initarg :dstport :index :any :accessor dstport)
 	       (protocol :initarg :protocol)
 	       (packets :initarg :packets)
 	       (bytez :initarg :bytez)
@@ -27,13 +27,12 @@
 
 	    (defclass flow_files ()
 	      ((name :initarg :name :index :any-unique))
-	      (:metaclass db.ac:persistent-class)))
+	      (:metaclass db.ac:persistent-class))
 
-;; (defmethod print-object ((flow flow) stream)
-;;   (format stream "#<date:~s srcaddr:~s dstaddr:~s srcport:~s dstport:~s>" flow-date flow-srcaddr flow-dstaddr flow-srcport flow-dstport)))
+	    (defmethod print-object ((flow flow) stream)
+	      (format stream "#<date:~s srcaddr:~s dstaddr:~s srcport:~s dstport:~s>" (date flow) (srcaddr flow) (dstaddr flow) (srcport flow) (dstport flow))))
 
 (defparameter flow_tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow_files :ips :ports))
-
 
 (defun load-file-flow-values ()
   (unless *files*
@@ -112,9 +111,8 @@
     (format nil "~A/~A/~A" dir2 dir1 (file-namestring x))))
 
 (defun find-by-field (class field value)
-  (format t "~A" (retrieve-from-index 'flow_files 'name value)))
-
-;;  (format t "fuck: ~A~%" (flows-have-we-seen-this-file file)))
+  ;;(describe #'date))
+  (format t "xxx: date:~A ~%" (retrieve-from-index 'flow 'srcport "53")))
 
 (defun flows-have-we-seen-this-file (file)
   (format t "seen? ~A~%" file)
