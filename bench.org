@@ -1,0 +1,681 @@
+*** vpcbench
+-  (ql:quickload :metis)(metis::bench-vpc-flows-report-async "2" "/home/akkad/vpcbench/")
+**** allegro 243
+taskSampling stopped after 707000 samples taken for the space profiler.
+
+Sample represents 5656000.0 Kbytes of space allocated.
+
+Mem.s below 1.0% will be suppressed.
+
+ %    %     self   total         self   total  Function
+Mem. Cum.  Kbyte   Kbyte calls by/call by/call   name
+17.3 17.3 977968  977968                       ... subseq
+13.0 30.3 734496 1351456                       ... fare-memoization::compute-memoized-function
+ 8.0 38.3 455200  455200                       ... (method device-write (string-output-simple-stream t t t t))
+ 7.9 46.2 444816  444816                       ... get-output-stream-string
+ 6.5 52.7 369056  369080                       ... excl::make-array-simple
+ 5.6 58.3 315456  332832                       ... parse-float:parse-float
+ 4.4 62.7 250688 1602144                       ... (:internal fare-memoization:memoize 0)
+ 4.4 67.1 248280  616960                       ... (flet fare-memoization::compute-memoized-function fare-memoization::f)
+ 4.2 71.3 236240  236240                       ... split-sequence:split-sequence
+ 4.1 75.4 230248  489128                       ... cl-ppcre:split
+ 3.3 78.7 189360  189360                       ... (method device-open :before (string-output-simple-stream t t))
+ 3.2 81.9 183016  902032                       ... split-sequence::split-from-start
+ 2.3 84.3 132632  132632                       ... excl::pop-format-arg
+ 2.3 86.6 132352  848520                       ... format
+ 2.2 88.8 122768  122768                       ... values
+ 1.3 90.1  72200   76832                       ... postmodern:connect
+ 1.1 91.2  64544   64544                       ... "make_array_header"
+ 1.1 92.3  63232   76056                       ... (:internal (:anonymous-lambda 7) 0)
+ 1.1 93.4  59992   59992                       ... list*
+
+delta 243.439 rows:607004 files:100
+nil
+
+**** sbcl 153
+
+Number of samples:   5250
+Sample interval:     0.01 seconds
+Total sampling time: 52.5 seconds
+Number of cycles:    0
+Sampled threads:
+ #<sb-thread:thread "repl-thread" running {1003B00033}>
+
+           Self        Total        Cumul
+  Nr  Count     %  Count     %  Count     %    Calls  Function
+------------------------------------------------------------------------
+   1   1158  22.1   1158  22.1   1158  22.1        -  "foreign function write"
+   2    229   4.4    229   4.4   1387  26.4        -  "foreign function __poll"
+   3    162   3.1    162   3.1   1549  29.5        -  (flet #:cleanup-fun-2186 :in sb-impl::refill-input-buffer)
+   4    127   2.4    159   3.0   1676  31.9        -  sb-impl::output-unsigned-byte-full-buffered
+   5     91   1.7     91   1.7   1767  33.7        -  sb-impl::input-char/utf-8
+   6     89   1.7    314   6.0   1856  35.4        -  (flet #:body-fun-579 :in sb-impl::gethash3)
+   7     88   1.7     88   1.7   1944  37.0        -  sb-kernel:ub32-bash-copy
+   8     77   1.5    617  11.8   2021  38.5        -  read-byte
+   9     75   1.4    119   2.3   2096  39.9        -  sb-kernel:%find-position
+  10     73   1.4    234   4.5   2169  41.3        -  write-byte
+  11     71   1.4     84   1.6   2240  42.7        -  (lambda (char) :in cl-ppcre::convert-char-class-to-test-function)
+  12     67   1.3    118   2.2   2307  43.9        -  (labels sb-impl::equal-aux :in equal)
+  13     62   1.2   2555  48.7   2369  45.1        -  cl-postgres::send-query
+  14     60   1.1     75   1.4   2429  46.3        -  parse-integer
+  15     58   1.1     58   1.1   2487  47.4        -  sb-kernel:%sxhash-simple-string
+  16     57   1.1    124   2.4   2544  48.5        -  (labels sb-impl::sxhash-recurse :in sxhash)
+  17     51   1.0    105   2.0   2595  49.4        -  (lambda (cl-ppcre::start-pos) :in cl-ppcre::create-matcher-aux)
+  18     49   0.9     49   0.9   2644  50.4        -  sb-c:return-multiple
+  19     44   0.8    199   3.8   2688  51.2        -  cl-postgres-trivial-utf-8:write-utf-8-bytes
+  20     43   0.8    537  10.2   2731  52.0        -  sb-impl::input-unsigned-8bit-byte
+  21     43   0.8     43   0.8   2774  52.8        -  sb-kernel:%coerce-callable-to-fun
+  22     42   0.8   5129  97.7   2816  53.6        -  (flet #:without-interrupts-body-359 :in sb-thread::call-with-mutex)
+  23     40   0.8     40   0.8   2856  54.4        -  sb-impl::synchronize-stream-output
+  24     39   0.7    165   3.1   2895  55.1        -  position
+  25     39   0.7     39   0.7   2934  55.9        -  (lambda (sb-pcl::.arg0. sb-pcl::.arg1. sb-int:&more sb-pcl::.more-context. sb-pcl::.more-count.) :in "/home/akkad/sbcl/src/pcl/dlisp3.fasl")
+  26     37   0.7     37   0.7   2971  56.6        -  (lambda (sb-pcl::.arg0.) :in "/home/akkad/sbcl/src/pcl/braid.fasl")
+  27     36   0.7    291   5.5   3007  57.3        -  cl-ppcre:split
+  28     36   0.7     78   1.5   3043  58.0        -  sb-impl::vector-subseq-dispatch/simple-character-string
+  29     35   0.7     37   0.7   3078  58.6        -  sb-vm::generic-+
+  30     35   0.7     35   0.7   3113  59.3        -  (flet #:cleanup-fun-371 :in sb-thread::call-with-mutex)
+  31     34   0.6    125   2.4   3147  59.9        -  sb-impl::ansi-stream-read-char
+  32     34   0.6     34   0.6   3181  60.6        -  sb-kernel:vector-subseq*
+  33     31   0.6    306   5.8   3212  61.2        -  split-sequence::split-from-start
+  34     31   0.6    220   4.2   3243  61.8        -  (lambda (string cl-ppcre::start cl-ppcre::end) :in cl-ppcre::create-scanner-aux)
+  35     30   0.6    748  14.2   3273  62.3        -  cl-date-time-parser::parse-iso8601-genus
+  36     30   0.6     70   1.3   3303  62.9        -  sb-kernel:%make-array
+  37     30   0.6     55   1.0   3333  63.5        -  get-output-stream-string
+  38     30   0.6     30   0.6   3363  64.1        -  sb-unix:unix-simple-poll
+  39     29   0.6     29   0.6   3392  64.6        -  (flet #:cleanup-fun-299 :in sb-thread::call-with-system-mutex)
+  40     28   0.5     28   0.5   3420  65.1        -  cl-postgres-trivial-utf-8:utf-8-byte-length
+  41     28   0.5     28   0.5   3448  65.7        -  truncate
+  42     27   0.5    211   4.0   3475  66.2        -  parse-float:parse-float
+  43     27   0.5     74   1.4   3502  66.7        -  sb-impl::string-sout
+  44     27   0.5     27   0.5   3529  67.2        -  eql
+  45     26   0.5     32   0.6   3555  67.7        -  sb-pcl::check-applicable-keywords
+  46     25   0.5   1076  20.5   3580  68.2        -  metis::get-index-value
+  47     25   0.5     52   1.0   3605  68.7        -  (sb-pcl::emf cl-ppcre:scan)
+  48     25   0.5     28   0.5   3630  69.1        -  identity
+  49     24   0.5     24   0.5   3654  69.6        -  (lambda (sb-pcl::.arg0.) :in "/home/akkad/sbcl/src/pcl/dlisp3.fasl")
+  50     23   0.4   2944  56.1   3677  70.0        -  metis::psql-do-query
+  51     23   0.4     39   0.7   3700  70.5        -  sb-kernel:string=*
+  52     23   0.4     28   0.5   3723  70.9        -  sb-impl::allocate-vector-with-widetag
+  53     22   0.4     57   1.1   3745  71.3        -  (lambda (cl-ppcre::start-pos) :in cl-ppcre::create-matcher-aux)
+  54     22   0.4     22   0.4   3767  71.8        -  sb-impl::string-output-stream-new-buffer
+  55     21   0.4     79   1.5   3788  72.2        -  sb-impl::output-integer
+  56     21   0.4     57   1.1   3809  72.6        -  (lambda (cl-ppcre::start-pos) :in cl-ppcre::create-constant-repetition-constant-length-matcher)
+  57     21   0.4     21   0.4   3830  73.0        -  sb-kernel:hairy-data-vector-set
+  58     20   0.4   1008  19.2   3850  73.3        -  (flet fare-memoization::f :in fare-memoization::compute-memoized-function)
+  59     20   0.4    138   2.6   3870  73.7        -  princ
+  60     20   0.4     25   0.5   3890  74.1        -  split-sequence:split-sequence
+  61     20   0.4     20   0.4   3910  74.5        -  "foreign function funcallable_instance_tramp"
+  62     19   0.4    556  10.6   3929  74.8        -  cl-postgres::read-uint1
+  63     19   0.4     36   0.7   3948  75.2        -  sb-kernel::values-specifier-type-r
+  64     19   0.4     21   0.4   3967  75.6        -  string-equal
+  65     19   0.4     19   0.4   3986  75.9        -  sb-kernel:%sp-string-compare
+  66     19   0.4     19   0.4   4005  76.3        -  write-string
+  67     18   0.3     44   0.8   4023  76.6        -  parse-float::parse-integer-only
+  68     18   0.3     18   0.3   4041  77.0        -  sb-impl::%make-string-output-stream
+  69     18   0.3     18   0.3   4059  77.3        -  "foreign function closure_tramp"
+  70     17   0.3   2606  49.6   4076  77.6        -  (labels #:g498 :in cl-postgres:exec-query)
+  71     17   0.3   2298  43.8   4093  78.0        -  metis::insert-flows
+  72     17   0.3   1225  23.3   4110  78.3        -  force-output
+  73     17   0.3    173   3.3   4127  78.6        -  cl-postgres::look-for-row
+  74     17   0.3     79   1.5   4144  78.9        -  sb-impl::%write-string
+  75     17   0.3     37   0.7   4161  79.3        -  sb-impl::ansi-stream-write-sequence
+  76     17   0.3     17   0.3   4178  79.6        -  sb-impl::fd-stream-misc-routine
+  77     16   0.3    157   3.0   4194  79.9        -  sb-impl::ansi-stream-read-sequence
+  78     16   0.3     39   0.7   4210  80.2        -  (flet #:body-fun-715 :in sb-kernel:%puthash)
+  79     16   0.3     18   0.3   4226  80.5        -  fare-memoization::compute-memoized-function
+  80     16   0.3     16   0.3   4242  80.8        -  length
+  81     16   0.3     16   0.3   4258  81.1        -  sb-kernel:%%typep
+  82     16   0.3     16   0.3   4274  81.4        -  (lambda (&rest fare-memoization::args) :in fare-memoization:memoize)
+  83     15   0.3    493   9.4   4289  81.7        -  sb-impl::refill-input-buffer
+  84     15   0.3    108   2.1   4304  82.0        -  cl-postgres-trivial-utf-8:read-utf-8-string
+  85     15   0.3     97   1.8   4319  82.3        -  sb-impl::sysread-may-block-p
+  86     15   0.3     24   0.5   4334  82.6        -  sb-sys:decode-timeout
+  87     15   0.3     18   0.3   4349  82.8        -  find
+  88     15   0.3     15   0.3   4364  83.1        -  (lambda (sb-pcl::.arg0. sb-pcl::.arg1.) :in "/home/akkad/sbcl/src/pcl/braid.fasl")
+  89     15   0.3     15   0.3   4379  83.4        -  sb-kernel:output-ugly-object
+  90     15   0.3     15   0.3   4394  83.7        -  expt
+  91     14   0.3   1195  22.8   4408  84.0        -  sb-impl::flush-output-buffer
+  92     14   0.3    885  16.9   4422  84.2        -  metis::to-epoch
+  93     14   0.3     15   0.3   4436  84.5        -  sb-impl::buffer-output
+  94     14   0.3     15   0.3   4450  84.8        -  "foreign function __vdso_gettimeofday"
+  95     13   0.2     98   1.9   4463  85.0        -  postmodern:connect
+  96     13   0.2     85   1.6   4476  85.3        -  postmodern::get-from-pool
+  97     13   0.2     57   1.1   4489  85.5        -  cl-postgres::read-uint4
+  98     13   0.2     47   0.9   4502  85.8        -  sb-impl::%output-reasonable-integer-in-base
+  99     13   0.2     24   0.5   4515  86.0        -  replace
+ 100     13   0.2     13   0.2   4528  86.2        -  sb-kernel:output-object
+ 101     13   0.2     13   0.2   4541  86.5        -  sb-impl::%output-integer-in-base
+ 102     13   0.2     13   0.2   4554  86.7        -  sb-kernel:type=
+ 103     13   0.2     13   0.2   4567  87.0        -  (sb-impl::optimized-data-vector-set character)
+ 104     12   0.2    128   2.4   4579  87.2        -  sxhash
+ 105     11   0.2   5129  97.7   4590  87.4        -  metis::process-vf-file
+ 106     11   0.2    326   6.2   4601  87.6        -  sb-impl::gethash3
+ 107     11   0.2    221   4.2   4612  87.8        -  sb-sys:wait-until-fd-usable
+ 108     11   0.2     25   0.5   4623  88.1        -  sb-kernel:%map
+ 109     11   0.2     21   0.4   4634  88.3        -  encode-universal-time
+ 110     11   0.2     17   0.3   4645  88.5        -  get-internal-real-time
+ 111     11   0.2     13   0.2   4656  88.7        -  sb-c::get-info-value
+ 112     11   0.2     11   0.2   4667  88.9        -  nreverse
+ 113     10   0.2     60   1.1   4677  89.1        -  coerce
+ 114     10   0.2     47   0.9   4687  89.3        -  sb-kernel:specifier-type
+ 115     10   0.2     10   0.2   4697  89.5        -  sb-kernel:%with-array-data/fp
+ 116     10   0.2     10   0.2   4707  89.7        -  sb-kernel:classoid-typep
+ 117     10   0.2     10   0.2   4717  89.8        -  sb-kernel:hairy-data-vector-ref/check-bounds
+ 118      9   0.2    234   4.5   4726  90.0        -  (sb-pcl::fast-method cl-ppcre:scan (function t))
+ 119      9   0.2     42   0.8   4735  90.2        -  sb-kernel::specifier-type-r
+ 120      9   0.2     23   0.4   4744  90.4        -  sb-impl::data-vector-from-inits
+ 121      9   0.2     22   0.4   4753  90.5        -  sb-kernel:%map-for-effect-arity-1
+ 122      9   0.2     19   0.4   4762  90.7        -  write-char
+ 123      9   0.2      9   0.2   4771  90.9        -  sb-impl::get-cat-entry
+ 124      9   0.2      9   0.2   4780  91.0        -  sb-int:memq
+ 125      9   0.2      9   0.2   4789  91.2        -  sb-kernel:two-arg-gcd
+ 126      9   0.2      9   0.2   4798  91.4        -  sb-impl::list-nreverse
+ 127      9   0.2      9   0.2   4807  91.6        -  subseq
+ 128      8   0.2   5132  97.8   4815  91.7        -  sb-thread::call-with-mutex
+ 129      8   0.2     15   0.3   4823  91.9        -  cl-postgres:database-open-p
+ 130      8   0.2     12   0.2   4831  92.0        -  sb-impl::string-ouch
+ 131      8   0.2      8   0.2   4839  92.2        -  "foreign function sb_gettimeofday"
+ 132      8   0.2      8   0.2   4847  92.3        -  (lambda (sequence split-sequence::start) :in split-sequence:split-sequence)
+ 133      8   0.2      8   0.2   4855  92.5        -  sb-kernel:%member-eq
+ 134      7   0.1     30   0.6   4862  92.6        -  sb-kernel::intexp
+ 135      7   0.1     25   0.5   4869  92.7        -  sb-impl::vector-map-into/simple-vector
+ 136      7   0.1     23   0.4   4876  92.9        -  vector-push-extend
+ 137      7   0.1     17   0.3   4883  93.0        -  sb-thread::%wait-for-mutex
+ 138      7   0.1      7   0.1   4890  93.1        -  cl-postgres::read-str
+ 139      7   0.1      7   0.1   4897  93.3        -  (sb-pcl::fast-method sb-gray::pcl-open-stream-p (sb-kernel:ansi-stream))
+ 140      7   0.1      7   0.1   4904  93.4        -  sb-kernel:two-arg-/
+ 141      7   0.1      7   0.1   4911  93.5        -  sb-kernel:sequencep
+ 142      7   0.1      7   0.1   4918  93.7        -  sb-impl::slow-hairy-data-vector-set
+ 143      7   0.1      7   0.1   4925  93.8        -  digit-char-p
+ 144      7   0.1      7   0.1   4932  93.9        -  ash
+ 145      6   0.1    265   5.0   4938  94.1        -  metis::process-vf-line
+ 146      6   0.1    256   4.9   4944  94.2        -  cl-postgres::simple-parse-message
+ 147      6   0.1    116   2.2   4950  94.3        -  cl-date-time-parser:parse-date-time
+ 148      6   0.1     44   0.8   4956  94.4        -  write-sequence
+ 149      6   0.1     13   0.2   4962  94.5        -  cl-postgres::skip-bytes
+ 150      6   0.1      6   0.1   4968  94.6        -  cl-postgres:log-query
+ 151      6   0.1      6   0.1   4974  94.7        -  (flet sb-int:%write :in sb-unix:unix-write)
+ 152      6   0.1      6   0.1   4980  94.9        -  sb-kernel:list-fill*
+ 153      6   0.1      6   0.1   4986  95.0        -  "foreign function syscall"
+ 154      6   0.1      6   0.1   4992  95.1        -  list-length
+ 155      6   0.1      6   0.1   4998  95.2        -  sb-unix:unix-write
+ 156      5   0.1    126   2.4   5003  95.3        -  sb-impl::equal-hash
+ 157      5   0.1     35   0.7   5008  95.4        -  (labels parse-float::parse-integer-part :in parse-float:parse-float)
+ 158      5   0.1      5   0.1   5013  95.5        -  sb-c::check-ds-list
+ 159      5   0.1      5   0.1   5018  95.6        -  sb-impl::validate-array-initargs
+ 160      5   0.1      5   0.1   5023  95.7        -  sb-kernel:%single-float
+ 161      4   0.1    732  13.9   5027  95.8        -  metis::get-id-or-insert-psql
+ 162      4   0.1    185   3.5   5031  95.8        -  (flet #:cleanup-fun-101 :in metis::psql-do-query)
+ 163      4   0.1    175   3.3   5035  95.9        -  (sb-pcl::fast-method postmodern:disconnect (postmodern::pooled-database-connection))
+ 164      4   0.1    112   2.1   5039  96.0        -  (labels sb-impl::handle-it :in sb-kernel:output-object)
+ 165      4   0.1     63   1.2   5043  96.1        -  (flet sb-thread::with-mutex-thunk :in postmodern:disconnect)
+ 166      4   0.1     38   0.7   5047  96.1        -  cl-postgres:list-row-reader
+ 167      4   0.1     22   0.4   5051  96.2        -  (lambda (cl-ppcre::start-pos) :in cl-ppcre::create-matcher-aux)
+ 168      4   0.1     21   0.4   5055  96.3        -  cl-postgres::ensure-connection
+ 169      4   0.1     17   0.3   5059  96.4        -  (labels parse-float::parse-decimal-part :in parse-float:parse-float)
+ 170      4   0.1      9   0.2   5063  96.4        -  sb-kernel::integer-/-integer
+ 171      4   0.1      8   0.2   5067  96.5        -  (labels parse-float::parse-sign :in parse-float:parse-float)
+ 172      4   0.1      7   0.1   5071  96.6        -  typep
+ 173      4   0.1      5   0.1   5075  96.7        -  (lambda (cl-ppcre::start-pos) :in cl-ppcre::create-matcher-aux)
+ 174      4   0.1      4   0.1   5079  96.7        -  cl-postgres::formats-to-bytes
+ 175      4   0.1      4   0.1   5083  96.8        -  sb-kernel:csubtypep
+ 176      4   0.1      4   0.1   5087  96.9        -  (lambda (sb-pcl::|.P0.| sb-pcl::|.P1.| sb-pcl::|.P2.|))
+ 177      4   0.1      4   0.1   5091  97.0        -  sb-int:two-arg-char-equal
+ 178      4   0.1      4   0.1   5095  97.0        -  sb-c::packed-info-value-index
+ 179      4   0.1      4   0.1   5099  97.1        -  cl-ppcre::digit-char-p
+ 180      4   0.1      4   0.1   5103  97.2        -  cl-date-time-parser::month-to-ut
+ 181      3   0.1    111   2.1   5106  97.3        -  (labels parse-float::parse-finish :in parse-float:parse-float)
+ 182      3   0.1     42   0.8   5109  97.3        -  (flet sb-thread::with-mutex-thunk :in postmodern::get-from-pool)
+ 183      3   0.1     33   0.6   5112  97.4        -  sb-kernel:%typep
+ 184      3   0.1     26   0.5   5115  97.4        -  cl-postgres:exec-query
+ 185      3   0.1     22   0.4   5118  97.5        -  cl-postgres::simple-bind-message
+ 186      3   0.1     18   0.3   5121  97.5        -  cl-postgres::simple-execute-message
+ 187      3   0.1     16   0.3   5124  97.6        -  cl-postgres::read-field-descriptions
+ 188      3   0.1     16   0.3   5127  97.7        -  (lambda (sb-impl::buffer sb-impl::from) :in get-output-stream-string)
+ 189      3   0.1      4   0.1   5130  97.7        -  local-time:universal-to-timestamp
+ 190      3   0.1      3   0.1   5133  97.8        -  sb-int:equal-but-no-car-recursion
+ 191      3   0.1      3   0.1   5136  97.8        -  sb-kernel:hairy-data-vector-ref
+ 192      3   0.1      3   0.1   5139  97.9        -  sb-int:delq
+ 193      3   0.1      3   0.1   5142  97.9        -  "foreign function ldso_stub__poll"
+ 194      3   0.1      3   0.1   5145  98.0        -  (sb-impl::optimized-data-vector-ref character)
+ 195      3   0.1      3   0.1   5148  98.1        -  sb-kernel:classoid-cell-typep
+ 196      3   0.1      3   0.1   5151  98.1        -  sb-impl::output-vector
+ 197      3   0.1      3   0.1   5154  98.2        -  (sb-impl::optimized-data-vector-ref character)
+ 198      2   0.0     62   1.2   5156  98.2        -  local-time:timestamp-to-unix
+ 199      2   0.0     41   0.8   5158  98.2        -  sb-kernel:%puthash
+ 200      2   0.0     28   0.5   5160  98.3        -  (labels cl-date-time-parser::parse-year :in cl-date-time-parser::parse-iso8601-genus)
+ 201      2   0.0      8   0.2   5162  98.3        -  cl-postgres::sync-message
+ 202      2   0.0      6   0.1   5164  98.4        -  (labels cl-date-time-parser::parse-month :in cl-date-time-parser::parse-iso8601-genus)
+ 203      2   0.0      2   0.0   5166  98.4        -  (flet sb-thread::with-recursive-system-lock-thunk :in sb-kernel:%puthash)
+ 204      2   0.0      2   0.0   5168  98.4        -  sb-thread::check-deadlock
+ 205      2   0.0      2   0.0   5170  98.5        -  cl-postgres::type-interpreter
+ 206      2   0.0      2   0.0   5172  98.5        -  (flet #:wrapper278 :in cl-date-time-parser::parse-iso8601-genus)
+ 207      2   0.0      2   0.0   5174  98.6        -  (flet #:cleanup-fun-669 :in sb-impl::ansi-stream-read-byte)
+ 208      2   0.0      2   0.0   5176  98.6        -  local-time::timestamp-values-to-unix
+ 209      2   0.0      2   0.0   5178  98.6        -  cl-postgres::read-uint2
+ 210      2   0.0      2   0.0   5180  98.7        -  cl-date-time-parser::year-to-ut
+ 211      2   0.0      2   0.0   5182  98.7        -  (labels sb-impl::print-it :in sb-kernel:output-object)
+ 212      2   0.0      2   0.0   5184  98.7        -  "foreign function futex_wait"
+ 213      1   0.0     88   1.7   5185  98.8        -  (labels cl-date-time-parser::parse-extended-format :in cl-date-time-parser::parse-iso8601-genus)
+ 214      1   0.0     23   0.4   5186  98.8        -  (flet sb-impl::replace-all :in get-output-stream-string)
+ 215      1   0.0     10   0.2   5187  98.8        -  sb-impl::leap-years-before
+ 216      1   0.0      9   0.2   5188  98.8        -  cl-postgres::flush-message
+ 217      1   0.0      8   0.2   5189  98.8        -  (flet #:cleanup-fun-509 :in cl-postgres:exec-query)
+ 218      1   0.0      4   0.1   5190  98.9        -  (labels cl-date-time-parser::parse-days :in cl-date-time-parser::parse-iso8601-genus)
+ 219      1   0.0      1   0.0   5191  98.9        -  "foreign function open64"
+ 220      1   0.0      1   0.0   5192  98.9        -  sb-c::maybe-add-eql-var-lvar-constraint
+ 221      1   0.0      1   0.0   5193  98.9        -  sb-c::%processing-decls
+ 222      1   0.0      1   0.0   5194  98.9        -  (sb-c::vop-arg-typep)
+ 223      1   0.0      1   0.0   5195  99.0        -  sb-walker::with-augmented-environment-internal
+ 224      1   0.0      1   0.0   5196  99.0        -  sb-kernel:copy-ub8-to-system-area
+ 225      1   0.0      1   0.0   5197  99.0        -  cl-date-time-parser::leap-year-p
+ 226      1   0.0      1   0.0   5198  99.0        -  equal
+ 227      1   0.0      1   0.0   5199  99.0        -  "foreign function __xstat64"
+ 228      1   0.0      1   0.0   5200  99.0        -  (labels sb-impl::sxhash-number :in sxhash)
+ 229      1   0.0      1   0.0   5201  99.1        -  (flet #:cleanup-fun-450 :in sb-thread::call-with-recursive-system-lock/without-gcing)
+ 230      1   0.0      1   0.0   5202  99.1        -  list
+ 231      1   0.0      1   0.0   5203  99.1        -  sb-pcl::%make-standard-instance
+ 232      1   0.0      1   0.0   5204  99.1        -  (sb-impl::optimized-data-vector-ref t)
+ 233      1   0.0      1   0.0   5205  99.1        -  "foreign function ldso_stub__memcmp"
+ 234      1   0.0      1   0.0   5206  99.2        -  sb-impl::output-to-c-string/utf-8
+ 235      1   0.0      1   0.0   5207  99.2        -  (lambda (#:g232 #:g233) :in "/home/akkad/quicklisp/dists/quicklisp/software/postmodern-20160208-git/cl-postgres/interpret.lisp")
+ 236      1   0.0      1   0.0   5208  99.2        -  (flet #:cleanup-fun-3568 :in sb-impl::release-fd-stream-resources)
+ 237      1   0.0      1   0.0   5209  99.2        -  (lambda (sb-pcl::.arg0.) :in "/home/akkad/sbcl/src/pcl/braid.fasl")
+ 238      1   0.0      1   0.0   5210  99.2        -  sb-kernel:two-arg-*
+ 239      1   0.0      1   0.0   5211  99.3        -  (lambda (sb-pcl::|.P0.| sb-pcl::|.P1.| sb-pcl::|.P2.| sb-pcl::|.P3.|))
+ 240      1   0.0      1   0.0   5212  99.3        -  values
+ 241      1   0.0      1   0.0   5213  99.3        -  (labels #:g499 :in cl-postgres:exec-query)
+ 242      1   0.0      1   0.0   5214  99.3        -  metis::flatten
+ 243      1   0.0      1   0.0   5215  99.3        -  "foreign function __close"
+ 244      1   0.0      1   0.0   5216  99.4        -  valid-type-specifier-p
+ 245      1   0.0      1   0.0   5217  99.4        -  (flet sb-kernel::integer*ratio :in sb-kernel:two-arg-*)
+ 246      1   0.0      1   0.0   5218  99.4        -  "foreign function ldso_stub__write"
+ 247      0   0.0   5129  97.7   5218  99.4        -  pcall::execute-task
+ 248      0   0.0   5129  97.7   5218  99.4        -  pcall:join
+ 249      0   0.0   5129  97.7   5218  99.4        -  metis::vpc-flows-report-async
+ 250      0   0.0   5129  97.7   5218  99.4        -  metis::bench-vpc-flows-report-async
+ 251      0   0.0   5129  97.7   5218  99.4        -  sb-int:simple-eval-in-lexenv
+ 252      0   0.0   5129  97.7   5218  99.4        -  eval
+ 253      0   0.0   5129  97.7   5218  99.4        -  swank::eval-region
+ 254      0   0.0   5129  97.7   5218  99.4        -  (lambda nil :in swank-repl::repl-eval)
+ 255      0   0.0   5129  97.7   5218  99.4        -  swank-repl::track-package
+ 256      0   0.0   5129  97.7   5218  99.4        -  swank::call-with-retry-restart
+ 257      0   0.0   5129  97.7   5218  99.4        -  swank::call-with-buffer-syntax
+ 258      0   0.0   5129  97.7   5218  99.4        -  swank-repl::repl-eval
+ 259      0   0.0   5129  97.7   5218  99.4        -  swank:eval-for-emacs
+ 260      0   0.0   5129  97.7   5218  99.4        -  swank::process-requests
+ 261      0   0.0   5129  97.7   5218  99.4        -  (lambda nil :in swank::handle-requests)
+ 262      0   0.0   5129  97.7   5218  99.4        -  swank/sbcl::call-with-break-hook
+ 263      0   0.0   5129  97.7   5218  99.4        -  (flet swank/backend:call-with-debugger-hook :in "/home/akkad/quicklisp/dists/quicklisp/software/slime-v2.18/swank/sbcl.lisp")
+ 264      0   0.0   5129  97.7   5218  99.4        -  swank::call-with-bindings
+ 265      0   0.0   5129  97.7   5218  99.4        -  swank::handle-requests
+ 266      0   0.0   5129  97.7   5218  99.4        -  (flet #:without-interrupts-body-1158 :in sb-thread::initial-thread-function-trampoline)
+ 267      0   0.0   5129  97.7   5218  99.4        -  (flet sb-thread::with-mutex-thunk :in sb-thread::initial-thread-function-trampoline)
+ 268      0   0.0   5129  97.7   5218  99.4        -  sb-thread::initial-thread-function-trampoline
+ 269      0   0.0   5129  97.7   5218  99.4        -  "foreign function call_into_lisp"
+ 270      0   0.0   5129  97.7   5218  99.4        -  "foreign function new_thread_trampoline"
+ 271      0   0.0    225   4.3   5218  99.4        -  uiop/stream:call-with-temporary-file
+ 272      0   0.0    225   4.3   5218  99.4        -  (labels uiop/run-program::hard-case :in uiop/run-program::%call-with-program-io)
+ 273      0   0.0    225   4.3   5218  99.4        -  uiop/run-program::%use-system
+ 274      0   0.0    222   4.2   5218  99.4        -  (flet #:before7818 :in uiop/run-program::%call-with-program-io)
+ 275      0   0.0    198   3.8   5218  99.4        -  cl-postgres::write-str
+ 276      0   0.0    192   3.7   5218  99.4        -  uiop/stream:call-with-input-file
+ 277      0   0.0    191   3.6   5218  99.4        -  (labels uiop/run-program::activity :in uiop/run-program::%call-with-program-io)
+ 278      0   0.0    187   3.6   5218  99.4        -  uiop/stream:slurp-stream-string
+ 279      0   0.0    182   3.5   5218  99.4        -  uiop/stream:copy-stream-to-stream
+ 280      0   0.0    157   3.0   5218  99.4        -  read-sequence
+ 281      0   0.0     30   0.6   5218  99.4        -  run-program
+ 282      0   0.0     30   0.6   5218  99.4        -  uiop/run-program::%run-program
+ 283      0   0.0     30   0.6   5218  99.4        -  uiop/run-program::%system
+ 284      0   0.0     30   0.6   5218  99.4        -  (lambda (uiop/run-program::reduced-input #:g8300) :in uiop/run-program::%use-system)
+ 285      0   0.0     29   0.6   5218  99.4        -  sb-thread::call-with-system-mutex
+ 286      0   0.0      6   0.1   5218  99.4        -  sb-thread::%%wait-for-mutex
+ 287      0   0.0      6   0.1   5218  99.4        -  cl-postgres::simple-describe-message
+ 288      0   0.0      4   0.1   5218  99.4        -  sb-pcl::get-fun1
+ 289      0   0.0      4   0.1   5218  99.4        -  sb-pcl::compute-secondary-dispatch-function1
+ 290      0   0.0      4   0.1   5218  99.4        -  sb-pcl::get-secondary-dispatch-function1
+ 291      0   0.0      4   0.1   5218  99.4        -  sb-pcl::cache-miss-values-internal
+ 292      0   0.0      4   0.1   5218  99.4        -  sb-pcl::cache-miss-values
+ 293      0   0.0      4   0.1   5218  99.4        -  sb-pcl::initial-dfun
+ 294      0   0.0      3   0.1   5218  99.4        -  open
+ 295      0   0.0      3   0.1   5218  99.4        -  sb-c::compile-component
+ 296      0   0.0      3   0.1   5218  99.4        -  sb-c::%compile
+ 297      0   0.0      3   0.1   5218  99.4        -  (flet #:without-interrupts-body-387 :in sb-thread::call-with-recursive-lock)
+ 298      0   0.0      3   0.1   5218  99.4        -  sb-thread::call-with-recursive-lock
+ 299      0   0.0      3   0.1   5218  99.4        -  (lambda nil :in sb-c::actually-compile)
+ 300      0   0.0      3   0.1   5218  99.4        -  (flet sb-c::with-it :in sb-c::%with-compilation-unit)
+ 301      0   0.0      3   0.1   5218  99.4        -  sb-c::actually-compile
+ 302      0   0.0      3   0.1   5218  99.4        -  sb-c:compile-in-lexenv
+ 303      0   0.0      3   0.1   5218  99.4        -  compile
+ 304      0   0.0      3   0.1   5218  99.4        -  sb-pcl::get-new-fun-generator
+ 305      0   0.0      3   0.1   5218  99.4        -  sb-walker::walk-form-internal
+ 306      0   0.0      3   0.1   5218  99.4        -  sb-walker::walk-let
+ 307      0   0.0      3   0.1   5218  99.4        -  sb-walker::walk-repeat-eval
+ 308      0   0.0      3   0.1   5218  99.4        -  sb-walker::walk-declarations
+ 309      0   0.0      3   0.1   5218  99.4        -  sb-walker::walk-locally
+ 310      0   0.0      3   0.1   5218  99.4        -  sb-walker::walk-lambda
+ 311      0   0.0      3   0.1   5218  99.4        -  sb-pcl::compute-constants
+ 312      0   0.0      2   0.0   5218  99.4        -  sb-c::ir1-phases
+ 313      0   0.0      2   0.0   5218  99.4        -  sb-pcl::make-effective-method-function-internal
+ 314      0   0.0      2   0.0   5218  99.4        -  sb-pcl::methods-converter
+ 315      0   0.0      2   0.0   5218  99.4        -  sb-pcl::net-constant-converter
+ 316      0   0.0      2   0.0   5218  99.4        -  (lambda (sb-pcl::f sb-pcl::c sb-pcl::e) :in sb-pcl::compute-constants)
+ 317      0   0.0      2   0.0   5218  99.4        -  sb-walker::walk-bindings-1
+ 318      0   0.0      2   0.0   5218  99.4        -  (lambda (sb-walker::real-body sb-walker::real-env) :in sb-walker::walk-let)
+ 319      0   0.0      2   0.0   5218  99.4        -  sb-unix:unix-stat
+ 320      0   0.0      2   0.0   5218  99.4        -  sb-impl::query-file-system
+ 321      0   0.0      2   0.0   5218  99.4        -  probe-file
+ 322      0   0.0      2   0.0   5218  99.4        -  (flet sb-impl::f :in sb-impl::vector-map-into/simple-vector)
+ 323      0   0.0      2   0.0   5218  99.4        -  metis::flow-mark-file-processed
+ 324      0   0.0      2   0.0   5218  99.4        -  (sb-pcl::fast-method sb-gray::pcl-close (sb-kernel:ansi-stream))
+ 325      0   0.0      1   0.0   5218  99.4        -  sb-c::constraint-propagate-in-block
+ 326      0   0.0      1   0.0   5218  99.4        -  sb-c::find-block-type-constraints
+ 327      0   0.0      1   0.0   5218  99.4        -  sb-c::find-and-propagate-constraints
+ 328      0   0.0      1   0.0   5218  99.4        -  sb-c::constraint-propagate
+ 329      0   0.0      1   0.0   5218  99.4        -  sb-c::ir1-convert-let
+ 330      0   0.0      1   0.0   5218  99.4        -  sb-c::ir1-convert
+ 331      0   0.0      1   0.0   5218  99.4        -  sb-c::ir1-convert-global-functoid
+ 332      0   0.0      1   0.0   5218  99.4        -  (flet sb-c::closure-needing-ir1-environment-from-node :in sb-c::filter-lvar)
+ 333      0   0.0      1   0.0   5218  99.4        -  sb-c::%with-ir1-environment-from-node
+ 334      0   0.0      1   0.0   5218  99.4        -  sb-c::filter-lvar
+ 335      0   0.0      1   0.0   5218  99.4        -  sb-c::convert-type-check
+ 336      0   0.0      1   0.0   5218  99.4        -  sb-c::generate-type-checks
+ 337      0   0.0      1   0.0   5218  99.4        -  sb-c::template-args-ok
+ 338      0   0.0      1   0.0   5218  99.4        -  sb-c::is-ok-template-use
+ 339      0   0.0      1   0.0   5218  99.4        -  sb-c::find-template
+ 340      0   0.0      1   0.0   5218  99.4        -  sb-c::find-template-for-ltn-policy
+ 341      0   0.0      1   0.0   5218  99.4        -  sb-c::ltn-analyze-known-call
+ 342      0   0.0      1   0.0   5218  99.4        -  sb-c::ltn-analyze-block
+ 343      0   0.0      1   0.0   5218  99.4        -  sb-c::ltn-analyze
+ 344      0   0.0      1   0.0   5218  99.4        -  sb-c::%compile-component
+ 345      0   0.0      1   0.0   5218  99.4        -  (flet sb-impl::copy-to-buffer :in sb-impl::buffer-output)
+ 346      0   0.0      1   0.0   5218  99.4        -  sb-thread::call-with-recursive-system-lock/without-gcing
+ 347      0   0.0      1   0.0   5218  99.4        -  cl-postgres::read-int4
+ 348      0   0.0      1   0.0   5218  99.4        -  sb-impl::release-fd-stream-resources
+ 349      0   0.0      1   0.0   5218  99.4        -  (flet #:cleanup-fun-6070 :in uiop/stream:call-with-temporary-file)
+ 350      0   0.0      1   0.0   5218  99.4        -  (flet #:cleanup-fun-5529 :in uiop/stream:copy-stream-to-stream)
+ 351      0   0.0      1   0.0   5218  99.4        -  (flet #:cleanup-fun-1433 :in run-program)
+------------------------------------------------------------------------
+         32   0.6                                     elsewhere
+
+delta 153.523 rows:607004 files:100
+nil
+**** ccl 284
+(metis::vpc-flows-report-async metis::workers metis::path)
+took 284,460,362 microseconds (284.460360 seconds) to run.
+      74,261,852 microseconds ( 74.261856 seconds, 26.11%) of which was spent in GC.
+During that period, and with 4 available CPU cores,
+     318,943,872 microseconds (318.943880 seconds) were spent in user mode
+      65,973,718 microseconds ( 65.973720 seconds) were spent in system mode
+ 1,963,899,498 bytes of memory allocated.
+ 738,159 minor page faults, 0 major page faults, 0 swaps.
+
+delta 284.46094 rows:607004 files:100
+**** lispworks 240
+
+Call tree
+Symbol                                                              seen   (%)
+    1: "repl-thread"                                               15076 ( 65)
+     2: eval                                                       14929 ( 64)
+      3: eval                                                      14929 ( 64)
+       4: metis::bench-vpc-flows-report-async                      14929 ( 64)
+        5: metis::vpc-flows-report-async                           14929 ( 64)
+         6: metis::process-vf-file                                 14929 ( 64)
+          7: metis::process-vf-line                                14749 ( 63)
+           8: metis::psql-do-query                                  8345 ( 36)
+            9: read-byte                                             956 (  4)
+            10: some                                                   4 (  0)
+            10: char-code                                              1 (  0)
+            9: map                                                   205 (  1)
+            10: subst                                                 53 (  0)
+             11: eql                                                   2 (  0)
+            10: subtypep                                              35 (  0)
+             11: equal                                                 2 (  0)
+            10: length                                                 2 (  0)
+            10: equal                                                  1 (  0)
+            9: write-sequence                                        136 (  1)
+            10: subtypep                                              31 (  0)
+            10: equal                                                  7 (  0)
+            10: svref                                                  7 (  0)
+            10: array-element-type                                     7 (  0)
+            10: cadr                                                   1 (  0)
+            9: make-array                                            106 (  0)
+            10: upgraded-array-element-type                           20 (  0)
+             11: equal                                                 1 (  0)
+            9: parse-integer                                          81 (  0)
+            10: subseq                                                20 (  0)
+            10: <=                                                     9 (  0)
+             11: realp                                                 1 (  0)
+            10: array-element-type                                     5 (  0)
+            10: length                                                 3 (  0)
+            9: position                                               46 (  0)
+            10: eql                                                    3 (  0)
+            9: vector-push-extend                                     31 (  0)
+            9: write-byte                                             31 (  0)
+            9: equal                                                  20 (  0)
+            10: equal                                                  2 (  0)
+            9: dpb                                                    12 (  0)
+            9: char-code                                              11 (  0)
+            9: list                                                    8 (  0)
+            9: force-output                                            6 (  0)
+            9: length                                                  3 (  0)
+            9: (method open-stream-p (stream:buffered-stream))         3 (  0)
+            9: typep                                                   3 (  0)
+            9: cons                                                    2 (  0)
+            9: simple-string-p                                         2 (  0)
+           8: metis::insert-flows                                   6043 ( 26)
+            9: metis::get-index-value                               3220 ( 14)
+            10: metis::psql-do-query                                2345 ( 10)
+             11: read-byte                                           242 (  1)
+             11: write-sequence                                       49 (  0)
+              12: subtypep                                            10 (  0)
+              12: array-element-type                                   3 (  0)
+              12: cadr                                                 1 (  0)
+              12: svref                                                1 (  0)
+              12: equal                                                1 (  0)
+             11: map                                                  46 (  0)
+              12: subst                                               13 (  0)
+               13: eql                                                 1 (  0)
+              12: subtypep                                             4 (  0)
+              12: equal                                                1 (  0)
+             11: make-array                                           36 (  0)
+              12: upgraded-array-element-type                         14 (  0)
+             11: parse-integer                                        16 (  0)
+              12: <=                                                   2 (  0)
+              12: subseq                                               2 (  0)
+             11: position                                             11 (  0)
+              12: eql                                                  1 (  0)
+             11: vector-push-extend                                    8 (  0)
+             11: write-byte                                            5 (  0)
+             11: equal                                                 5 (  0)
+             11: dpb                                                   5 (  0)
+             11: list                                                  4 (  0)
+             11: getf                                                  2 (  0)
+             11: cons                                                  2 (  0)
+             11: typep                                                 2 (  0)
+             11: (method
+                  open-stream-p
+                  (stream:buffered-stream))                            1 (  0)
+            10: equal                                                120 (  1)
+             11: equal                                                 6 (  0)
+            10: princ                                                 51 (  0)
+             11: (method print-object (string t))                      9 (  0)
+             11: (method print-object (integer t))                     1 (  0)
+            10: values                                                29 (  0)
+             11: length                                                6 (  0)
+            10: slot-value                                            13 (  0)
+             11: class-of                                              5 (  0)
+            10: delete                                                 5 (  0)
+            10: length                                                 2 (  0)
+            10: class-of                                               1 (  0)
+            10: metis::flatten                                         1 (  0)
+            9: metis::to-epoch                                      1882 (  8)
+            10: concatenate                                          522 (  2)
+             11: subst                                               246 (  1)
+              12: eql                                                  1 (  0)
+             11: subtypep                                             55 (  0)
+              12: equal                                                6 (  0)
+             11: equal                                                 2 (  0)
+             11: length                                                2 (  0)
+            10: parse-integer                                         47 (  0)
+             11: <=                                                    5 (  0)
+             11: length                                                2 (  0)
+            10: encode-universal-time                                 36 (  0)
+            10: position                                              32 (  0)
+             11: identity                                              1 (  0)
+            10: coerce                                                30 (  0)
+             11: typep                                                 2 (  0)
+            10: string-equal                                          19 (  0)
+            10: find                                                  18 (  0)
+            10: every                                                 12 (  0)
+             11: digit-char-p                                          2 (  0)
+             11: length                                                1 (  0)
+            10: subseq                                                10 (  0)
+            10: svref                                                 10 (  0)
+            10: nreconc                                                8 (  0)
+            10: floor                                                  7 (  0)
+            10: typep                                                  5 (  0)
+            10: char                                                   5 (  0)
+            10: nreverse                                               4 (  0)
+            10: expt                                                   3 (  0)
+            10: symbol-function                                        3 (  0)
+            10: identity                                               2 (  0)
+            10: array-element-type                                     2 (  0)
+            10: cddr                                                   2 (  0)
+            10: getf                                                   2 (  0)
+            10: cadr                                                   1 (  0)
+            9: princ                                                 316 (  1)
+            10: (method print-object (integer t))                    130 (  1)
+            10: (method
+                 output-stream-p
+                 (stream:buffered-stream))                             2 (  0)
+            10: (method streamp (stream:fundamental-stream))           1 (  0)
+            9: upgraded-array-element-type                             8 (  0)
+            9: cddr                                                    3 (  0)
+            9: array-element-type                                      2 (  0)
+            9: char-code                                               1 (  0)
+           8: position                                               174 (  1)
+            9: eql                                                    15 (  0)
+            9: identity                                                3 (  0)
+           8: subseq                                                  16 (  0)
+           8: symbol-function                                          7 (  0)
+           8: length                                                   5 (  0)
+           8: array-element-type                                       2 (  0)
+          7: position                                                 68 (  0)
+           8: eql                                                      3 (  0)
+          7: write-sequence                                           40 (  0)
+          7: read-sequence                                            25 (  0)
+          7: get-output-stream-string                                  6 (  0)
+          7: rplacd                                                    2 (  0)
+          7: metis::flow-mark-file-processed                           2 (  0)
+           8: metis::psql-do-query                                     2 (  0)
+          7: list-length                                               1 (  0)
+          7: subseq                                                    1 (  0)
+          7: array-element-type                                        1 (  0)
+
+
+Cumulative profile summary
+Symbol                                    called  profile   (%)      top   (%)
+eval                                           0    29858 (128)        0 (  0)
+metis::bench-vpc-flows-report-async            0    14929 ( 64)        0 (  0)
+metis::vpc-flows-report-async                  0    14929 ( 64)        0 (  0)
+metis::process-vf-file                         0    14929 ( 64)        9 (  0)
+metis::process-vf-line                         0    14749 ( 63)       21 (  0)
+metis::psql-do-query                           0    10692 ( 46)       40 (  0)
+metis::insert-flows                            0     6043 ( 26)       19 (  0)
+metis::get-index-value                         0     3220 ( 14)       41 (  0)
+metis::to-epoch                                0     1882 (  8)       14 (  0)
+read-byte                                      0     1198 (  5)       96 (  0)
+concatenate                                    0      522 (  2)       14 (  0)
+princ                                          0      367 (  2)       26 (  0)
+position                                       0      331 (  1)      101 (  0)
+subst                                          0      312 (  1)      202 (  1)
+map                                            0      251 (  1)       33 (  0)
+write-sequence                                 0      225 (  1)       23 (  0)
+equal                                          0      174 (  1)      165 (  1)
+parse-integer                                  0      144 (  1)       59 (  0)
+make-array                                     0      142 (  1)       60 (  0)
+subtypep                                       0      135 (  1)       51 (  0)
+(method print-object (integer t))              0      131 (  1)       12 (  0)
+subseq                                         0       49 (  0)       42 (  0)
+upgraded-array-element-type                    0       42 (  0)       17 (  0)
+vector-push-extend                             0       39 (  0)       37 (  0)
+encode-universal-time                          0       36 (  0)       10 (  0)
+write-byte                                     0       36 (  0)       36 (  0)
+coerce                                         0       30 (  0)        6 (  0)
+values                                         0       29 (  0)       14 (  0)
+length                                         0       26 (  0)       26 (  0)
+eql                                            0       26 (  0)       26 (  0)
+read-sequence                                  0       25 (  0)        0 (  0)
+array-element-type                             0       22 (  0)       22 (  0)
+string-equal                                   0       19 (  0)        7 (  0)
+find                                           0       18 (  0)       14 (  0)
+svref                                          0       18 (  0)       18 (  0)
+dpb                                            0       17 (  0)       17 (  0)
+<=                                             0       16 (  0)       15 (  0)
+char-code                                      0       13 (  0)       13 (  0)
+slot-value                                     0       13 (  0)        8 (  0)
+typep                                          0       12 (  0)       12 (  0)
+every                                          0       12 (  0)        4 (  0)
+list                                           0       12 (  0)        2 (  0)
+symbol-function                                0       10 (  0)       10 (  0)
+(method print-object (string t))               0        9 (  0)        1 (  0)
+nreconc                                        0        8 (  0)        8 (  0)
+floor                                          0        7 (  0)        7 (  0)
+identity                                       0        6 (  0)        6 (  0)
+class-of                                       0        6 (  0)        6 (  0)
+get-output-stream-string                       0        6 (  0)        0 (  0)
+force-output                                   0        6 (  0)        6 (  0)
+delete                                         0        5 (  0)        5 (  0)
+char                                           0        5 (  0)        5 (  0)
+cddr                                           0        5 (  0)        5 (  0)
+some                                           0        4 (  0)        3 (  0)
+cons                                           0        4 (  0)        4 (  0)
+getf                                           0        4 (  0)        4 (  0)
+(method
+ open-stream-p
+ (stream:buffered-stream))                     0        4 (  0)        4 (  0)
+nreverse                                       0        4 (  0)        4 (  0)
+cadr                                           0        3 (  0)        3 (  0)
+expt                                           0        3 (  0)        3 (  0)
+metis::flow-mark-file-processed                0        2 (  0)        0 (  0)
+simple-string-p                                0        2 (  0)        2 (  0)
+digit-char-p                                   0        2 (  0)        2 (  0)
+(method
+ output-stream-p
+ (stream:buffered-stream))                     0        2 (  0)        2 (  0)
+rplacd                                         0        2 (  0)        2 (  0)
+metis::flatten                                 0        1 (  0)        1 (  0)
+realp                                          0        1 (  0)        1 (  0)
+list-length                                    0        1 (  0)        1 (  0)
+(method
+ streamp
+ (stream:fundamental-stream))                  0        1 (  0)        1 (  0)
+
+On average .6475 stacks profiled each profiler invocation
+Top of stack not monitored 91% of the time
+
+delta 240.847 rows:607004 files:100
+nil
+
+
+
+*** sqlless
+-ccl 37s
+
+
+*** allegrocache
+**** 0
+; cpu time (non-gc) 42.569665 sec user, 0.669740 sec system
+; cpu time (gc)     51.389107 sec user, 0.136018 sec system
+; cpu time (total)  93.958772 sec (00:01:33.958772) user, 0.805758 sec system
+; cpu time (thread) 42.560861 sec user, 0.668755 sec system
+; real time  75.679793 sec (00:01:15.679793) (125.2%)
+; space allocation:
+;  43,808,707 cons cells, 1,720,558,096 other bytes, 0 static bytes
+; Page Faults: major: 0 (gc: 60375), minor: 224474 (gc: 60375)
+./metis/metis v 0 ~/vpcbench  95.23s user 1.67s system 127% cpu 1:15.83 total
+
+**** 1
+**** 2
+**** 3
