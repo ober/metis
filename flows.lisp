@@ -214,7 +214,7 @@
   #+allegro
   (progn
     (make-instance 'flow
-		   :date date
+		   :date (to-epoch date)
 		   ;;:interface_id interface_id
 		   :srcaddr srcaddr
 		   :dstaddr dstaddr
