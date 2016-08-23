@@ -9,18 +9,18 @@
 
 	    (defclass flow ()
 	      ((date :initarg :date :index :any :accessor date)
-	       (version :initarg version )
-	       (account_id :initarg account_id)
-	       (interface_id :initarg :interface_id :index :any)
+	       ;;(version :initarg version )
+	       ;;(account_id :initarg account_id)
+	       (interface_id :initarg :interface_id)
 	       (srcaddr :initarg :srcaddr :index :any :accessor srcaddr)
 	       (dstaddr :initarg :dstaddr :index :any :accessor dstaddr)
 	       (srcport :initarg :srcport :index :any :accessor srcport)
 	       (dstport :initarg :dstport :index :any :accessor dstport)
 	       (protocol :initarg :protocol)
 	       (packets :initarg :packets)
-	       (bytez :initarg :bytez)
-	       (start :initarg :start)
-	       (endf :initarg :endf)
+	       (bytez :initarg :bytez )
+	       (start :initarg :start :index :any :accessor start)
+	       (endf :initarg :endf :index :any :accessor endf)
 	       (action :initarg :action)
 	       (status :initarg :status))
 	      (:metaclass db.ac:persistent-class))
@@ -213,7 +213,20 @@
 (defun insert-flows( date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   #+allegro
   (progn
-    (make-instance 'flow :date date :interface_id interface_id :srcaddr srcaddr :dstaddr dstaddr :srcport srcport :dstport dstport :protocol protocol :packets packets :bytez bytez :start start :endf endf :action action :status status)
+    (make-instance 'flow
+		   :date date
+		   ;;:interface_id interface_id
+		   :srcaddr srcaddr
+		   :dstaddr dstaddr
+		   :srcport srcport
+		   :dstport dstport
+		   :protocol protocol
+		   :packets packets
+		   :bytez bytez
+		   :start start
+		   :endf endf
+		   :action action
+		   :status status)
     )
 
   #-allegro
