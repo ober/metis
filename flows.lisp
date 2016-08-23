@@ -145,7 +145,7 @@
 (defun flows-have-we-seen-this-file (file)
   (format t "seen? ~A~%" file)
   #+allegro (progn
-	      (if (retrieve-from-index 'flow_files 'name (format nil "~A" file))
+	      (if (retrieve-from-index 'flow_files 'name (format nil "~A" (get-full-filename file)))
 		  t
 		  nil))
   #-allegro (progn
@@ -165,7 +165,7 @@
 (defun flow-mark-file-processed (x)
   #+allegro (progn
 	      (format t "mark-file: ~A" x)
-	      (make-instance 'flow_files :name (format nil "~A" x))
+	      (make-instance 'flow_files :name (format nil "~A" (get-full-filename x)))
 	      )
   #-allegro (progn
 	      (let ((fullname (get-full-filename x)))
