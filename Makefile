@@ -24,8 +24,11 @@ clisp:
 	@ cat deliver.lisp|clisp
 
 allegro:
-	@ rm -rf ./metis/
+	@ rm -rf dist/allegro metis
+	@ mkdir -p dist/allegro
 	@ cat deliver.lisp|allegro
+	@ mv metis/* dist/allegro
+	@ rm -rf metis
 
 cmucl:
 	@ cat deliver.lisp|/usr/cmucl/bin/lisp
