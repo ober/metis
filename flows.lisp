@@ -109,33 +109,39 @@
 	 (dir2 (nth (- length 3) split)))
     (format nil "~A/~A/~A" dir2 dir1 (file-namestring x))))
 
+#+allegro
 (defmacro find-by-field (class field value)
   `(let ((myclass (intern (string-upcase class)))
 	 (myfield (intern field)))
      (mapcar #'(lambda (x)
 		 (format t "xxx: ~A ~%" x))
 	     (retrieve-from-index 'metis::flow (quote ,field) "53" :all t))))
-
+#+allegro
 (defun find-by-srcaddr (value)
   (mapcar #'(lambda (x)
 	      (format t "xxx: ~A ~%" x))
 	  (retrieve-from-index 'metis::flow 'srcaddr value :all t)))
 
+#+allegro
 (defun find-by-dstaddr (value)
   (mapcar #'(lambda (x)
 	      (format t "xxx: ~A ~%" x))
 	  (retrieve-from-index 'metis::flow 'dstaddr value :all t)))
 
+#+allegro
 (defun find-by-srcport (value)
   (mapcar #'(lambda (x)
 	      (format t "xxx: ~A ~%" x))
 	  (retrieve-from-index 'metis::flow 'srcport value :all t)))
 
+
+#+allegro
 (defun find-by-dstport (value)
   (mapcar #'(lambda (x)
 	      (format t "xxx: ~A ~%" x))
 	  (retrieve-from-index 'metis::flow 'date value :all t)))
 
+#+allegro
 (defun find-by-dstport (value)
   (mapcar #'(lambda (x)
 	      (format t "xxx: ~A ~%" x))
