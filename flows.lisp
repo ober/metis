@@ -43,7 +43,6 @@
 	    *files*))
   *h*)
 
-
 (defun bench-vpc-flows-report-async (workers path)
   (recreate-flow-tables)
 
@@ -83,7 +82,7 @@
      #'(lambda (x)
 	 (if (typep x 'pcall::task)
 	     (progn
-	       (format t "~%here:~A" (type-of x))
+	       ;;(format t "~%here:~A" (type-of x))
 	       (pcall:join x))
 	     (format t "~%not ~A" (type-of x))
 	     ))
@@ -143,7 +142,7 @@
 	  (retrieve-from-index 'metis::flow 'dstport value :all t)))
 
 (defun flows-have-we-seen-this-file (file)
-  (format t "seen? ~A~%" file)
+  ;;(format t "seen? ~A~%" file)
   #+allegro (progn
 	      (if (retrieve-from-index 'flow_files 'name (format nil "~A" (get-full-filename file)))
 		  t
