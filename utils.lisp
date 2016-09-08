@@ -2,11 +2,8 @@
 
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
 ;;(defun get-hostname-by-ip (ip)
-  (if (eq (uiop:getenv "BENCHING") nil)
+  (unless (eq (uiop:getenv "BENCHING") nil)
       "bogus.host.com"
-  ;; 	(progn
-  ;; 	  (format t "Benching is set to yes. Disabling dns lookups!:~A~%" benching)
-  ;; 	  "bogus.host.com")
   (progn
     #+allegro
     (socket:ipaddr-to-hostname ip)
