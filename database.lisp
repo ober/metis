@@ -115,13 +115,13 @@
   *h*)
 
 (defun load-normalized-values (table)
-  (let* ((values-hash (make-hash-table :test 'equalp))
+  (let* ((values-hash (make-hash-table :test 'equalp :synchronized t))
 	 (query (format nil "select id, value from ~A order by id" table))
 	 (values (psql-do-query query)))
-    (mapcar
+    (mapc
      #'(lambda (x)
-	 (let ((id (car x))
-	       (value (car (cdr x))))
+	 (destructuring-bind (id value)
+	     x
 	   (setf (gethash id values-hash) value)))
      values)
     values-hash))
