@@ -113,3 +113,15 @@
 		(setf (gethash (car x) *h*) t))
 	    *files*))
   *h*)
+
+(defun load-normalized-values (table)
+  (let* ((values-hash (make-hash-table :test 'equalp))
+	 (query (format nil "select id, value from ~A order by id" table))
+	 (values (psql-do-query query)))
+    (mapcar
+     #'(lambda (x)
+	 (let ((id (car x))
+	       (value (car (cdr x))))
+	   (setf (gethash id values-hash) value)))
+     values)
+    values-hash))
