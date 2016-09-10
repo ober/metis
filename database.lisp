@@ -125,3 +125,15 @@
 	   (setf (gethash id values-hash) value)))
      values)
     values-hash))
+
+(defun sync-hash-to-table (table hash)
+  ;; just sync.
+  (let* ((query (format nil "select max(id) from ~A" table))
+	 (max-id (car (flatten (psql-do-query query))))
+	 (max-hash-value (reduce #'max (alexandria:hash-table-keys hash))))
+    ;;(format t "query:~A max-id:~A max-hash-value:~A~%" query max-id max-hash-value)))
+    (if (> max-hash-value max-id)
+    	(loop for x from (+ max-id 1) to max-hash-value
+	   do (progn
+		(let ((query (format nil "insert into ~A(value) values(\'~A\')" table (gethash x hash))))
+		  (psql-do-query query)))))))
