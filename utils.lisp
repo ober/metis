@@ -2,19 +2,19 @@
 
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
 ;;(defun get-hostname-by-ip (ip)
-  (unless (eq (uiop:getenv "BENCHING") nil)
-      "bogus.host.com"
-  (progn
-    #+allegro
-    (socket:ipaddr-to-hostname ip)
-    #+sbcl
-    (sb-bsd-sockets:host-ent-name
-     (sb-bsd-sockets:get-host-by-address
-      (sb-bsd-sockets:make-inet-address ip)))
-    #+lispworks
-    (comm:get-host-entry ip :fields '(:name))
-    #+clozure
-    (ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip))))))
+  ;; (unless (eq (uiop:getenv "BENCHING") nil)
+  ;;     "bogus.host.com"
+  ;; (progn
+  #+allegro
+  (socket:ipaddr-to-hostname ip)
+  #+sbcl
+  (sb-bsd-sockets:host-ent-name
+   (sb-bsd-sockets:get-host-by-address
+    (sb-bsd-sockets:make-inet-address ip)))
+  #+lispworks
+  (comm:get-host-entry ip :fields '(:name))
+  #+clozure
+  (ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip))))
 
 ;; #-clozure
 (defun read-json-gzip-file (file)
