@@ -13,7 +13,6 @@
 	      (ignore-errors (comm:get-host-entry ip :fields '(:name)))
 	      #+clozure
 	      (ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip)))))
-	(format t "ip:~A name:~A~%" ip name)
 	(if (null name)
 	    ip
 	    name))
