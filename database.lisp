@@ -115,22 +115,37 @@
   *h*)
 
 (defun load-normalized-values (table)
-  (let* ((values-hash (make-hash-table :test 'equalp :synchronized t))
+  (let* ((values-hash (make-hash-table :test 'equalp ))
 	 (query (format nil "select id, value from ~A order by id" table))
 	 (values (psql-do-query query)))
     (mapc
      #'(lambda (x)
 	 (destructuring-bind (id value)
 	     x
-	   (setf (gethash id values-hash) value)))
+	   (setf (gethash value values-hash) id)))
      values)
     values-hash))
+
+(defun hash-max-key (hash)
+  (reduce #'max (alexandria:hash-table-values hash)))
+
+(defun get-id-or-update-hash (hash value)
+  "Look up the id value in a hash.
+  If found, return it.
+  Otherwise add it to hash and +1 *maxima*::hash::max-id"
+  (multiple-value-bind (id found)
+      (gethash value hash)
+    (if found
+	id
+	(let ((new-id (+ (hash-max-key hash) 1)))
+	  (setf (gethash value hash) new-id)
+	  new-id))))
 
 (defun sync-hash-to-table (table hash)
   ;; just sync.
   (let* ((query (format nil "select max(id) from ~A" table))
 	 (max-id (car (flatten (psql-do-query query))))
-	 (max-hash-value (reduce #'max (alexandria:hash-table-keys hash))))
+	 (max-hash-value (hash-max-key hash)))
     ;;(format t "query:~A max-id:~A max-hash-value:~A~%" query max-id max-hash-value)))
     (if (> max-hash-value max-id)
     	(loop for x from (+ max-id 1) to max-hash-value
