@@ -5,22 +5,20 @@
 (defvar *DB* nil)
 (defvar *pcallers* 5)
 (defvar dbtype "postgres")
-(defvar *files* nil)
 
-(defun db-have-we-seen-this-file (x)
-  (format t ".")
-  (if (psql-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
-      t
-      nil))
 
-(defun db-mark-file-processed (x)
-  (psql-do-query
-   (format nil "insert into files(value) values ('~A')" (file-namestring x)))
-  (setf (gethash (file-namestring x) *h*) t))
+(defun initialize-hashes ()
+  (defparameter to-db (make-instance 'queue))
+  (defvar event_names (load-normalized-values "event_names"))
+  (defvar event_times (load-normalized-values "event_times"))
+  (defvar files (load-normalized-values "files"))
+  (defvar source_hosts (load-normalized-values "source_hosts"))
+  (defvar user_agents (load-normalized-values "user_agents"))
+  (defvar user_names (load-normalized-values "user_names"))
+  (defvar user_keys (load-normalized-values "user_keys")))
 
-(defun db-mark-file-processed-preload (x)
-  (psql-do-query
-   (format nil "insert into files(value) values ('~A')" (file-namestring x))))
+(defun mark-file-processed (x)
+  (format t "~A~%" (get-id-or-update-hash (file-namestring x))))
 
 (defun psql-do-query (query &optional db)
   (let ((database (or db "metis"))
@@ -94,16 +92,34 @@
 
 (defun normalize-insert (event-time user-name user-key event-name user-agent source-host)
   (let*
-      ((event-time-id (get-id-or-insert-psql "event_times" event-time))
-       (user-name-id (get-id-or-insert-psql "user_names" user-name))
-       (user-key-id (get-id-or-insert-psql "user_keys" user-key))
-       ;;(user-identity-id (get-id-or-insert-psql "user_identitys " user-identity))
-       (event-name-id (get-id-or-insert-psql "event_names" event-name))
-       (user-agent-id (get-id-or-insert-psql "user_agents" user-agent))
-       (source-host-id (get-id-or-insert-psql "source_hosts" source-host)))
-    (psql-do-query
-     (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
-	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
+      ((event-time-id (get-id-or-update-hash event_times event-time))
+       (user-name-id (get-id-or-update-hash user_names user-name))
+       (user-key-id (get-id-or-update-hash user_keys user-key))
+       ;;(user-identity-id (get-id-or-update-hash user_identitys user-identity))
+       (event-name-id (get-id-or-update-hash event_names event-name))
+       (user-agent-id (get-id-or-update-hash user_agents user-agent))
+       (source-host-id (get-id-or-update-hash source_hosts source-host)))
+    (enqueue (format nil
+		     "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
+		     event-time-id
+		     user-name-id
+		     user-key-id
+		     event-name-id
+		     user-agent-id
+		     source-host-id) to-db)))
+
+;; (defun normalize-insert (event-time user-name user-key event-name user-agent source-host)
+;;   (let*
+;;       ((event-time-id (get-id-or-insert-psql "event_times" event-time))
+;;        (user-name-id (get-id-or-insert-psql "user_names" user-name))
+;;        (user-key-id (get-id-or-insert-psql "user_keys" user-key))
+;;        ;;(user-identity-id (get-id-or-insert-psql "user_identitys " user-identity))
+;;        (event-name-id (get-id-or-insert-psql "event_names" event-name))
+;;        (user-agent-id (get-id-or-insert-psql "user_agents" user-agent))
+;;        (source-host-id (get-id-or-insert-psql "source_hosts" source-host)))
+;;     (psql-do-query
+;;      (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
+;; 	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
 
 (defun load-file-values ()
   (unless *files*

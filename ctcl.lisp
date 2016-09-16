@@ -3,17 +3,9 @@
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
-  ;;(format t ".")
-  (let ((them (load-file-values)))
-    (if (gethash (file-namestring file) them)
-  	t
-	nil)))
-
-;; (defun have-we-seen-this-value (var value)
-;;   (let ((them (load-values var)))
-;;     (if (gethash var them)
-;;   	t
-;; 	nil)))
+  (multiple-value-bind (id seen)
+      (gethash (file-namestring file) files)
+    seen))
 
 (defun walk-ct (path fn)
   (cl-fad:walk-directory path fn))
@@ -28,7 +20,7 @@
 (defun process-ct-file (x)
   (when (equal (pathname-type x) "gz")
     (unless (have-we-seen-this-file x)
-      (db-mark-file-processed x)
+      (mark-file-processed x)
       ;;(format t "n")
       ;;(format t "New:~A~%" (file-namestring x))
       (parse-ct-contents x))))
@@ -86,12 +78,13 @@
 	    (format t "~%rps:~A rows:~A delta:~A" rps num delta))))))
 
 (defun cloudtrail-report-sync (path)
+  (initialize-hashes)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
 	     #'sync-ct-file)))
 
 (defun cloudtrail-report-async (workers path)
-  ;;(psql-create-tables)
+  (initialize-hashes)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (let ((cloudtrail-reports (or path "~/CT")))
