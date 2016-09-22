@@ -177,13 +177,16 @@
     	(loop for x from (+ max-id 1) to max-hash-value
 	   do (progn
 		(format t ".")
-		(let ((query (format nil "insert into ~A(value) values(\'~A\')" table (car (rassoc x hash-alist)))))
-		  (psql-do-query query)))))))
-;;		  (format t "sql:~A~%" query)))))))
-;;		  (psql-do-query query)))))
+		(let* ((value (car (rassoc x hash-alist)))
+		       (query (format nil "insert into ~A(value) values(\'~A\')" table value)))
+		  (unless (null value)
+		    (progn
+		      ;;(format t "type:~A~%" (type-of value))
+		      ;;(format t "sql:~A~%" query)
+		      (psql-do-query query)))))))))
 
 (defun sync-world ()
-  (format t "syncing world")
+  (format t "Syncing world~%")
   (sync-hash-to-table "event_names" event_names)
   (sync-hash-to-table "event_times" event_times)
   (sync-hash-to-table "files" files)
@@ -191,12 +194,14 @@
   (sync-hash-to-table "user_agents" user_agents)
   (sync-hash-to-table "user_names" user_names)
   (sync-hash-to-table "user_keys" user_keys)
-  (format t "done with sync"))
+  (time (drain-queue to-db))
+  (format t "World sync complete~%"))
 
 (defun drain-queue (queue)
-  (psql-do-query "BEGIN;")
+  (format t "Draining ~A log entries into postgres...~%" (pcall-queue:queue-length queue))
   (loop while (> (pcall-queue:queue-length queue) 0)
      do (progn
 	  (let ((query (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ~A;" (pcall-queue:queue-pop queue))))
+;;;	    (format t "%%")
 	    (psql-do-query query))))
-  (psql-do-query "COMMIT;"))
+  (format t "Draining complete.~%"))

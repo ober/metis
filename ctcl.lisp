@@ -18,13 +18,16 @@
   (push (pcall:pexec
 	  (funcall #'process-ct-file x)) *mytasks*))
 
+(defun start-sync-thread ()
+  (push (pcall:pexec
+    (funcall #'drain-queue to-db)) *mytasks*))
+
 (defun process-ct-file (x)
   (format t "-")
   (when (equal (pathname-type x) "gz")
     (unless (have-we-seen-this-file x)
       (mark-file-processed x)
-      ;;(format t "n")
-      (format t "New:~A~%" (file-namestring x))
+      ;;(format t "New:~A~%" (file-namestring x))
       (parse-ct-contents x))))
 
 ;; (defun parse-ct-contents (x)
@@ -92,4 +95,6 @@
     (let ((cloudtrail-reports (or path "~/CT")))
       (walk-ct cloudtrail-reports
 	       #'async-ct-file))
-    (mapc #'pcall:join *mytasks*)))
+    ;;(start-sync-thread)
+    (mapc #'pcall:join *mytasks*))
+  (sync-world))
