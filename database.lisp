@@ -8,17 +8,21 @@
 
 
 (defun initialize-hashes ()
-  (defparameter to-db (make-instance 'queue))
+  (format t "initializing hashes~%")
+  (defparameter to-db (pcall-queue:make-queue))
   (defvar event_names (load-normalized-values "event_names"))
   (defvar event_times (load-normalized-values "event_times"))
   (defvar files (load-normalized-values "files"))
   (defvar source_hosts (load-normalized-values "source_hosts"))
   (defvar user_agents (load-normalized-values "user_agents"))
   (defvar user_names (load-normalized-values "user_names"))
-  (defvar user_keys (load-normalized-values "user_keys")))
+  (defvar user_keys (load-normalized-values "user_keys"))
+  (format t "done with hashes~%")
+  )
 
 (defun mark-file-processed (x)
-  (format t "~A~%" (get-id-or-update-hash (file-namestring x))))
+  (format t "q:~A~%" (pcall-queue:queue-length to-db))
+  (format t "~A~%" (get-id-or-update-hash files (file-namestring x))))
 
 (defun psql-do-query (query &optional db)
   (let ((database (or db "metis"))
@@ -99,7 +103,8 @@
        (event-name-id (get-id-or-update-hash event_names event-name))
        (user-agent-id (get-id-or-update-hash user_agents user-agent))
        (source-host-id (get-id-or-update-hash source_hosts source-host)))
-    (enqueue (format nil
+    ;;(format t "q:~A~%" (queue-length to-db))
+    (pcall-queue:queue-push (format nil
 		     "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
 		     event-time-id
 		     user-name-id
@@ -143,7 +148,10 @@
     values-hash))
 
 (defun hash-max-key (hash)
-  (reduce #'max (alexandria:hash-table-values hash)))
+  (let ((values (alexandria:hash-table-values hash)))
+    (if (null values)
+	0
+      (reduce #'max values))))
 
 (defun get-id-or-update-hash (hash value)
   "Look up the id value in a hash.
