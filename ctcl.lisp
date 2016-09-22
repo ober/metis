@@ -3,6 +3,7 @@
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
+  (format t ".")
   (multiple-value-bind (id seen)
       (gethash (file-namestring file) files)
     seen))
@@ -18,11 +19,12 @@
 	  (funcall #'process-ct-file x)) *mytasks*))
 
 (defun process-ct-file (x)
+  (format t "-")
   (when (equal (pathname-type x) "gz")
     (unless (have-we-seen-this-file x)
       (mark-file-processed x)
       ;;(format t "n")
-      ;;(format t "New:~A~%" (file-namestring x))
+      (format t "New:~A~%" (file-namestring x))
       (parse-ct-contents x))))
 
 ;; (defun parse-ct-contents (x)

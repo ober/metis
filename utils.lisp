@@ -56,35 +56,35 @@
         ,store-var)
      `(cdr (assoc ,item-var ,a-list-var ,@ keys)))))
 
-(defclass queue ()
-  ((list :initform nil)
-   (tail :initform nil)))
+;; (defclass queue ()
+;;   ((list :initform nil)
+;;    (tail :initform nil)))
 
-(defmethod print-object ((queue queue) stream)
-  (print-unreadable-object (queue stream :type t)
-    (with-slots (list tail) queue
-      (cond ((cddddr list)
-	     ;; at least five elements, so print ellipsis
-	     (format stream "(~{~S ~}... ~S)"
-		     (subseq list 0 3) (first tail)))
-	    ;; otherwise print whole list
-	    (t (format stream "~:S" list))))))
+;; (defmethod print-object ((queue queue) stream)
+;;   (print-unreadable-object (queue stream :type t)
+;;     (with-slots (list tail) queue
+;;       (cond ((cddddr list)
+;; 	     ;; at least five elements, so print ellipsis
+;; 	     (format stream "(~{~S ~}... ~S)"
+;; 		     (subseq list 0 3) (first tail)))
+;; 	    ;; otherwise print whole list
+;; 	    (t (format stream "~:S" list))))))
 
-(defmethod dequeue ((queue queue))
-  (with-slots (list) queue
-    (pop list)))
+;; (defmethod dequeue ((queue queue))
+;;   (with-slots (list) queue
+;;     (pop list)))
 
-(defmethod queue-length ((queue queue))
-  (with-slots (list) queue
-    (list-length list)))
+;; (defmethod queue-length ((queue queue))
+;;   (with-slots (list) queue
+;;     (list-length list)))
 
-(defmethod enqueue (new-item (queue queue))
-  (with-slots (list tail) queue
-    (let ((new-tail (list new-item)))
-      (cond ((null list) (setf list new-tail))
-	    (t (setf (cdr tail) new-tail)))
-      (setf tail new-tail)))
-  queue)
+;; (defmethod enqueue (new-item (queue queue))
+;;   (with-slots (list tail) queue
+;;     (let ((new-tail (list new-item)))
+;;       (cond ((null list) (setf list new-tail))
+;; 	    (t (setf (cdr tail) new-tail)))
+;;       (setf tail new-tail)))
+;;   queue)
 
 ;; (defun file-at-once (filespec &rest open-args)
 ;;   (with-open-stream (stream (apply #’open filespec

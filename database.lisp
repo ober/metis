@@ -105,7 +105,7 @@
        (source-host-id (get-id-or-update-hash source_hosts source-host)))
     ;;(format t "q:~A~%" (queue-length to-db))
     (pcall-queue:queue-push (format nil
-		     "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
+		     "('~A','~A','~A','~A','~A','~A')"
 		     event-time-id
 		     user-name-id
 		     user-key-id
@@ -126,14 +126,14 @@
 ;;      (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
 ;; 	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
 
-(defun load-file-values ()
-  (unless *files*
-    (setf *files*
-	  (psql-do-query "select value from files" *DB*))
-    (mapcar #'(lambda (x)
-		(setf (gethash (car x) *h*) t))
-	    *files*))
-  *h*)
+;; (defun load-file-values ()
+;;   (unless *files*
+;;     (setf *files*
+;; 	  (psql-do-query "select value from files" *DB*))
+;;     (mapcar #'(lambda (x)
+;; 		(setf (gethash (car x) *h*) t))
+;; 	    *files*))
+;;   *h*)
 
 (defun load-normalized-values (table)
   (let* ((values-hash (make-hash-table :test 'equalp ))
@@ -169,10 +169,34 @@
   ;; just sync.
   (let* ((query (format nil "select max(id) from ~A" table))
 	 (max-id (car (flatten (psql-do-query query))))
-	 (max-hash-value (hash-max-key hash)))
-    ;;(format t "query:~A max-id:~A max-hash-value:~A~%" query max-id max-hash-value)))
+	 (max-hash-value (hash-max-key hash))
+	 (hash-alist (alexandria:hash-table-alist hash))
+	 )
+    (unless (integerp max-id) (setf max-id 0))
     (if (> max-hash-value max-id)
     	(loop for x from (+ max-id 1) to max-hash-value
 	   do (progn
-		(let ((query (format nil "insert into ~A(value) values(\'~A\')" table (gethash x hash))))
+		(format t ".")
+		(let ((query (format nil "insert into ~A(value) values(\'~A\')" table (car (rassoc x hash-alist)))))
 		  (psql-do-query query)))))))
+;;		  (format t "sql:~A~%" query)))))))
+;;		  (psql-do-query query)))))
+
+(defun sync-world ()
+  (format t "syncing world")
+  (sync-hash-to-table "event_names" event_names)
+  (sync-hash-to-table "event_times" event_times)
+  (sync-hash-to-table "files" files)
+  (sync-hash-to-table "source_hosts" source_hosts)
+  (sync-hash-to-table "user_agents" user_agents)
+  (sync-hash-to-table "user_names" user_names)
+  (sync-hash-to-table "user_keys" user_keys)
+  (format t "done with sync"))
+
+(defun drain-queue (queue)
+  (psql-do-query "BEGIN;")
+  (loop while (> (pcall-queue:queue-length queue) 0)
+     do (progn
+	  (let ((query (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ~A;" (pcall-queue:queue-pop queue))))
+	    (psql-do-query query))))
+  (psql-do-query "COMMIT;"))
