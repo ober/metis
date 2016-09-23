@@ -89,7 +89,9 @@
   (initialize-hashes)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
-	     #'sync-ct-file)))
+	     #'sync-ct-file))
+  (sync-world)
+  )
 
 (defun cloudtrail-report-async (workers path)
   (initialize-hashes)
@@ -100,5 +102,5 @@
 	       #'async-ct-file))
     ;;(start-sync-thread)
     (mapc #'pcall:join *mytasks*))
-  (sync-world)
-  (exit))
+  (sync-world))
+  ;;(exit))
