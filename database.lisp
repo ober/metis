@@ -148,7 +148,8 @@
       (progn
 	(setf syncing t)
 	(format t "Sync limit of ~A hit." q-len)
-	(sync-world))
+	(sync-world)
+	(setf syncing nil))
       (format t "sync already running...~%")))
 
 (defun sync-hash-to-table (table hash)
