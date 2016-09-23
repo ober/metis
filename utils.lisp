@@ -110,9 +110,10 @@
           (t (setf node (cdr node))))))
 
 
-(defun quit ()
+(defun exit ()
   #+allegro (excl:exit code)
   #+sbcl (sb-ext::exit)
-  #+lispworks (quit)
+  #+lispworks (lispworks:quit)
   #+clozure (ccl::quit)
-  #+cmucl (quit)))
+  #+cmucl (quit)
+  )
