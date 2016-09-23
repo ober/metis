@@ -83,7 +83,7 @@
 		  (q-len (pcall-queue:queue-length to-db)))
 		(if (> q-len 100000)
 		    (periodic-sync q-len))
-	    (format t "~%rps:~A rows:~A delta:~A" rps num delta))))))
+	    (format t "~%rps:~A rows:~A delta:~A q:~A" rps num delta q-len))))))
 
 (defun cloudtrail-report-sync (path)
   (initialize-hashes)
