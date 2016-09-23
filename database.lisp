@@ -193,5 +193,5 @@
        do (progn
 	    (format drain "~A~%" (pcall-queue:queue-pop queue))))
     (format drain "\\.~%"))
-  ;;(uiop:run-program (format nil "cat /tmp/loadme.txt|psql -U metis -d metis"))
+  (uiop:run-program (format nil "cat /tmp/loadme.txt|psql -U metis -d metis"))
   (format t "Draining complete.~%"))
