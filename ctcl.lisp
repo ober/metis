@@ -97,4 +97,5 @@
 	       #'async-ct-file))
     ;;(start-sync-thread)
     (mapc #'pcall:join *mytasks*))
-  (sync-world))
+  (sync-world)
+  (quit))
