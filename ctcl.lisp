@@ -98,4 +98,4 @@
     ;;(start-sync-thread)
     (mapc #'pcall:join *mytasks*))
   (sync-world)
-  (quit))
+  (exit))
