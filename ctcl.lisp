@@ -23,9 +23,9 @@
     (funcall #'drain-queue to-db)) *mytasks*))
 
 (defun process-ct-file (x)
-  (format t "-")
   (when (equal (pathname-type x) "gz")
     (unless (have-we-seen-this-file x)
+
       (mark-file-processed x)
       ;;(format t "New:~A~%" (file-namestring x))
       (parse-ct-contents x))))
@@ -79,7 +79,10 @@
     (let* ((etime (get-internal-real-time))
 	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second))))
       (if (and (> delta 0) (> num 99))
-	  (let ((rps (/ (float num) (float delta))))
+	  (let ((rps (/ (float num) (float delta)))
+		  (q-len (pcall-queue:queue-length to-db)))
+		(if (> q-len 100000)
+		    (periodic-sync q-len))
 	    (format t "~%rps:~A rows:~A delta:~A" rps num delta))))))
 
 (defun cloudtrail-report-sync (path)

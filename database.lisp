@@ -5,7 +5,7 @@
 (defvar *DB* nil)
 (defvar *pcallers* 5)
 (defvar dbtype "postgres")
-
+(defvar syncing nil)
 
 (defun initialize-hashes ()
   (format t "initializing hashes~%")
@@ -142,6 +142,14 @@
 	(let ((new-id (+ (hash-max-key hash) 1)))
 	  (setf (gethash value hash) new-id)
 	  new-id))))
+
+(defun periodic-sync (q-len)
+  (if (null syncing)
+      (progn
+	(setf syncing t)
+	(format t "Sync limit of ~A hit." q-len)
+	(sync-world))
+      (format t "sync already running...~%")))
 
 (defun sync-hash-to-table (table hash)
   ;; just sync.
