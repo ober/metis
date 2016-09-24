@@ -168,8 +168,7 @@
 		       (query (format nil "insert into ~A(value) values(\'~A\')" table value)))
 		  (unless (null value)
 		    (progn
-		      ;;(format t "type:~A~%" (type-of value))
-		      ;;(format t "sql:~A~%" query)
+		      (format t "sql:~A~%" query)
 		      (psql-do-query query)))))))))
 
 (defun sync-world ()
