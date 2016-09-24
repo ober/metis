@@ -158,9 +158,7 @@
       (gethash value hash)
     (if found
 	id
-	(progn
-	  (setf new-id (+ (gethash max maxima) 1))
-
+	(let ((new-id (+ (gethash max maxima) 1)))
 	  (setf (gethash value hash) new-id)
 	  (setf (gethash max maxima) new-id)
 	  ;;		  (format t "~%X: value:~A max:~A type:~A new-id:~A~%" value max (type-of value) new-id)
