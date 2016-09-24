@@ -132,18 +132,23 @@
 	0
       (reduce #'max values))))
 
+
+(defun block-if-syncing ()
+  (loop while syncing
+     do (progn
+	  (format t "s")
+	  (sleep 1))))
+
+
 (defun get-id-or-update-hash (hash value max)
   "Look up the id value in a hash.
   If found, return it.
   Otherwise add it to hash and +1 *maxima*::hash::max-id"
-  ;;(format t "~%hash:~A value:~A max:~A" hash value max)
   (if (null value)
-      0)
+      (setf value "nil")) ;; sql needs a string.
 
-  (loop while syncing
-     do (progn
-	  (format t "s")
-	  (sleep 1)))
+  ;;(format t "~%X max:~A value:~A type:~A null?~A~%" max value (type-of value) (null value))
+  (block-if-syncing)
 
   (multiple-value-bind (max-value found) (gethash max maxima)
     (if (null found)
@@ -153,10 +158,12 @@
       (gethash value hash)
     (if found
 	id
-	(let ((new-id (+ (gethash max maxima) 1)))
-	  (format t "~%X: value:~A max:~A type:~A~%" value max (type-of value))
+	(progn
+	  (setf new-id (+ (gethash max maxima) 1))
+
 	  (setf (gethash value hash) new-id)
 	  (setf (gethash max maxima) new-id)
+	  ;;		  (format t "~%X: value:~A max:~A type:~A new-id:~A~%" value max (type-of value) new-id)
 	  new-id))))
 
 (defun periodic-sync (q-len)
