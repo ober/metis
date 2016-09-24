@@ -136,6 +136,15 @@
   "Look up the id value in a hash.
   If found, return it.
   Otherwise add it to hash and +1 *maxima*::hash::max-id"
+  ;;(format t "~%hash:~A value:~A max:~A" hash value max)
+  (if (null value)
+      0)
+
+  (loop while syncing
+     do (progn
+	  (format t "s")
+	  (sleep 1)))
+
   (multiple-value-bind (max-value found) (gethash max maxima)
     (if (null found)
 	(setf (gethash max maxima) (hash-max-key hash))))
@@ -145,6 +154,7 @@
     (if found
 	id
 	(let ((new-id (+ (gethash max maxima) 1)))
+	  (format t "~%X: value:~A max:~A type:~A~%" value max (type-of value))
 	  (setf (gethash value hash) new-id)
 	  (setf (gethash max maxima) new-id)
 	  new-id))))
@@ -178,7 +188,7 @@
 		      (psql-do-query query)))))))))
 
 (defun sync-world ()
-  (format t "Syncing world~%")
+  (format t "~%Syncing world~%")
   (sync-hash-to-table "event_names" event_names)
   (sync-hash-to-table "event_times" event_times)
   (sync-hash-to-table "files" files)
@@ -187,7 +197,7 @@
   (sync-hash-to-table "user_names" user_names)
   (sync-hash-to-table "user_keys" user_keys)
   (time (emit-drain-file to-db))
-  (format t "World sync complete~%"))
+  (format t "~%World sync complete~%"))
 
 (defun drain-queue (queue)
   (format t "Draining ~A log entries into postgres...~%" (pcall-queue:queue-length queue))

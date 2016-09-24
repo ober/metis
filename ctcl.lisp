@@ -82,7 +82,7 @@
 	  (let ((rps (/ (float num) (float delta)))
 		  (q-len (pcall-queue:queue-length to-db)))
 	    ;;(if (> q-len 100000)
-	;;	    (periodic-sync q-len))
+	    ;;(periodic-sync q-len))
 	    (format t "~%rps:~A rows:~A delta:~A q:~A" rps num delta q-len))))))
 
 (defun cloudtrail-report-sync (path)
@@ -90,6 +90,7 @@
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
 	     #'sync-ct-file))
+  (sync-world)
   (sync-world)
   )
 
@@ -102,5 +103,6 @@
 	       #'async-ct-file))
     ;;(start-sync-thread)
     (mapc #'pcall:join *mytasks*))
+  (sync-world)
   (sync-world))
   ;;(exit))
