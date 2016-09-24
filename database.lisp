@@ -6,6 +6,7 @@
 (defvar *pcallers* 5)
 (defvar dbtype "postgres")
 (defvar syncing nil)
+(defvar maxima (make-hash-table :test 'equalp))
 
 (defun initialize-hashes ()
   (format t "initializing hashes~%")
@@ -22,7 +23,7 @@
 
 (defun mark-file-processed (x)
   ;;(format t "q:~A~%" (pcall-queue:queue-length to-db))
-  (get-id-or-update-hash files (file-namestring x)))
+  (get-id-or-update-hash files (file-namestring x) "files"))
 
 (defun psql-do-query (query &optional db)
   (let ((database (or db "metis"))
@@ -96,13 +97,13 @@
 
 (defun normalize-insert (event-time user-name user-key event-name user-agent source-host)
   (let*
-      ((event-time-id (get-id-or-update-hash event_times event-time))
-       (user-name-id (get-id-or-update-hash user_names user-name))
-       (user-key-id (get-id-or-update-hash user_keys user-key))
-       ;;(user-identity-id (get-id-or-update-hash user_identitys user-identity))
-       (event-name-id (get-id-or-update-hash event_names event-name))
-       (user-agent-id (get-id-or-update-hash user_agents user-agent))
-       (source-host-id (get-id-or-update-hash source_hosts source-host)))
+      ((event-time-id (get-id-or-update-hash event_times event-time "event-time"))
+       (user-name-id (get-id-or-update-hash user_names user-name "user-name"))
+       (user-key-id (get-id-or-update-hash user_keys user-key "user-key"))
+       ;;(user-identity-id (get-id-or-update-hash user_identitys user-identity "user-identity"))
+       (event-name-id (get-id-or-update-hash event_names event-name "event-name"))
+       (user-agent-id (get-id-or-update-hash user_agents user-agent "user-agent"))
+       (source-host-id (get-id-or-update-hash source_hosts source-host "source-host")))
     ;;(format t "q:~A~%" (queue-length to-db))
     (pcall-queue:queue-push (format nil
 		     "~A~C~A~C~A~C~A~C~A~C~A"
@@ -131,16 +132,21 @@
 	0
       (reduce #'max values))))
 
-(defun get-id-or-update-hash (hash value)
+(defun get-id-or-update-hash (hash value max)
   "Look up the id value in a hash.
   If found, return it.
   Otherwise add it to hash and +1 *maxima*::hash::max-id"
+  (multiple-value-bind (max-value found) (gethash max maxima)
+    (if (null found)
+	(setf (gethash max maxima) (hash-max-key hash))))
+
   (multiple-value-bind (id found)
       (gethash value hash)
     (if found
 	id
-	(let ((new-id (+ (hash-max-key hash) 1)))
+	(let ((new-id (+ (gethash max maxima) 1)))
 	  (setf (gethash value hash) new-id)
+	  (setf (gethash max maxima) new-id)
 	  new-id))))
 
 (defun periodic-sync (q-len)
@@ -168,7 +174,7 @@
 		       (query (format nil "insert into ~A(value) values(\'~A\')" table value)))
 		  (unless (null value)
 		    (progn
-		      (format t "sql:~A~%" query)
+		      ;;(format t "sql:~A~%" query)
 		      (psql-do-query query)))))))))
 
 (defun sync-world ()
