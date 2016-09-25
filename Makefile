@@ -3,7 +3,6 @@
 usage:
 	@ echo "make all # create distributions for all installed lisps"
 
-
 lispworks:
 	@ mkdir -p dist/lispworks
 	@ ~/lw-console -build deliver.lisp
@@ -15,9 +14,10 @@ ecl:
 sbcl:
 	@ mkdir -p dist/sbcl
 	@ cat deliver.lisp|sbcl --dynamic-space-size 2048
+
 ccl:
 	@ mkdir -p dist/ccl || true
-	@ cat deliver.lisp|ccl64
+	@ cat deliver.lisp|ccl
 
 clisp:
 	@ mkdir -p dist/clisp || true

@@ -20,8 +20,8 @@
   #+lispworks (progn
 		(hcl:set-up-profiler :package '(metis))
 		(hcl:profile (do-bench)))
-  #+allegro (progn
-	       (setf excl:*tenured-bytes-limit* 524288000)
-	       (prof::with-profiling (:type :space) (metis::do-bench))
-	       (prof::show-flat-profile))
-  #+(or clozure abcl ecl)(time (do-bench)))
+  ;; #+allegro (progn
+  ;; 	       (setf excl:*tenured-bytes-limit* 524288000)
+  ;; 	       (prof::with-profiling (:type :space) (metis::do-bench))
+  ;; 	       (prof::show-flat-profile))
+  #+(or allegro clozure abcl ecl)(time (do-bench)))

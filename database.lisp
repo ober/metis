@@ -184,7 +184,6 @@
     (if (> max-hash-value max-id)
     	(loop for x from (+ max-id 1) to max-hash-value
 	   do (progn
-		(format t ".")
 		(let* ((value (car (rassoc x hash-alist)))
 		       (query (format nil "insert into ~A(value) values(\'~A\')" table value)))
 		  (unless (null value)
