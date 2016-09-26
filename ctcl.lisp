@@ -64,7 +64,6 @@
   (let* ((records (cdr (elt (read-json-gzip-file x) 0)))
 	 (num (length records))
 	 (btime (get-internal-real-time)))
-    ;;(format t "wtf: records:~A~%" (length records))
     (dolist (x records)
       (let* ((event-time (cdr-assoc :EVENT-TIME x))
 	     ;;(user-identity (cdr-assoc :ACCESS-KEY-ID (cdr-assoc :USER-IDENTITY x)))
