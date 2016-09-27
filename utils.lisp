@@ -1,26 +1,25 @@
 (in-package :metis)
 
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
-  ;; (unless (boundp '*benching*)
-  ;;   (if (cl-ppcre:all-matches "^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" ip)
-  ;; 	(let ((name
-  ;; 	       #+allegro
-  ;; 		(ignore-errors (socket:ipaddr-to-hostname ip))
-  ;; 		#+sbcl
-  ;; 		(ignore-errors (sb-bsd-sockets:host-ent-name
-  ;; 				(sb-bsd-sockets:get-host-by-address
-  ;; 				 (sb-bsd-sockets:make-inet-address ip))))
-  ;; 		#+lispworks
-  ;; 		(ignore-errors (comm:get-host-entry ip :fields '(:name)))
-  ;; 		#+clozure
-  ;; 		(ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip)))))
-  ;; 	  (format t "ip:~A name:~A~%" ip name)
-  ;; 	  (if (null name)
-  ;; 	      ip
-  ;; 	      name))
-  ;; 	ip))
-  "bogus.host.com")
-
+  (unless (boundp '*benching*)
+    (if (cl-ppcre:all-matches "^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" ip)
+  	(let ((name
+  	       #+allegro
+  		(ignore-errors (socket:ipaddr-to-hostname ip))
+  		#+sbcl
+  		(ignore-errors (sb-bsd-sockets:host-ent-name
+  				(sb-bsd-sockets:get-host-by-address
+  				 (sb-bsd-sockets:make-inet-address ip))))
+  		#+lispworks
+  		(ignore-errors (comm:get-host-entry ip :fields '(:name)))
+  		#+clozure
+  		(ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip)))))
+  	  ;;(format t "ip:~A name:~A~%" ip name)
+  	  (if (null name)
+  	      ip
+  	      name))
+  	ip)))
+;;  "bogus.host.com"))
 
 #-clozure
 (defun read-json-gzip-file (file)
