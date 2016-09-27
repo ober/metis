@@ -3,7 +3,7 @@
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
-  (format t ".")
+  ;;(format t ".")
   (multiple-value-bind (id seen)
       (gethash (file-namestring file) files)
     seen))
@@ -60,7 +60,7 @@
 ;;   (enqueue (cdr (elt (read-json-gzip-file x) 0)) *q*))
 
 (defun parse-ct-contents (x)
-  (format t "+")
+  ;;(format t "+")
   (let* ((records (cdr (elt (read-json-gzip-file x) 0)))
 	 (num (length records))
 	 (btime (get-internal-real-time)))
