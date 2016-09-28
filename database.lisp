@@ -182,6 +182,7 @@
 	 )
     (unless (integerp max-id) (setf max-id 0))
     (if (> max-hash-value max-id)
+	(format t "~%syncing ~A: ~A entries...~%" table (- max-hash-value max-id))
     	(loop for x from (+ max-id 1) to max-hash-value
 	   do (progn
 		(let* ((value (car (rassoc x hash-alist)))
