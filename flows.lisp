@@ -1,6 +1,7 @@
 (in-package :metis)
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
+(defvar *files* nil)
 
 #+allegro (progn
 	    (defclass conversation ()
