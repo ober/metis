@@ -4,16 +4,9 @@
 
 (defun have-we-seen-this-file (file)
   ;;(format t ".")
-  (let ((them (load-file-values)))
-    (if (gethash (file-namestring file) them)
-  	t
-	nil)))
-
-;; (defun have-we-seen-this-value (var value)
-;;   (let ((them (load-values var)))
-;;     (if (gethash var them)
-;;   	t
-;; 	nil)))
+  (multiple-value-bind (id seen)
+      (gethash (file-namestring file) files)
+    seen))
 
 (defun walk-ct (path fn)
   (cl-fad:walk-directory path fn))
@@ -25,11 +18,15 @@
   (push (pcall:pexec
 	  (funcall #'process-ct-file x)) *mytasks*))
 
+(defun start-sync-thread ()
+  (push (pcall:pexec
+    (funcall #'drain-queue to-db)) *mytasks*))
+
 (defun process-ct-file (x)
   (when (equal (pathname-type x) "gz")
     (unless (have-we-seen-this-file x)
-      (db-mark-file-processed x)
-      ;;(format t "n")
+
+      (mark-file-processed x)
       ;;(format t "New:~A~%" (file-namestring x))
       (parse-ct-contents x))))
 
@@ -63,11 +60,10 @@
 ;;   (enqueue (cdr (elt (read-json-gzip-file x) 0)) *q*))
 
 (defun parse-ct-contents (x)
-  (format t "+")
+  ;;(format t "+")
   (let* ((records (cdr (elt (read-json-gzip-file x) 0)))
 	 (num (length records))
 	 (btime (get-internal-real-time)))
-    ;;(format t "wtf: records:~A~%" (length records))
     (dolist (x records)
       (let* ((event-time (cdr-assoc :EVENT-TIME x))
 	     ;;(user-identity (cdr-assoc :ACCESS-KEY-ID (cdr-assoc :USER-IDENTITY x)))
@@ -82,19 +78,29 @@
     (let* ((etime (get-internal-real-time))
 	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second))))
       (if (and (> delta 0) (> num 99))
-	  (let ((rps (/ (float num) (float delta))))
-	    (format t "~%rps:~A rows:~A delta:~A" rps num delta))))))
+	  (let ((rps (/ (float num) (float delta)))
+		  (q-len (pcall-queue:queue-length to-db)))
+	    (if (> q-len 100000)
+		(periodic-sync q-len))
+	    (format t "~%rps:~A rows:~A delta:~A q:~A" rps num delta q-len))))))
 
 (defun cloudtrail-report-sync (path)
+  (initialize-hashes)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
-	     #'sync-ct-file)))
+	     #'sync-ct-file))
+  (sync-world)
+  #+lispworks (exit)
+  )
 
 (defun cloudtrail-report-async (workers path)
-  ;;(psql-create-tables)
+  (initialize-hashes)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (let ((cloudtrail-reports (or path "~/CT")))
       (walk-ct cloudtrail-reports
 	       #'async-ct-file))
-    (mapc #'pcall:join *mytasks*)))
+    ;;(start-sync-thread)
+    (mapc #'pcall:join *mytasks*))
+  (sync-world)
+  #+lispworks (exit))

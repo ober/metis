@@ -13,6 +13,7 @@
 	       :gzip-stream
 	       :cl-json
 	       :pcall
+	       :pcall-queue
 	       :postmodern
 	       :split-sequence
 	       :cl-date-time-parser
