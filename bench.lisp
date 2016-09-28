@@ -2,19 +2,19 @@
 
 (defun do-bench ()
   (setf debugg t)
-  (setf *DB* "metistest")
+  (setf *DB* "metis")
   ;;(declare (optimize (safety 3) (speed 0) (debug 3)))
   (defparameter BENCHING t)
-  (cloudtrail-report-async "8" "~/test-ct/"))
+  (cloudtrail-report-async "4" "~/test-ct/"))
 
 
-(defun run-bench () 
+(defun run-bench ()
   (let ((varz '(*files *h* *mytasks* *DB* *pcallers* dbtype *q*)))
     (mapcar #'(lambda (x)
 		(setf x nil)) varz))
-  (psql-ensure-connection "metistest")
+  (psql-ensure-connection "metis")
   ;;(princ "XXX: Dropping tables")
-  (psql-recreate-tables "metistest")
+  (psql-recreate-tables "metis")
   (princ "XXX: Running Test")
   ;;#+sbcl (time (do-bench))
   ;; (progn
@@ -29,9 +29,9 @@
     ;;(prof::with-profiling (:type :space) (ctcl::do-bench))
     ;;(prof::show-flat-profile))
   ;;#+(or clozure abcl ecl) (time (do-bench))
-  ;;(format t "results: size:~A" (queue-length *q*))  
+  ;;(format t "results: size:~A" (queue-length *q*))
   ;;(cl-store:store *q* "~/q.store")
-  (do-bench)
+  (time (do-bench))
   )
 
 ;;(run-bench)
