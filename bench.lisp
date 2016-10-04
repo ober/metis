@@ -9,9 +9,6 @@
 
 
 (defun run-bench ()
-  (let ((varz '(*files *h* *mytasks* *DB* *pcallers* dbtype *q*)))
-    (mapcar #'(lambda (x)
-		(setf x nil)) varz))
   (psql-ensure-connection "metis")
   ;;(princ "XXX: Dropping tables")
   (psql-recreate-tables "metis")
