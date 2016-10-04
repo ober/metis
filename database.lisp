@@ -29,7 +29,17 @@
 	(host "localhost"))
     (postmodern:with-connection
 	`(,database ,user-name ,password ,host :pooled-p t)
-      (postmodern:query query))))
+	(postmodern:query query))))
+
+(defun psql-do-trans (query &optional db)
+  (let ((database (or db "metis"))
+	(user-name "metis")
+	(password "metis")
+	(host "localhost"))
+    (postmodern:with-connection
+	`(,database ,user-name ,password ,host :pooled-p t)
+      (postmodern:with-transaction ()
+	(postmodern:query query)))))
 
 (defun psql-drop-table (table &optional db)
   (let ((database (or db "metis")))
@@ -71,6 +81,12 @@
     (psql-do-query (format nil "create unique index concurrently if not exists ~A_idx1 on ~A(id)" table table) database)
     (psql-do-query (format nil "create unique index concurrently if not exists ~A_idx2 on ~A(value)" table table) database)))
 
+(defun try-twice (table query)
+  (let ((val (or
+	      (ignore-errors (get-id-or-insert-psql table query))
+		 (get-id-or-insert-psql table query))))
+    val))
+
 ;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
   (setf *print-circle* nil)
@@ -79,7 +95,7 @@
 	 (flatten
 	  (car
 	   (car
-	    (psql-do-query
+	    (psql-do-trans
 	     (format nil "select id from ~A where value = '~A'" table value)))))))
     ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
     (if (listp id)
@@ -94,13 +110,13 @@
 
 (defun normalize-insert (event-time user-name user-key event-name user-agent source-host)
   (let*
-      ((event-time-id (get-id-or-insert-psql "event_times" event-time))
-       (user-name-id (get-id-or-insert-psql "user_names" user-name))
-       (user-key-id (get-id-or-insert-psql "user_keys" user-key))
-       ;;(user-identity-id (get-id-or-insert-psql "user_identitys " user-identity))
-       (event-name-id (get-id-or-insert-psql "event_names" event-name))
-       (user-agent-id (get-id-or-insert-psql "user_agents" user-agent))
-       (source-host-id (get-id-or-insert-psql "source_hosts" source-host)))
+      ((event-time-id (try-twice "event_times" event-time))
+       (user-name-id (try-twice "user_names" user-name))
+       (user-key-id (try-twice "user_keys" user-key))
+       ;;(user-identity-id (try-twice "user_identitys " user-identity))
+       (event-name-id (try-twice "event_names" event-name))
+       (user-agent-id (try-twice "user_agents" user-agent))
+       (source-host-id (try-twice "source_hosts" source-host)))
     (psql-do-query
      (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
 	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
