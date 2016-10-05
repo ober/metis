@@ -7,6 +7,7 @@
 		:pcall
 		:uiop
 		:postmodern
+		:com.gigamonkeys.json
 		:cl-date-time-parser
 		))
 
