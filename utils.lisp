@@ -104,3 +104,9 @@
            (when (cdar node) (push (cdar node) (cdr node)))
            (setf (car node) (caar node)))
           (t (setf node (cdr node))))))
+
+(defun file-string (path)
+  (with-open-file (stream path)
+    (let ((data (make-string (file-length stream))))
+      (read-sequence data stream)
+      data)))
