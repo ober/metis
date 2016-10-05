@@ -18,23 +18,30 @@
 	    name))
       ip))
 
-;; #-clozure
 (defun read-json-gzip-file (file)
-  (with-input-from-string
-      (s
-       (uiop:run-program
-	(format nil "zcat ~A" file)
-	:output :string))
-    (cl-json:decode-json s)))
+  (com.gigamonkeys.json:parse-json
+   (uiop:run-program
+    (format nil "zcat ~A" file)
+    :output :string)))
 
-;;#+clozure
+
+;; ;; #-clozure
 ;; (defun read-json-gzip-file (file)
 ;;   (with-input-from-string
-;;       (s (apply #'concatenate 'string
-;; 		(gzip-stream:with-open-gzip-file (in file)
-;; 		  (loop for l = (read-line in nil nil)
-;; 		     while l collect l))))
+;;       (s
+;;        (uiop:run-program
+;; 	(format nil "zcat ~A" file)
+;; 	:output :string))
 ;;     (cl-json:decode-json s)))
+
+;; ;;#+clozure
+;; ;; (defun read-json-gzip-file (file)
+;; ;;   (with-input-from-string
+;; ;;       (s (apply #'concatenate 'string
+;; ;; 		(gzip-stream:with-open-gzip-file (in file)
+;; ;; 		  (loop for l = (read-line in nil nil)
+;; ;; 		     while l collect l))))
+;; ;;     (cl-json:decode-json s)))
 
 (defun cdr-assoc (item a-list &rest keys)
   (cdr (apply #'assoc item a-list keys)))
@@ -83,18 +90,6 @@
 	    (t (setf (cdr tail) new-tail)))
       (setf tail new-tail)))
   queue)
-
-;; (defun file-at-once (filespec &rest open-args)
-;;   (with-open-stream (stream (apply #’open filespec
-;; 				     open-args))
-;;     (let* ((buffer
-;; 	    (make-array (file-length stream)
-;; 			:element-type
-;; 			(stream-element-type stream)
-;; 			:fill-pointer t))
-;; 	   (position (read-sequence buffer stream)))
-;;       (setf (fill-pointer buffer) position)
-;;       buffer)))
 
 (defun flatten (obj)
   (do* ((result (list obj))
