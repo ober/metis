@@ -3,7 +3,6 @@
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
-  ;;(format t ".")
   (let ((them (load-file-values)))
     (if (gethash (file-namestring file) them)
   	t
@@ -29,8 +28,6 @@
   (when (equal (pathname-type x) "gz")
     (unless (have-we-seen-this-file x)
       (db-mark-file-processed x)
-      ;;(format t "n")
-      ;;(format t "New:~A~%" (file-namestring x))
       (parse-ct-contents x))))
 
 
@@ -39,11 +36,9 @@
   (reduce #'getf indicators :initial-value plist))
 
 (defun parse-ct-contents (x)
-  ;;(format t "+")
   (let* ((records (second (read-json-gzip-file x)))
 	 (num (length records))
 	 (btime (get-internal-real-time)))
-    ;;(format t "wtf: records:~A~%" (length records))
     (dolist (x records)
       (let* ((event-time (getf x :|eventTime|))
 	     ;;(user-identity (cdr-assoc :ACCESS-KEY-ID (cdr-assoc :USER-IDENTITY x)))

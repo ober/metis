@@ -8,7 +8,6 @@
 (defvar *files* nil)
 
 (defun db-have-we-seen-this-file (x)
-  (format t ".")
   (if (psql-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
       t
       nil))
