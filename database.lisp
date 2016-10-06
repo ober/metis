@@ -109,7 +109,7 @@
     one))
 
 (defun normalize-insert (event-time user-name user-key event-name user-agent source-host)
-  (format t "NI: ~A ~A ~A ~A ~A ~A~%" event-time user-name user-key event-name user-agent source-host)
+  ;;(format t "NI: ~A ~A ~A ~A ~A ~A~%" event-time user-name user-key event-name user-agent source-host)
   (let*
       ((event-time-id (try-twice "event_times" event-time))
        (user-name-id (try-twice "user_names" user-name))

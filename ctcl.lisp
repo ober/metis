@@ -39,11 +39,11 @@
   (reduce #'getf indicators :initial-value plist))
 
 (defun parse-ct-contents (x)
-  (format t "+")
+  ;;(format t "+")
   (let* ((records (second (read-json-gzip-file x)))
 	 (num (length records))
 	 (btime (get-internal-real-time)))
-    (format t "wtf: records:~A~%" (length records))
+    ;;(format t "wtf: records:~A~%" (length records))
     (dolist (x records)
       (let* ((event-time (getf x :|eventTime|))
 	     ;;(user-identity (cdr-assoc :ACCESS-KEY-ID (cdr-assoc :USER-IDENTITY x)))
