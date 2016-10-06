@@ -12,7 +12,7 @@
 	       :cl-fad
 	       :gzip-stream
 	       :cl-json
-	       :com.gigamonkeys.json
+	       :jonathan
 	       :pcall
 	       :postmodern
 	       :split-sequence

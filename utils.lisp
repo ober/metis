@@ -20,7 +20,7 @@
 
 #-clozure
 (defun read-json-gzip-file (file)
-  (com.gigamonkeys.json:parse-json
+  (jonathan:parse
    (uiop:run-program
     (format nil "zcat ~A" file)
     :output :string)))
@@ -32,7 +32,7 @@
 		(gzip-stream:with-open-gzip-file (in file)
 		  (loop for l = (read-line in nil nil)
 		     while l collect l))))
-    (com.gigamonkeys.json:parse-json s)))
+    (jonathan:parse s)))
 
 (defun cdr-assoc (item a-list &rest keys)
   (cdr (apply #'assoc item a-list keys)))
