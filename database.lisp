@@ -166,10 +166,10 @@
   ;;(format t "omg: ni: ~A~%" (length omg)))
   (let ((n 0))
     (loop for i in *fields*
-       collect (let ((value (try-twice i (nth n record))))
+       collect (let ((value (try-twice i (format nil "~A" (nth n record)))))
 		 (incf n)
 		 (if (null value)
-		     (format t "i:~A val:~A try:~A~%" i (nth n record) value))
+		     (format t "i:~A val:~A try:~A~%"  i (type-of (nth n record)) value))
 		 value))))
 
 (defun get-tables()
