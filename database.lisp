@@ -7,7 +7,31 @@
 (defvar dbtype "postgres")
 (defvar *files* nil)
 
+(defvar *fields* '(
+		   :recipientAccountId
+		   :eventType
+		   :eventID
+		   :requestID
+		   :responseElements
+		   :requestParameters
+		   :userAgent
+		   :sourceIPAddress
+		   :awsRegion
+		   :eventName
+		   :eventSource
+		   :eventTime
+		   :userIdentity
+		   :eventVersion
+		   :errorCode
+		   :errorMessage
+		   :additionalEventData
+		   :resources
+		   ))
+
+
+
 (defun db-have-we-seen-this-file (x)
+  (format t ".")
   (if (psql-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
       t
       nil))
@@ -28,7 +52,7 @@
 	(host "localhost"))
     (postmodern:with-connection
 	`(,database ,user-name ,password ,host :pooled-p t)
-	(postmodern:query query))))
+      (postmodern:query query))))
 
 (defun psql-do-trans (query &optional db)
   (let ((database (or db "metis"))
@@ -52,26 +76,52 @@
 	   (or db "metis")
 	   "metis" "metis" "localhost" :pooled-p t))))
 
+(defun process-record (record fields)
+  (loop for i in fields
+     collect (get-value i record)))
+
+(defun get-value (field record)
+  (cond
+    ((equal :accessKeyId field)(fetch-value '(:|userIdentity| :|accessKeyId|) record))
+    ((equal :additionalEventData field)(getf record :|additionalEventData|))
+    ((equal :awsRegion field)(getf record :|awsRegion|))
+    ((equal :errorCode field)(getf record :|errorCode|))
+    ((equal :errorMessage field)(getf record :|errorMessage|))
+    ((equal :eventID field)(getf record :|eventID|))
+    ((equal :eventName field)(getf record :|eventName|))
+    ((equal :eventSource field)(getf record :|eventSource|))
+    ((equal :eventTime field)(getf record :|eventTime|))
+    ((equal :eventType field)(getf record :|eventType|))
+    ((equal :eventVersion field)(getf record :|eventVersion|))
+    ((equal :recipientAccountId field)(getf record :|recipientAccountId|))
+    ((equal :requestID field)(getf record :|requestID|))
+    ((equal :requestParameters field)(getf record :|requestParameters|))
+    ((equal :resources field)(getf record :|resources|))
+    ((equal :responseElements field)(getf record :|responseElements|))
+    ((equal :sourceIPAddress field)(getf record :|sourceIPAddress|))
+    ((equal :userAgent field)(getf record :|userAgent|))
+    ((equal :userIdentity field)(getf record :|userIdentity|))
+    ((equal :userName field)(fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record))
+    (t (format nil "Unknown arg:~A~%" field))))
+
 (defun psql-recreate-tables (&optional db)
-  (let ((database (or db "metis"))
-	(tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys )))
-    (mapcar
-     #'(lambda (x)
-	 (psql-drop-table x database)) tables)
-    (psql-do-query "drop table if exists log" database)
-    (mapcar
-     #'(lambda (x)
-	 (psql-create-table x database)) tables)
-    (psql-do-query "create table if not exists log(id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)" database)
-    (psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;" database)))
+  (psql-drop-table "files" database)
+  (mapcar
+   #'(lambda (x)
+       (psql-drop-table x database)) *fields*)
+  (psql-do-query "drop table if exists log cascade" database)
+  (psql-create-tables))
 
 (defun psql-create-tables (&optional db)
-  (let ((tables '(:event_names :event_times :files :source_hosts :user_agents :user_names :user_keys ))
-	(database (or db "metis")))
-    (mapcar #'(lambda (x)
-		(psql-create-table x db)) tables)
-    (psql-do-query "create table if not exists log(id serial, event_time integer, user_name integer, user_key integer, event_name integer, user_agent integer, source_host integer)" database)
-    (psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;" database)))
+  (let ((database (or db "metis")))
+    (psql-create-table "files" database)
+    (mapcar
+     #'(lambda (x)
+	 (psql-create-table x database)) *fields*)
+
+    (psql-do-query (format nil "create table if not exists log(id serial, ~{~A ~^ integer, ~} integer)" *fields*) database)))
+
+;;(psql-do-query "create or replace view ct as select event_names.value as event, event_times.value as etime, source_hosts.value as source, user_agents.value as agent, user_names.value as name, user_keys.value as key from event_names,log,event_times,source_hosts,user_agents,user_names,user_keys where event_names.id = log.event_name and event_times.id = log.event_time and source_hosts.id = log.source_host and user_agents.id = log.user_agent and user_names.id = log.user_name and user_keys.id = log.user_key;" database)))
 
 (defun psql-create-table (table &optional db)
   (let ((database (or db "metis")))
@@ -83,7 +133,7 @@
 (defun try-twice (table query)
   (let ((val (or
 	      (ignore-errors (get-id-or-insert-psql table query))
-		 (get-id-or-insert-psql table query))))
+	      (get-id-or-insert-psql table query))))
     val))
 
 ;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
@@ -107,19 +157,23 @@
       (setf one (get-id-or-insert-psql table value)))
     one))
 
-(defun normalize-insert (event-time user-name user-key event-name user-agent source-host)
-  ;;(format t "NI: ~A ~A ~A ~A ~A ~A~%" event-time user-name user-key event-name user-agent source-host)
-  (let*
-      ((event-time-id (try-twice "event_times" event-time))
-       (user-name-id (try-twice "user_names" user-name))
-       (user-key-id (try-twice "user_keys" user-key))
-       ;;(user-identity-id (try-twice "user_identitys " user-identity))
-       (event-name-id (try-twice "event_names" event-name))
-       (user-agent-id (try-twice "user_agents" user-agent))
-       (source-host-id (try-twice "source_hosts" source-host)))
-    (psql-do-query
-     (format nil "insert into log(event_time,user_name,user_key,event_name,user_agent,source_host) values ('~A','~A','~A','~A','~A','~A')"
-	     event-time-id user-name-id user-key-id event-name-id user-agent-id source-host-id))))
+
+(defun get-ids(record)
+  ;;(format t "omg: ni: ~A~%" (length omg)))
+  (let ((n 0))
+    (loop for i in *fields*
+       collect (let ((value (try-twice i (nth n record))))
+		 (incf n)
+		 ;;(format t "i:~A val:~A try:~A~%" i (nth n record) value)
+		 value))))
+
+(defun get-tables()
+  (format nil "~{~A~^, ~}" *fields*))
+
+(defun normalize-insert (record)
+  (let ((values (get-ids record))
+	(tables (get-tables)))
+    (psql-do-query (format nil "insert into log(~{~A~^, ~}) values(~{~A~^, ~})" *fields* values))))
 
 (defun load-file-values ()
   (unless *files*

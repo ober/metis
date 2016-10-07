@@ -3,6 +3,7 @@
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
+  ;;(format t ".")
   (let ((them (load-file-values)))
     (if (gethash (file-namestring file) them)
   	t
@@ -25,11 +26,11 @@
 	  (funcall #'process-ct-file x)) *mytasks*))
 
 (defun process-ct-file (x)
+  "Handle the contents of the json gzip file"
   (when (equal (pathname-type x) "gz")
     (unless (have-we-seen-this-file x)
       (db-mark-file-processed x)
       (parse-ct-contents x))))
-
 
 (defun fetch-value (indicators plist)
   "Return the value at the end of the indicators list"
@@ -40,16 +41,7 @@
 	 (num (length records))
 	 (btime (get-internal-real-time)))
     (dolist (x records)
-      (let* ((event-time (getf x :|eventTime|))
-	     ;;(user-identity (cdr-assoc :ACCESS-KEY-ID (cdr-assoc :USER-IDENTITY x)))
-	     (event-name (getf x :|eventName|))
-	     (user-agent (getf x :|userAgent|))
-	     (ip (getf x :|sourceIPAddress|))
-	     (hostname (get-hostname-by-ip ip))
-	     (user-identity (getf x :|userIdentity|))
-	     (user-name (fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) x))
-	     (user-key (fetch-value '(:|userIdentity| :|accessKeyId|) x)))
-	(normalize-insert event-time user-name user-key event-name user-agent (or hostname ip))))
+      (normalize-insert (process-record x *fields*)))
     (let* ((etime (get-internal-real-time))
 	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second))))
       (if (and (> delta 0) (> num 99))
