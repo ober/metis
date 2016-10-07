@@ -80,6 +80,8 @@
   (loop for i in fields
      collect (get-value i record)))
 
+
+
 (defun get-value (field record)
   (cond
     ((equal :accessKeyId field)(fetch-value '(:|userIdentity| :|accessKeyId|) record))
@@ -139,17 +141,19 @@
 ;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
   (setf *print-circle* nil)
-  (psql-do-query (format nil "insert into ~A(value) select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
-  (let ((id
-	 (flatten
-	  (car
-	   (car
-	    (psql-do-trans
-	     (format nil "select id from ~A where value = '~A'" table value)))))))
-    ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
-    (if (listp id)
-	(car id)
-	id)))
+  (let ((query (format nil "insert into ~A(value) select '~A' where not exists (select * from ~A where value = '~A')" table value table value)))
+    ;;(format t "~%Q:~A~%" query)
+    (psql-do-query query)
+    (let ((id
+	   (flatten
+	    (car
+	     (car
+	      (psql-do-trans
+	       (format nil "select id from ~A where value = '~A'" table value)))))))
+      ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
+      (if (listp id)
+	  (car id)
+	  id))))
 
 (defun get-index-value (table value)
   (let ((one (ignore-errors (get-id-or-insert-psql table value))))
@@ -164,7 +168,8 @@
     (loop for i in *fields*
        collect (let ((value (try-twice i (nth n record))))
 		 (incf n)
-		 ;;(format t "i:~A val:~A try:~A~%" i (nth n record) value)
+		 (if (null value)
+		     (format t "i:~A val:~A try:~A~%" i (nth n record) value))
 		 value))))
 
 (defun get-tables()
