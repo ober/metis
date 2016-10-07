@@ -5,10 +5,10 @@
 			    :fare-memoization
 			    :cl-fad
 			    :gzip-stream
-			    :cl-json
 			    :s-sql
 			    :pcall
 			    :uiop
+			    :jonathan
 			    :cl-date-time-parser
 			    :postmodern)))
 
