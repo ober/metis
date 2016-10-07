@@ -39,7 +39,7 @@
 
 #+allegro
 (defun main (&rest args)
-  (db.ac:open-network-database "localhost" 2222)
+  ;;(db.ac:open-network-database "localhost" 2222)
   (format t "args :~s %" args)
   (let ((verb (or (nth 1 args) nil))
 	(a (or (nth 2 args) nil))
