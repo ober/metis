@@ -57,6 +57,6 @@
       ((equal "b" verb)(time (metis::bench-vpc-flows-report-async a b)))
       ((equal "s" verb)(time (metis::cloudtrail-report-sync a)))
       ((equal "f" verb)(time (metis::find-by-field a b c)))
-      ((equal "r" verb)(time (run-bench)))
+      ((equal "r" verb)(time (metis:run-bench)))
       (t (format t "Usage <~A> <p or s> <directory of logs>" app)))))
 ;; ;;(cl-store:store *q* "~/q.store"))
