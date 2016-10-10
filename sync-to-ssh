@@ -1,0 +1,1 @@
+rsync -ai -e "ssh -p 2222" .git jaimef@localhost:metis-git

@@ -37,7 +37,7 @@
 (defun load-file-flow-values ()
   (unless *files*
     (setf *files*
-	  (psql-do-query "select value from flow_files"))
+	  (dbi-do-query "select value from flow_files"))
     (mapcar #'(lambda (x)
 		(setf (gethash (car x) *h*) t))
 	    *files*))
@@ -63,8 +63,8 @@
     #+(or clozure abcl ecl) (time (vpc-flows-report-async workers path))
     (let* ((etime (get-internal-real-time))
 	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
-	   (files (psql-do-query "select count(*) from flow_files"))
-	   (rows (psql-do-query "select count(*) from raw")))
+	   (files (dbi-do-query "select count(*) from flow_files"))
+	   (rows (dbi-do-query "select count(*) from raw")))
       ;;      (if (and delta rows)
       ;;(let ((rps (/ (float rows) (float delta))))
       ;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
@@ -174,7 +174,7 @@
 	      )
   #-allegro (progn
 	      (let ((fullname (get-full-filename x)))
-		(psql-do-query
+		(dbi-do-query
 		 (format nil "insert into flow_files(value) values ('~A')" fullname))
 		(setf (gethash (file-namestring x) *h*) t))))
 
@@ -254,7 +254,7 @@
 	   (endf-id (get-index-value "endfs" endf))
 	   (action-id (get-index-value "actions" action))
 	   (status-id (get-index-value "statuss" status)))
-	(psql-do-query
+	(dbi-do-query
 	 (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')"
 		 date-id
 		 interface_id-id
@@ -277,13 +277,13 @@
 ;; 	(sport-id (get-id-or-insert-psql "ports" sport))
 ;; 	(dport-id (get-id-or-insert-psql "ports" dstport)))
 
-;;     ;;(psql-do-query (format nil "insert into ~A(value)  select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
-;;     (psql-do-query (format nil "insert into conversations(srcaddr_id, dstaddr_id, sport_id, dport_id) select '~A' where not exists (select * from conversations where srcaddr_id = '~A' and dstaddr_id = '~A' and sport_id = '~A' and dport_id = '~A')" table value table value))
+;;     ;;(dbi-do-query (format nil "insert into ~A(value)  select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
+;;     (dbi-do-query (format nil "insert into conversations(srcaddr_id, dstaddr_id, sport_id, dport_id) select '~A' where not exists (select * from conversations where srcaddr_id = '~A' and dstaddr_id = '~A' and sport_id = '~A' and dport_id = '~A')" table value table value))
 ;;     (let ((id
 ;; 	   (flatten
 ;; 	    (car
 ;; 	     (car
-;; 	      (psql-do-query
+;; 	      (dbi-do-query
 ;; 	       (format nil "select id from ~A where value = '~A'" table value)))))))
 ;;     ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
 ;;       (if (listp id)
@@ -296,8 +296,8 @@
     (mapcar
      #'(lambda (x)
 	 (psql-drop-table x database)) flow_tables)
-    (psql-do-query "drop table if exists raw cascade" database)
-    (psql-do-query "drop table if exists endpoints cascade" database)
+    (dbi-do-query "drop table if exists raw cascade" database)
+    (dbi-do-query "drop table if exists endpoints cascade" database)
     (create-flow-tables)))
 
 (defun create-flow-tables (&optional db)
@@ -305,7 +305,7 @@
     (mapcar
      #'(lambda (x)
 	 (psql-create-table x db)) flow_tables)
-    (psql-do-query "create table endpoints(id serial unique, host int references ips(id),  port int references ports(id))")
-    (psql-do-query "create unique index endpoints_idx on endpoints(host,port)")
-    (psql-do-query "create table if not exists raw(id serial, date integer, interface_id integer, srcaddr integer, dstaddr integer, srcport integer, dstport integer, protocol integer, packets integer, bytez integer, start integer, endf integer, action integer, status integer)" database)
-    (psql-do-query "create or replace view flows as select dates.value as date, interface_ids.value as interface_id, srcaddrs.value as srcaddr, dstaddrs.value as dstaddr, srcports.value as srcport, dstports.value as dstport, protocols.value as protocol, packetss.value as packets, bytezs.value as bytez, starts.value as start, endfs.value as endf, actions.value as action, statuss.value as status from raw, dates, interface_ids, srcaddrs, dstaddrs, srcports, dstports, protocols, packetss, bytezs, starts, endfs, actions, statuss where dates.id = raw.date and interface_ids.id = raw.interface_id and srcaddrs.id = raw.srcaddr and dstaddrs.id = raw.dstaddr and protocols.id = raw.protocol and packetss.id = raw.packets and bytezs.id = raw.bytez and starts.id = raw.start and endfs.id = raw.endf and actions.id = raw.action and statuss.id = raw.status" database)))
+    (dbi-do-query "create table endpoints(id serial unique, host int references ips(id),  port int references ports(id))")
+    (dbi-do-query "create unique index endpoints_idx on endpoints(host,port)")
+    (dbi-do-query "create table if not exists raw(id serial, date integer, interface_id integer, srcaddr integer, dstaddr integer, srcport integer, dstport integer, protocol integer, packets integer, bytez integer, start integer, endf integer, action integer, status integer)" database)
+    (dbi-do-query "create or replace view flows as select dates.value as date, interface_ids.value as interface_id, srcaddrs.value as srcaddr, dstaddrs.value as dstaddr, srcports.value as srcport, dstports.value as dstport, protocols.value as protocol, packetss.value as packets, bytezs.value as bytez, starts.value as start, endfs.value as endf, actions.value as action, statuss.value as status from raw, dates, interface_ids, srcaddrs, dstaddrs, srcports, dstports, protocols, packetss, bytezs, starts, endfs, actions, statuss where dates.id = raw.date and interface_ids.id = raw.interface_id and srcaddrs.id = raw.srcaddr and dstaddrs.id = raw.dstaddr and protocols.id = raw.protocol and packetss.id = raw.packets and bytezs.id = raw.bytez and starts.id = raw.start and endfs.id = raw.endf and actions.id = raw.action and statuss.id = raw.status" database)))

@@ -8,16 +8,15 @@
   :class :package-inferred-system
   :defsystem-depends-on (:asdf-package-system)
   :depends-on (:quicklisp
-	       :fare-memoization
-	       :cl-fad
-	       :gzip-stream
-	       :cl-json
-	       :jonathan
-	       :pcall
-	       :postmodern
-	       :split-sequence
 	       :cl-date-time-parser
-	       :local-time)
+	       :dbi
+	       :cl-fad
+	       :fare-memoization
+	       :gzip-stream
+	       :jonathan
+	       :local-time
+	       :pcall
+	       :split-sequence)
   :components (
 	       (:file "package")
 	       (:file "ctcl" :depends-on ("package" "utils" "database"))

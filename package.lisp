@@ -4,6 +4,7 @@
 	    (ql:quickload '(
 			    :fare-memoization
 			    :cl-fad
+			    :dbi
 			    :gzip-stream
 			    :s-sql
 			    :pcall

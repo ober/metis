@@ -6,12 +6,13 @@
 (defvar *pcallers* 5)
 (defvar dbtype "postgres")
 (defvar *files* nil)
+(defvar *connection* nil)
 
 (defvar *fields* '(
-		   :recipientAccountId
+		   ;;:recipientAccountId
 		   :eventType
-		   :eventID
-		   :requestID
+		   ;;:eventID
+		   ;;:requestID
 		   :responseElements
 		   :requestParameters
 		   :userAgent
@@ -21,7 +22,7 @@
 		   :eventSource
 		   :eventTime
 		   :userIdentity
-		   :eventVersion
+		   ;;:eventVersion
 		   :errorCode
 		   :errorMessage
 		   :additionalEventData
@@ -30,55 +31,53 @@
 
 (defun db-have-we-seen-this-file (x)
   (format t ".")
-  (if (psql-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
+  (if (dbi-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
       t
       nil))
 
 (defun db-mark-file-processed (x)
-  (psql-do-query
+  (dbi-do-query
    (format nil "insert into files(value) values ('~A')" (file-namestring x)))
   (setf (gethash (file-namestring x) *h*) t))
 
 (defun db-mark-file-processed-preload (x)
-  (psql-do-query
+  (dbi-do-query
    (format nil "insert into files(value) values ('~A')" (file-namestring x))))
 
-(defun psql-do-query (query &optional db)
-  (let ((database (or db "metis"))
-	(user-name "metis")
-	(password "metis")
-	(host "localhost"))
-    (postmodern:with-connection
-	`(,database ,user-name ,password ,host :pooled-p t)
-      (postmodern:query query))))
+;; (defun dbi-do-query (query &optional db)
+;;   (let ((database (or db "metis"))
+;; 	(user-name "metis")
+;; 	(password "metis")
+;; 	(host "localhost"))
+;;     (postmodern:with-connection
+;; 	`(,database ,user-name ,password ,host :pooled-p t)
+;;       (postmodern:query query))))
 
-(defun psql-do-trans (query &optional db)
-  (let ((database (or db "metis"))
-	(user-name "metis")
-	(password "metis")
-	(host "localhost"))
-    (postmodern:with-connection
-	`(,database ,user-name ,password ,host :pooled-p t)
-      (postmodern:with-transaction ()
-	(postmodern:query query)))))
+;; (defun psql-do-trans (query &optional db)
+;;   (let ((database (or db "metis"))
+;; 	(user-name "metis")
+;; 	(password "metis")
+;; 	(host "localhost"))
+;;     (postmodern:with-connection
+;; 	`(,database ,user-name ,password ,host :pooled-p t)
+;;       (postmodern:with-transaction ()
+;; 	(postmodern:query query)))))
 
 (defun psql-drop-table (table &optional db)
   (let ((database (or db "metis")))
     (format t "dt: ~A db:~A~%" table db)
-    (psql-do-query (format nil "drop table if exists ~A cascade" table) database)))
+    (dbi-do-query (format nil "drop table if exists ~A cascade" table) database)))
 
-(defun psql-ensure-connection (&optional db)
-  (unless postmodern:*database*
-    (setf postmodern:*database*
-	  (postmodern:connect
-	   (or db "metis")
-	   "metis" "metis" "localhost" :pooled-p t))))
+;; (defun psql-ensure-connection (&optional db)
+;;   (unless postmodern:*database*
+;;     (setf postmodern:*database*
+;; 	  (postmodern:connect
+;; 	   (or db "metis")
+;; 	   "metis" "metis" "localhost" :pooled-p t))))
 
 (defun process-record (record fields)
   (loop for i in fields
      collect (get-value i record)))
-
-
 
 (defun get-value (field record)
   (cond
@@ -104,12 +103,30 @@
     ((equal :userName field)(fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record))
     (t (format nil "Unknown arg:~A~%" field))))
 
+
+;; (defvar *connection*
+;;   (dbi:connect :sqlite
+;;                :database-name "test"
+;;                :username "nobody"
+;;                :password "1234"))
+
+(defun dbi-do-query (query &optional db)
+  (if (null *connection*)
+      ;;(setf *connection* (dbi:connect :sqlite3 :database-name "/tmp/test.db")))
+      (setf *connection* (dbi:connect :postgres :database-name "metis" :username "metis" :password "metis")))
+  (let* ((q (dbi:prepare *connection* query))
+	 (result (dbi:execute q)))
+    (loop for row in (dbi:fetch result)
+       while row
+	 collect row)))
+
+
 (defun psql-recreate-tables (&optional db)
   (psql-drop-table "files" database)
   (mapcar
    #'(lambda (x)
        (psql-drop-table x database)) *fields*)
-  (psql-do-query "drop table if exists log cascade" database)
+  (dbi-do-query "drop table if exists log cascade" database)
   (psql-create-tables))
 
 (defun psql-create-tables (&optional db)
@@ -119,17 +136,17 @@
      #'(lambda (x)
 	 (psql-create-table x database)) *fields*)
 
-    (psql-do-query (format nil "create table if not exists log(id serial, ~{~A ~^ integer, ~} integer)" *fields*) database)
-    (psql-do-query
+    (dbi-do-query (format nil "create table if not exists log(id serial, ~{~A ~^ integer, ~} integer)" *fields*) database)
+    (dbi-do-query
      (format nil "create or replace view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*)
 		   database)))
 
 (defun psql-create-table (table &optional db)
   (let ((database (or db "metis")))
     (format t "ct:~A db:~A~%" table database)
-    (psql-do-query (format nil "create table if not exists ~A(id serial, value text)" table) database)
-    (psql-do-query (format nil "create unique index concurrently if not exists ~A_idx1 on ~A(id)" table table) database)
-    (psql-do-query (format nil "create unique index concurrently if not exists ~A_idx2 on ~A(value)" table table) database)))
+    (dbi-do-query (format nil "create table if not exists ~A(id serial, value text)" table) database)
+    (dbi-do-query (format nil "create unique index concurrently if not exists ~A_idx1 on ~A(id)" table table) database)
+    (dbi-do-query (format nil "create unique index concurrently if not exists ~A_idx2 on ~A(value)" table table) database)))
 
 (defun try-twice (table query)
   (let ((val (or
@@ -142,7 +159,7 @@
   (setf *print-circle* nil)
   (let ((query (format nil "insert into ~A(value) select '~A' where not exists (select * from ~A where value = '~A')" table value table value)))
     ;;(format t "~%Q:~A~%" query)
-    (psql-do-query query)
+    (dbi-do-query query)
     (let ((id
 	   (flatten
 	    (car
@@ -177,12 +194,12 @@
 (defun normalize-insert (record)
   (let ((values (get-ids record))
 	(tables (get-tables)))
-    (psql-do-query (format nil "insert into log(~{~A~^, ~}) values(~{~A~^, ~})" *fields* values))))
+    (dbi-do-query (format nil "insert into log(~{~A~^, ~}) values(~{~A~^, ~})" *fields* values))))
 
 (defun load-file-values ()
   (unless *files*
     (setf *files*
-	  (psql-do-query "select value from files" *DB*))
+	  (dbi-do-query "select value from files" *DB*))
     (mapcar #'(lambda (x)
 		(setf (gethash (car x) *h*) t))
 	    *files*))

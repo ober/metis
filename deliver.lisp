@@ -1,14 +1,14 @@
 (load (merge-pathnames "~/quicklisp/setup.lisp" *default-pathname-defaults*))
-(ql:quickload '(:fare-memoization
-		:cl-fad
-		:gzip-stream
-		:cl-json
-		:s-sql
-		:pcall
-		:uiop
-		:postmodern
-		:jonathan
+(ql:quickload '(
 		:cl-date-time-parser
+		:cl-fad
+		:dbi
+		:fare-memoization
+		:gzip-stream
+		:jonathan
+		:pcall
+		:s-sql
+		:uiop
 		))
 
 (load "package.lisp")
@@ -39,4 +39,4 @@
 (progn
   (let ((lfiles '("package.lisp" "utils.lisp" "ctcl.lisp" "database.lisp" "main.lisp" "bench.lisp" "flows.lisp")))
     (mapcar #'compile-file lfiles)
-    (cl-user::generate-executable "dist/allegro/metis" '("package.fasl" "utils.fasl" "database.fasl" "ctcl.fasl" "main.fasl" "bench.fasl" "flows.fasl"))))
+    (cl-user::generate-executable "dist/allegro/metis" '("package.fasl" "utils.fasl" "database.fasl" "ctcl.fasl" "main.fasl" "bench.fasl" "flows.fasl") :runtime :partners :include-compiler t)))
