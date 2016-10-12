@@ -54,6 +54,7 @@
 	     #'sync-ct-file)))
 
 (defun cloudtrail-report-async (workers path)
+  (force-output)
   ;;(psql-create-tables)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
