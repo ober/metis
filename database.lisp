@@ -1,4 +1,5 @@
 (in-package :metis)
+(defvar *db-backend* "postgres")
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
@@ -8,24 +9,25 @@
 (defvar *files* nil)
 
 (defvar *fields* '(
-		   :recipientAccountId
-		   :eventType
-		   :eventID
-		   :requestID
-		   :responseElements
-		   :requestParameters
-		   :userAgent
-		   :sourceIPAddress
+		   :additionalEventData
 		   :awsRegion
+		   :errorCode
+		   :errorMessage
+		   :eventID
 		   :eventName
 		   :eventSource
 		   :eventTime
-		   :userIdentity
+		   :eventType
 		   :eventVersion
-		   :errorCode
-		   :errorMessage
-		   :additionalEventData
+		   :recipientAccountId
+		   :requestID
+		   :requestParameters
 		   :resources
+		   :responseElements
+		   :sourceIPAddress
+		   :userAgent
+		   :userIdentity
+		   :userName
 		   ))
 
 (defun db-have-we-seen-this-file (x)
@@ -42,6 +44,25 @@
 (defun db-mark-file-processed-preload (x)
   (psql-do-query
    (format nil "insert into files(value) values ('~A')" (file-namestring x))))
+
+(defun db-do-query (query)
+  (cond
+    ((equal :sqlite *db-backend*) (sqlite-do-query query))
+    ((equal :postgres *db-backend*)(psql-do-query query))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
+
+;; (defun sqlite-drop-table (query)
+;;   )
+
+;; (defun sqlite-do-query (query)
+;;   )
+
+;; (defun db-drop-table (query)
+;;   (cond
+;;     ((equal :sqlite *db-backend*) (sqlite-drop-table query))
+;;     ((equal :postgres *db-backend*)(psql-drop-table query))
+;;     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun psql-do-query (query &optional db)
   (let ((database (or db "metis"))
@@ -78,8 +99,6 @@
   (loop for i in fields
      collect (get-value i record)))
 
-
-
 (defun get-value (field record)
   (cond
     ((equal :accessKeyId field)(fetch-value '(:|userIdentity| :|accessKeyId|) record))
@@ -105,11 +124,11 @@
     (t (format nil "Unknown arg:~A~%" field))))
 
 (defun psql-recreate-tables (&optional db)
-  (psql-drop-table "files" database)
+  (psql-drop-table "files")
   (mapcar
    #'(lambda (x)
-       (psql-drop-table x database)) *fields*)
-  (psql-do-query "drop table if exists log cascade" database)
+       (psql-drop-table x)) *fields*)
+  (psql-do-query "drop table if exists log cascade")
   (psql-create-tables))
 
 (defun psql-create-tables (&optional db)
@@ -159,7 +178,6 @@
     (unless (typep one 'integer)
       (setf one (get-id-or-insert-psql table value)))
     one))
-
 
 (defun get-ids(record)
   ;;(format t "omg: ni: ~A~%" (length omg)))
