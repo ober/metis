@@ -1,14 +1,15 @@
 (load (merge-pathnames "~/quicklisp/setup.lisp" *default-pathname-defaults*))
-(ql:quickload '(:fare-memoization
-		:cl-fad
-		:gzip-stream
-		:cl-json
-		:s-sql
-		:pcall
-		:uiop
-		:postmodern
-		:jonathan
+(ql:quickload '(
 		:cl-date-time-parser
+		:cl-fad
+		:cl-json
+		:fare-memoization
+		:gzip-stream
+		:jonathan
+		:pcall
+		:postmodern
+		:sqlite
+		:uiop
 		))
 
 (load "package.lisp")

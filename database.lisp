@@ -52,17 +52,17 @@
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 
-;; (defun sqlite-drop-table (query)
-;;   )
+(defun sqlite-drop-table (query)
+  )
 
-;; (defun sqlite-do-query (query)
-;;   )
+(defun sqlite-do-query (query)
+  )
 
-;; (defun db-drop-table (query)
-;;   (cond
-;;     ((equal :sqlite *db-backend*) (sqlite-drop-table query))
-;;     ((equal :postgres *db-backend*)(psql-drop-table query))
-;;     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+(defun db-drop-table (query)
+  (cond
+    ((equal :sqlite *db-backend*) (sqlite-drop-table query))
+    ((equal :postgres *db-backend*)(psql-drop-table query))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun psql-do-query (query &optional db)
   (let ((database (or db "metis"))

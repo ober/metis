@@ -6,6 +6,7 @@
 			    :cl-fad
 			    :gzip-stream
 			    :s-sql
+			    :sqlite
 			    :pcall
 			    :uiop
 			    :jonathan

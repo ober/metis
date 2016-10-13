@@ -3,9 +3,8 @@
 (defun do-bench ()
   (setf *DB* "metis")
   ;;(declare (optimize (safety 3) (speed 0) (debug 3)))
-  (defparameter BENCHING t)
+  (defvar *benching* t)
   (cloudtrail-report-async "2" "~/test-ct/"))
-
 
 (defun run-bench ()
   (defvar database "metis")

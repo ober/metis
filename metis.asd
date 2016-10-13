@@ -7,17 +7,20 @@
   :license "MIT"
   :class :package-inferred-system
   :defsystem-depends-on (:asdf-package-system)
-  :depends-on (:quicklisp
-	       :fare-memoization
+  :depends-on (
+	       :cl-date-time-parser
 	       :cl-fad
-	       :gzip-stream
 	       :cl-json
+	       :fare-memoization
+	       :gzip-stream
 	       :jonathan
+	       :local-time
 	       :pcall
 	       :postmodern
+	       :quicklisp
 	       :split-sequence
-	       :cl-date-time-parser
-	       :local-time)
+	       :sqlite
+	       )
   :components (
 	       (:file "package")
 	       (:file "ctcl" :depends-on ("package" "utils" "database"))
