@@ -2,16 +2,17 @@
 	    (load (merge-pathnames "~/quicklisp/setup.lisp" *default-pathname-defaults*))
 	    (require :acache "acache-3.0.6.fasl")
 	    (ql:quickload '(
-			    :fare-memoization
+			    :cl-date-time-parser
 			    :cl-fad
+			    :fare-memoization
 			    :gzip-stream
+			    :jonathan
+			    :pcall
+			    :postmodern
 			    :s-sql
 			    :sqlite
-			    :pcall
 			    :uiop
-			    :jonathan
-			    :cl-date-time-parser
-			    :postmodern)))
+			    )))
 
 
 (defpackage :metis
