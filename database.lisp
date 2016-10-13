@@ -1,14 +1,14 @@
 (in-package :metis)
-(defvar *db-backend* :sqlite)
 ;;(defvar *db-backend* :sqlite)
+(defvar *db-backend* :postgres)
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
 (defvar *db* nil)
 (defvar *pcallers* 5)
 (defvar *files* nil)
-(defvar *sqlite-db* ":memory:")
-;;(defvar *sqlite-db* "/tmp/metis.db")
+;;(defvar *sqlite-db* ":memory:")
+(defvar *sqlite-db* "/tmp/metis.db")
 
 (defvar *fields* '(
 		   :additionalEventData
