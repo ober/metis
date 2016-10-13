@@ -1,12 +1,14 @@
 (in-package :metis)
-;;(defvar *db-backend* :postgres)
 (defvar *db-backend* :sqlite)
+;;(defvar *db-backend* :sqlite)
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
 (defvar *db* nil)
 (defvar *pcallers* 5)
 (defvar *files* nil)
+(defvar *sqlite-db* ":memory:")
+;;(defvar *sqlite-db* "/tmp/metis.db")
 
 (defvar *fields* '(
 		   :additionalEventData
@@ -59,34 +61,30 @@
     ((equal :postgres *db-backend*)(psql-do-query query))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
-(defun sqlite-drop-table (table &optional db)
-  (let* ((database (or db "/tmp/metis.db"))
-	 (conn (sqlite:connect database)))
+(defun sqlite-drop-table (table &optional (db *sqlite-db*))
+  (let* ((conn (sqlite:connect db)))
     (sqlite:execute-non-query conn (format nil "drop table if exists ~A" table))))
 
-(defun sqlite-do-query (query &optional db)
-  (let* ((database (or db "/tmp/metis.db"))
-	(conn (sqlite:connect database)))
+(defun sqlite-do-query (query &optional (db *sqlite-db*))
+  (let* ((conn (sqlite:connect db)))
     (sqlite:execute-to-list conn query)))
 
-(defun sqlite-recreate-tables (&optional db)
-  (let* ((database (or db "/tmp/metis.db"))
-	(conn (sqlite:connect database)))
-    (sqlite-drop-table "files" database)
-    (sqlite-drop-table "log" database)
+(defun sqlite-recreate-tables (&optional (db *sqlite-db*))
+  (let* ((conn (sqlite:connect db)))
+    (sqlite-drop-table "files" db)
+    (sqlite-drop-table "log" db)
     (sqlite:execute-non-query conn"drop view ct")
     (mapcar
      #'(lambda (x)
-	 (sqlite-drop-table x database)) *fields*)
+	 (sqlite-drop-table x db)) *fields*)
     (sqlite-create-tables)))
 
-(defun sqlite-create-tables (&optional db)
-  (let* ((database (or db "/tmp/metis.db"))
-	(conn (sqlite:connect database)))
-    (sqlite-create-table "files" database)
+(defun sqlite-create-tables (&optional (db *sqlite-db*))
+  (let* ((conn (sqlite:connect db)))
+    (sqlite-create-table "files" db)
     (mapcar
      #'(lambda (x)
-	 (sqlite-create-table x database)) *fields*)
+	 (sqlite-create-table x db)) *fields*)
 
     (format t "~%create table log(id integer primary key autoincrement, ~{~A ~^ integer, ~} integer)" *fields*)
     (sqlite:execute-non-query conn (format nil "create table log(id serial, ~{~A ~^ integer, ~} integer)" *fields*))
@@ -94,9 +92,9 @@
      (format nil "create view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*)
 		   )))
 
-(defun sqlite-create-table (table &optional db)
-  (let* ((conn (sqlite:connect (or db "/tmp/metis.db"))))
-    (format t "ct:~A db:~A~%" table database)
+(defun sqlite-create-table (table &optional (db *sqlite-db*))
+  (let* ((conn (sqlite:connect db)))
+    (format t "ct:~A db:~A~%" table db)
     (sqlite:execute-non-query conn (format nil "create table ~A(id serial, value text)" table))
     (sqlite:execute-non-query conn (format nil "create unique index ~A_idx1 on ~A(id)" table table))
     (sqlite:execute-non-query conn (format nil "create unique index ~A_idx2 on ~A(value)" table table))))
