@@ -71,13 +71,14 @@
 
 (defun sqlite-recreate-tables (&optional (db *sqlite-db*))
   (let* ((conn (sqlite:connect db)))
-    (sqlite-drop-table "files" db)
-    (sqlite-drop-table "log" db)
-    (sqlite:execute-non-query conn"drop view ct")
-    (mapcar
-     #'(lambda (x)
-	 (sqlite-drop-table x db)) *fields*)
-    (sqlite-create-tables)))
+    (ignore-errors
+      (sqlite-drop-table "files" db)
+      (sqlite-drop-table "log" db)
+      (sqlite:execute-non-query conn"drop view ct")
+      (mapcar
+       #'(lambda (x)
+	   (sqlite-drop-table x db)) *fields*)
+      (sqlite-create-tables))))
 
 (defun sqlite-create-tables (&optional (db *sqlite-db*))
   (let* ((conn (sqlite:connect db)))
