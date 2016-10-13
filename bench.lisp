@@ -8,9 +8,8 @@
 
 (defun run-bench ()
   (defvar database "metis")
-  (psql-ensure-connection "metis")
   ;;(princ "XXX: Dropping tables")
-  (psql-recreate-tables "metis")
+  (db-recreate-tables "metis")
   (princ "XXX: Running Test")
   ;;#+sbcl (time (do-bench))
   ;; (progn

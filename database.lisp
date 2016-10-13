@@ -1,11 +1,11 @@
 (in-package :metis)
-(defvar *db-backend* "postgres")
+;;(defvar *db-backend* :postgres)
+(defvar *db-backend* :sqlite)
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
-(defvar *DB* nil)
+(defvar *db* nil)
 (defvar *pcallers* 5)
-(defvar dbtype "postgres")
 (defvar *files* nil)
 
 (defvar *fields* '(
@@ -32,18 +32,26 @@
 
 (defun db-have-we-seen-this-file (x)
   (format t ".")
-  (if (psql-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
+  (if (db-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
       t
       nil))
 
 (defun db-mark-file-processed (x)
-  (psql-do-query
+  (db-do-query
    (format nil "insert into files(value) values ('~A')" (file-namestring x)))
   (setf (gethash (file-namestring x) *h*) t))
 
-(defun db-mark-file-processed-preload (x)
-  (psql-do-query
-   (format nil "insert into files(value) values ('~A')" (file-namestring x))))
+(defun db-recreate-tables (query)
+  (cond
+    ((equal :sqlite *db-backend*) (sqlite-recreate-tables))
+    ((equal :postgres *db-backend*)(psql-recreate-tables))))
+
+
+(defun db-get-or-insert-id (table value)
+  (cond
+    ((equal :sqlite *db-backend*) (sqlite-get-or-insert-id table value))
+    ((equal :postgres *db-backend*)(psql-get-or-insert-id table value))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-do-query (query)
   (cond
@@ -51,12 +59,47 @@
     ((equal :postgres *db-backend*)(psql-do-query query))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
+(defun sqlite-drop-table (table &optional db)
+  (let* ((database (or db "/tmp/metis.db"))
+	 (conn (sqlite:connect database)))
+    (sqlite:execute-non-query conn (format nil "drop table if exists ~A" table))))
 
-(defun sqlite-drop-table (query)
-  )
+(defun sqlite-do-query (query &optional db)
+  (let* ((database (or db "/tmp/metis.db"))
+	(conn (sqlite:connect database)))
+    (sqlite:execute-to-list conn query)))
 
-(defun sqlite-do-query (query)
-  )
+(defun sqlite-recreate-tables (&optional db)
+  (let* ((database (or db "/tmp/metis.db"))
+	(conn (sqlite:connect database)))
+    (sqlite-drop-table "files" database)
+    (sqlite-drop-table "log" database)
+    (sqlite:execute-non-query conn"drop view ct")
+    (mapcar
+     #'(lambda (x)
+	 (sqlite-drop-table x database)) *fields*)
+    (sqlite-create-tables)))
+
+(defun sqlite-create-tables (&optional db)
+  (let* ((database (or db "/tmp/metis.db"))
+	(conn (sqlite:connect database)))
+    (sqlite-create-table "files" database)
+    (mapcar
+     #'(lambda (x)
+	 (sqlite-create-table x database)) *fields*)
+
+    (format t "~%create table log(id integer primary key autoincrement, ~{~A ~^ integer, ~} integer)" *fields*)
+    (sqlite:execute-non-query conn (format nil "create table log(id serial, ~{~A ~^ integer, ~} integer)" *fields*))
+    (sqlite:execute-non-query conn
+     (format nil "create view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*)
+		   )))
+
+(defun sqlite-create-table (table &optional db)
+  (let* ((conn (sqlite:connect (or db "/tmp/metis.db"))))
+    (format t "ct:~A db:~A~%" table database)
+    (sqlite:execute-non-query conn (format nil "create table ~A(id serial, value text)" table))
+    (sqlite:execute-non-query conn (format nil "create unique index ~A_idx1 on ~A(id)" table table))
+    (sqlite:execute-non-query conn (format nil "create unique index ~A_idx2 on ~A(value)" table table))))
 
 (defun db-drop-table (query)
   (cond
@@ -143,6 +186,7 @@
      (format nil "create or replace view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*)
 		   database)))
 
+
 (defun psql-create-table (table &optional db)
   (let ((database (or db "metis")))
     (format t "ct:~A db:~A~%" table database)
@@ -150,14 +194,15 @@
     (psql-do-query (format nil "create unique index concurrently if not exists ~A_idx1 on ~A(id)" table table) database)
     (psql-do-query (format nil "create unique index concurrently if not exists ~A_idx2 on ~A(value)" table table) database)))
 
+
 (defun try-twice (table query)
   (let ((val (or
-	      (ignore-errors (get-id-or-insert-psql table query))
-	      (get-id-or-insert-psql table query))))
+	      (ignore-errors (db-get-or-insert-id table query))
+	      (db-get-or-insert-id table query))))
     val))
 
 ;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
-(fare-memoization:define-memo-function get-id-or-insert-psql (table value)
+(fare-memoization:define-memo-function psql-get-or-insert-id (table value)
   (setf *print-circle* nil)
   (let ((query (format nil "insert into ~A(value) select '~A' where not exists (select * from ~A where value = '~A')" table value table value)))
     ;;(format t "~%Q:~A~%" query)
@@ -173,10 +218,31 @@
 	  (car id)
 	  id))))
 
+(fare-memoization:define-memo-function sqlite-get-or-insert-id (table value)
+  (setf *print-circle* nil)
+  (let* ((database (or db "/tmp/metis.db"))
+	 (conn (sqlite:connect database))
+	 (query (format nil "insert into ~A(value) select '~A' where not exists (select * from ~A where value = '~A')" table value table value)))
+    (sqlite:execute-single conn query)))
+
+;; (let ((query
+;;     ;;(format t "~%Q:~A~%" query)
+;;     (psql-do-query query)
+;;     (let ((id
+;; 	   (flatten
+;; 	    (car
+;; 	     (car
+;; 	      (psql-do-trans
+;; 	       (format nil "select id from ~A where value = '~A'" table value)))))))
+;;       ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
+;;       (if (listp id)
+;; 	  (car id)
+;; 	  id))))
+
 (defun get-index-value (table value)
-  (let ((one (ignore-errors (get-id-or-insert-psql table value))))
+  (let ((one (ignore-errors (db-get-id-or-insert-id table value))))
     (unless (typep one 'integer)
-      (setf one (get-id-or-insert-psql table value)))
+      (setf one (db-get-id-or-insert-id table value)))
     one))
 
 (defun get-ids(record)
