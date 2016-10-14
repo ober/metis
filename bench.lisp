@@ -4,11 +4,11 @@
   (setf *DB* "metis")
   ;;(declare (optimize (safety 3) (speed 0) (debug 3)))
   (defvar *benching* t)
-  (cloudtrail-report-async "2" "~/test-ct/"))
+  (defvar *db-backend* :sqlite)
+  (cloudtrail-report-sync  "~/test-ct/"))
 
 (defun run-bench ()
   (defvar database "metis")
-  ;;(princ "XXX: Dropping tables")
   (db-recreate-tables "metis")
   (princ "XXX: Running Test")
   ;;#+sbcl (time (do-bench))
