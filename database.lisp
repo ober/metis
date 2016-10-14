@@ -238,9 +238,9 @@
 ;; 	  id))))
 
 (defun get-index-value (table value)
-  (let ((one (ignore-errors (db-get-id-or-insert-id table value))))
+  (let ((one (ignore-errors (db-get-or-insert-id table value))))
     (unless (typep one 'integer)
-      (setf one (db-get-id-or-insert-id table value)))
+      (setf one (db-get-or-insert-id table value)))
     one))
 
 (defun get-ids(record)
