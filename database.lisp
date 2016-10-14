@@ -48,6 +48,11 @@
     ((equal :sqlite *db-backend*) (sqlite-recreate-tables))
     ((equal :postgres *db-backend*)(psql-recreate-tables))))
 
+(defun normalize-insert (record)
+  (cond
+    ((equal :sqlite *db-backend*) (sqlite-normalize-insert record))
+    ((equal :postgres *db-backend*)(psql-normalize-insert record))))
+
 (defun db-get-or-insert-id (table value)
   (cond
     ((equal :sqlite *db-backend*) (sqlite-get-or-insert-id table value))
@@ -263,7 +268,12 @@
 (defun get-tables()
   (format nil "~{~A~^, ~}" *fields*))
 
-(defun normalize-insert (record)
+(defun sqlite-normalize-insert (record)
+  (let ((values (get-ids record))
+	(tables (get-tables)))
+    (db-do-query (format nil "insert into log(~{~A~^, ~}) values(~{~A~^, ~})" *fields* values))))
+
+(defun psql-normalize-insert (record)
   (let ((values (get-ids record))
 	(tables (get-tables)))
     (db-do-query (format nil "insert into log(~{~A~^, ~}) values(~{~A~^, ~})" *fields* values))))
