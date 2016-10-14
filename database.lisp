@@ -90,8 +90,8 @@
     (format t "~%create table log(id integer primary key autoincrement, ~{~A ~^ integer, ~} integer)" *fields*)
     (sqlite:execute-non-query conn (format nil "create table log(id serial, ~{~A ~^ integer, ~} integer)" *fields*))
     (sqlite:execute-non-query conn
-     (format nil "create view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*)
-		   )))
+			      (format nil "create view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*)
+			      )))
 
 (defun sqlite-create-table (table &optional (db *sqlite-db*))
   (let* ((conn (sqlite:connect db)))
@@ -140,14 +140,13 @@
 (defun process-record (record fields)
   (loop for i in fields
      collect (get-value i record)))
-
 (defun get-value (field record)
   (cond
     ((equal :accessKeyId field)(fetch-value '(:|userIdentity| :|accessKeyId|) record))
     ((equal :additionalEventData field)(getf record :|additionalEventData|))
     ((equal :awsRegion field)(getf record :|awsRegion|))
     ((equal :errorCode field)(getf record :|errorCode|))
-    ((equal :errorMessage field)(getf record :|errorMessage|))
+    ((equal :errorMessage field)(replace-all (getf record :|errorMessage|) "'" ""))
     ((equal :eventID field)(getf record :|eventID|))
     ((equal :eventName field)(getf record :|eventName|))
     ((equal :eventSource field)(getf record :|eventSource|))
@@ -183,7 +182,7 @@
     (psql-do-query (format nil "create table if not exists log(id serial, ~{~A ~^ integer, ~} integer)" *fields*) database)
     (psql-do-query
      (format nil "create or replace view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*)
-		   database)))
+     database)))
 
 
 (defun psql-create-table (table &optional db)
@@ -270,3 +269,18 @@
 		(setf (gethash (car x) *h*) t))
 	    *files*))
   *h*)
+
+(defun replace-all (string part replacement &key (test #'char=))
+  "Returns a new string in which all the occurences of the part
+is replaced with replacement."
+  (with-output-to-string (out)
+    (loop with part-length = (length part)
+       for old-pos = 0 then (+ pos part-length)
+       for pos = (search part string
+			 :start2 old-pos
+			 :test test)
+       do (write-string string out
+			:start old-pos
+			:end (or pos (length string)))
+       when pos do (write-string replacement out)
+       while pos)))
