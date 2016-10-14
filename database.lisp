@@ -1,6 +1,6 @@
 (in-package :metis)
-;;(defvar *db-backend* :sqlite)
-(defvar *db-backend* :postgres)
+(defvar *db-backend* :sqlite)
+;;(defvar *db-backend* :postgres)
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
@@ -43,11 +43,10 @@
    (format nil "insert into files(value) values ('~A')" (file-namestring x)))
   (setf (gethash (file-namestring x) *h*) t))
 
-(defun db-recreate-tables (query)
+(defun db-recreate-tables (db)
   (cond
     ((equal :sqlite *db-backend*) (sqlite-recreate-tables))
     ((equal :postgres *db-backend*)(psql-recreate-tables))))
-
 
 (defun db-get-or-insert-id (table value)
   (cond
@@ -66,19 +65,22 @@
     (sqlite:execute-non-query conn (format nil "drop table if exists ~A" table))))
 
 (defun sqlite-do-query (query &optional (db *sqlite-db*))
+  (format t "~%Q: ~A~%" query)
   (let* ((conn (sqlite:connect db)))
     (sqlite:execute-to-list conn query)))
 
 (defun sqlite-recreate-tables (&optional (db *sqlite-db*))
+  (force-output)
+  (format t "Hello~%")
   (let* ((conn (sqlite:connect db)))
     (ignore-errors
       (sqlite-drop-table "files" db)
       (sqlite-drop-table "log" db)
-      (sqlite:execute-non-query conn"drop view ct")
-      (mapcar
-       #'(lambda (x)
-	   (sqlite-drop-table x db)) *fields*)
-      (sqlite-create-tables))))
+      (sqlite:execute-non-query conn"drop view ct"))
+    (mapcar
+     #'(lambda (x)
+	 (sqlite-drop-table x db)) *fields*)
+    (sqlite-create-tables)))
 
 (defun sqlite-create-tables (&optional (db *sqlite-db*))
   (let* ((conn (sqlite:connect db)))
@@ -88,13 +90,13 @@
 	 (sqlite-create-table x db)) *fields*)
 
     (format t "~%create table log(id integer primary key autoincrement, ~{~A ~^ integer, ~} integer)" *fields*)
-    (sqlite:execute-non-query conn (format nil "create table log(id serial, ~{~A ~^ integer, ~} integer)" *fields*))
+    (sqlite:execute-non-query conn (format nil "create table log(id integer primary key autoincrement, ~{~A ~^ integer, ~} integer)" *fields*))
     (sqlite:execute-non-query conn
-			      (format nil "create view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*)
-			      )))
+			      (format nil "create view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*))))
 
 (defun sqlite-create-table (table &optional (db *sqlite-db*))
   (let* ((conn (sqlite:connect db)))
+    (force-output)
     (format t "ct:~A db:~A~%" table db)
     (sqlite:execute-non-query conn (format nil "create table ~A(id serial, value text)" table))
     (sqlite:execute-non-query conn (format nil "create unique index ~A_idx1 on ~A(id)" table table))
@@ -137,16 +139,22 @@
 	   (or db "metis")
 	   "metis" "metis" "localhost" :pooled-p t))))
 
+(defun make-safe-string (str)
+  (if (stringp str)
+      (replace-all str "'" "")
+      str))
+
 (defun process-record (record fields)
   (loop for i in fields
-     collect (get-value i record)))
+     collect (make-safe-string (get-value i record))))
+
 (defun get-value (field record)
   (cond
     ((equal :accessKeyId field)(fetch-value '(:|userIdentity| :|accessKeyId|) record))
     ((equal :additionalEventData field)(getf record :|additionalEventData|))
     ((equal :awsRegion field)(getf record :|awsRegion|))
     ((equal :errorCode field)(getf record :|errorCode|))
-    ((equal :errorMessage field)(replace-all (getf record :|errorMessage|) "'" ""))
+    ((equal :errorMessage field)(getf record :|errorMessage|))
     ((equal :eventID field)(getf record :|eventID|))
     ((equal :eventName field)(getf record :|eventName|))
     ((equal :eventSource field)(getf record :|eventSource|))
@@ -216,10 +224,10 @@
 	  (car id)
 	  id))))
 
-(fare-memoization:define-memo-function sqlite-get-or-insert-id (table value)
+(fare-memoization:define-memo-function sqlite-get-or-insert-id (table value &optional (db "/tmp/metis.db"))
+  (format t "~%sgoii: table:~A value:~A" table value)
   (setf *print-circle* nil)
-  (let* ((database (or db "/tmp/metis.db"))
-	 (conn (sqlite:connect database))
+  (let* ((conn (sqlite:connect db))
 	 (query (format nil "insert into ~A(value) select '~A' where not exists (select * from ~A where value = '~A')" table value table value)))
     (sqlite:execute-single conn query)))
 
@@ -244,14 +252,13 @@
     one))
 
 (defun get-ids(record)
-  ;;(format t "omg: ni: ~A~%" (length omg)))
   (let ((n 0))
     (loop for i in *fields*
        collect (let ((value (try-twice i (format nil "~A" (nth n record)))))
 		 (incf n)
 		 (if (null value)
-		     (format t "i:~A val:~A try:~A~%"  i (type-of (nth n record)) value))
-		 value))))
+		     (format t "i:~A val:~A try:~A~%"  i (nth n record) value))
+		     value))))
 
 (defun get-tables()
   (format nil "~{~A~^, ~}" *fields*))
