@@ -266,28 +266,13 @@
 (defun normalize-insert (record)
   (let ((values (get-ids record))
 	(tables (get-tables)))
-    (psql-do-query (format nil "insert into log(~{~A~^, ~}) values(~{~A~^, ~})" *fields* values))))
+    (db-do-query (format nil "insert into log(~{~A~^, ~}) values(~{~A~^, ~})" *fields* values))))
 
 (defun load-file-values ()
   (unless *files*
     (setf *files*
-	  (psql-do-query "select value from files" *DB*))
+	  (db-do-query "select value from files"))
     (mapcar #'(lambda (x)
 		(setf (gethash (car x) *h*) t))
 	    *files*))
   *h*)
-
-(defun replace-all (string part replacement &key (test #'char=))
-  "Returns a new string in which all the occurences of the part
-is replaced with replacement."
-  (with-output-to-string (out)
-    (loop with part-length = (length part)
-       for old-pos = 0 then (+ pos part-length)
-       for pos = (search part string
-			 :start2 old-pos
-			 :test test)
-       do (write-string string out
-			:start old-pos
-			:end (or pos (length string)))
-       when pos do (write-string replacement out)
-       while pos)))
