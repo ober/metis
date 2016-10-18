@@ -1,6 +1,6 @@
 (in-package :metis)
-(defvar *db-backend* :sqlite)
-;;(defvar *db-backend* :postgres)
+;(defvar *db-backend* :sqlite)
+(defvar *db-backend* :postgres)
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
