@@ -29,14 +29,19 @@
   "Handle the contents of the json gzip file"
   (when (equal (pathname-type x) "gz")
     (unless (have-we-seen-this-file x)
-      (db-mark-file-processed x)
-      (parse-ct-contents x))))
+      (progn
+	(let ((*conn* (sqlite-emit-conn)))
+	  (declare (special *conn*))
+	  (db-mark-file-processed x)
+	  (parse-ct-contents x))))))
 
 (defun fetch-value (indicators plist)
   "Return the value at the end of the indicators list"
   (reduce #'getf indicators :initial-value plist))
 
 (defun parse-ct-contents (x)
+  (if (equal *db-backend* :sqlite)
+      (defvar myconn (sqlite-emit-conn)))
   (let* ((records (second (read-json-gzip-file x)))
 	 (num (length records))
 	 (btime (get-internal-real-time)))
@@ -49,11 +54,13 @@
 	    (format t "~%rps:~A rows:~A delta:~A" rps num delta))))))
 
 (defun cloudtrail-report-sync (path)
+  (sqlite-establish-connection)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
 	     #'sync-ct-file)))
 
 (defun cloudtrail-report-async (workers path)
+  (sqlite-establish-connection)
   (force-output)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)

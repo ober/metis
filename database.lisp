@@ -1,6 +1,6 @@
 (in-package :metis)
-;(defvar *db-backend* :sqlite)
-(defvar *db-backend* :postgres)
+(defvar *db-backend* :sqlite)
+;;(defvar *db-backend* :postgres)
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
@@ -66,12 +66,15 @@
     ((equal :postgres *db-backend*)(psql-do-query query))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
-(defun sqlite-drop-table (table &optional (db *sqlite-db*))
-  (sqlite:execute-non-query *sqlite-conn* (format nil "drop table if exists ~A" table)))
+(defun sqlite-drop-table (table &optional (db *sqlite-conn*))
+  (sqlite:execute-non-query db (format nil "drop table if exists ~A" table)))
 
-(defun sqlite-do-query (query &optional (db *sqlite-db*))
+(defun sqlite-do-query (query &optional (db *sqlite-conn*))
+  "do query"
+  (declare (special *conn*))
+  (format t "*conn*:~A~%" *conn*)
   ;;(format t "~%Q: ~A~%" query)
-  (sqlite:execute-to-list *sqlite-conn* query))
+  (sqlite:execute-to-list db query))
 
 (defun sqlite-establish-connection ()
   (if (equal *db-backend* :sqlite)
@@ -81,13 +84,18 @@
 	      (setf *sqlite-conn* (sqlite:connect *sqlite-db*))
 	      (sqlite:execute-non-query *sqlite-conn* "pragma journal_mode = wal"))))))
 
-(defun sqlite-recreate-tables (&optional (db *sqlite-db*))
+(defun sqlite-emit-conn ()
+  (let ((conn (sqlite:connect *sqlite-db*)))
+    (sqlite:execute-non-query conn "pragma journal_mode = wal")
+    conn))
+
+(defun sqlite-recreate-tables (&optional (db *sqlite-conn*))
   (force-output)
   (format t "Hello~%")
   (ignore-errors
     (sqlite-drop-table "files" db)
     (sqlite-drop-table "log" db)
-    (sqlite:execute-non-query *sqlite-conn* "drop view ct"))
+    (sqlite:execute-non-query db "drop view ct"))
   (mapcar
    #'(lambda (x)
        (sqlite-drop-table x db)) *fields*)
@@ -98,7 +106,6 @@
   (mapcar
    #'(lambda (x)
        (sqlite-create-table x db)) *fields*)
-
   (format t "~%create table log(id integer primary key autoincrement, ~{~A ~^ integer, ~} integer)" *fields*)
   (sqlite:execute-non-query *sqlite-conn* (format nil "create table log(id integer primary key autoincrement, ~{~A ~^ integer, ~} integer)" *fields*))
   (sqlite:execute-non-query *sqlite-conn*
@@ -234,22 +241,23 @@
 	  id))))
 
 (fare-memoization:define-memo-function sqlite-get-or-insert-id (table value &optional (db "/tmp/metis.db"))
+  "get or set id"
   ;;(format t "~%sgoii: table:~A value:~A" table value)
   (setf *print-circle* nil)
+  (declare (special *conn*))
   (let ((insert (format nil "insert or ignore into ~A(value) values('~A')" table value))
 	(query (format nil "select id from ~A where value = '~A'" table value))
         (id nil))
-    (sqlite:with-transaction *sqlite-conn*
-      (sqlite:execute-non-query *sqlite-conn* insert)
-      (setf id (sqlite:execute-single *sqlite-conn* query)))
+    (sqlite:with-transaction *conn*
+      (sqlite:execute-non-query *conn* insert)
+      (setf id (sqlite:execute-single *conn* query)))
     id))
 
-
-;; (defun get-index-value (table value)
-;;   (let ((one (ignore-errors (db-get-or-insert-id table value))))
-;;     (unless (typep one 'integer)
-;;       (setf one (db-get-or-insert-id table value)))
-;;     one))
+(defun get-index-value (table value)
+  (let ((one (ignore-errors (db-get-or-insert-id table value))))
+    (unless (typep one 'integer)
+      (setf one (db-get-or-insert-id table value)))
+    one))
 
 (defun psql-get-ids (record)
   (let ((n 0))

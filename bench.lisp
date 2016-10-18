@@ -8,6 +8,7 @@
   (cloudtrail-report-sync  "~/test-ct/"))
 
 (defun run-bench ()
+  (sqlite-establish-connection)
   (defvar database "metis")
   (db-recreate-tables "metis")
   (princ "XXX: Running Test")
