@@ -103,7 +103,7 @@
   (let* ((conn (sqlite:connect db)))
     (force-output)
     (format t "ct:~A db:~A~%" table db)
-    (sqlite:execute-non-query conn (format nil "create table ~A(id serial, value text)" table))
+    (sqlite:execute-non-query conn (format nil "create table ~A(id integer primary key autoincrement, value text)" table))
     (sqlite:execute-non-query conn (format nil "create unique index ~A_idx1 on ~A(id)" table table))
     (sqlite:execute-non-query conn (format nil "create unique index ~A_idx2 on ~A(value)" table table))))
 
@@ -232,23 +232,12 @@
 (fare-memoization:define-memo-function sqlite-get-or-insert-id (table value &optional (db "/tmp/metis.db"))
   (format t "~%sgoii: table:~A value:~A" table value)
   (setf *print-circle* nil)
-  (let* ((conn (sqlite:connect db))
-	 (query (format nil "insert into ~A(value) select '~A' where not exists (select * from ~A where value = '~A')" table value table value)))
-    (sqlite:execute-single conn query)))
-
-;; (let ((query
-;;     ;;(format t "~%Q:~A~%" query)
-;;     (psql-do-query query)
-;;     (let ((id
-;; 	   (flatten
-;; 	    (car
-;; 	     (car
-;; 	      (psql-do-trans
-;; 	       (format nil "select id from ~A where value = '~A'" table value)))))))
-;;       ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
-;;       (if (listp id)
-;; 	  (car id)
-;; 	  id))))
+  (let ((conn (sqlite:connect db))
+	(insert (format nil "insert or ignore into ~A(value) values('~A')" table value value))
+	(query (format nil "select id from ~A where value = '~A'" table value)))
+    (sqlite:with-transaction conn
+      (sqlite:execute-non-query conn insert)
+      (sqlite:execute-non-query conn query))))
 
 (defun get-index-value (table value)
   (let ((one (ignore-errors (db-get-or-insert-id table value))))
@@ -256,25 +245,36 @@
       (setf one (db-get-or-insert-id table value)))
     one))
 
-(defun get-ids(record)
+(defun psql-get-ids (record)
   (let ((n 0))
     (loop for i in *fields*
        collect (let ((value (try-twice i (format nil "~A" (nth n record)))))
 		 (incf n)
 		 (if (null value)
 		     (format t "i:~A val:~A try:~A~%"  i (nth n record) value))
-		     value))))
+		 value))))
+
+
+(defun sqlite-get-ids (record)
+  (let ((n 0))
+    (loop for i in *fields*
+       collect (let ((value (try-twice i (format nil "~A" (nth n record)))))
+		 (incf n)
+		 (if (null value)
+		     (format t "i:~A val:~A try:~A~%"  i (nth n record) value))
+		 value))))
 
 (defun get-tables()
   (format nil "~{~A~^, ~}" *fields*))
 
 (defun sqlite-normalize-insert (record)
-  (let ((values (get-ids record))
+  (let ((values (sqlite-get-ids record))
 	(tables (get-tables)))
+    (format t "records:~{~A~^,~} values:~{~A~^,~} tables:~A" record values tables)
     (db-do-query (format nil "insert into log(~{~A~^, ~}) values(~{~A~^, ~})" *fields* values))))
 
 (defun psql-normalize-insert (record)
-  (let ((values (get-ids record))
+  (let ((values (psql-get-ids record))
 	(tables (get-tables)))
     (db-do-query (format nil "insert into log(~{~A~^, ~}) values(~{~A~^, ~})" *fields* values))))
 
