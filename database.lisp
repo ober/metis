@@ -234,10 +234,13 @@
   (setf *print-circle* nil)
   (let ((conn (sqlite:connect db))
 	(insert (format nil "insert or ignore into ~A(value) values('~A')" table value value))
-	(query (format nil "select id from ~A where value = '~A'" table value)))
+	(query (format nil "select id from ~A where value = '~A'" table value))
+        (id nil))
     (sqlite:with-transaction conn
       (sqlite:execute-non-query conn insert)
-      (sqlite:execute-non-query conn query))))
+      (setf id (sqlite:execute-single conn query)))
+  id))
+
 
 (defun get-index-value (table value)
   (let ((one (ignore-errors (db-get-or-insert-id table value))))
@@ -258,7 +261,7 @@
 (defun sqlite-get-ids (record)
   (let ((n 0))
     (loop for i in *fields*
-       collect (let ((value (try-twice i (format nil "~A" (nth n record)))))
+       collect (let ((value (sqlite-get-or-insert-id i (format nil "~A" (nth n record)))))
 		 (incf n)
 		 (if (null value)
 		     (format t "i:~A val:~A try:~A~%"  i (nth n record) value))
