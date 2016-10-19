@@ -80,17 +80,20 @@
   (format t "~% db-backend:~A~%" *db-backend*)
   (if (equal *db-backend* :sqlite)
       (progn
+	(format t "~% in sqlite-establish-connection!!!~%")
 	(if (null *sqlite-conn*)
 	    (progn
 	      (setf *sqlite-conn* (sqlite:connect *sqlite-db*))
 	      (sqlite:execute-non-query *sqlite-conn* "pragma journal_mode = wal"))))))
 
 (defun sqlite-emit-conn ()
-  (setf *print-circle* nil)
-  (let ((conn (sqlite:connect *sqlite-db*)))
-    (sqlite:execute-non-query conn "pragma journal_mode = wal")
-    conn))
-
+  (if (equal *db-backend* :sqlite)
+      (progn
+	(setf *print-circle* nil)
+	(format t "~% in sqlite-emit-conn!!!~%")
+	(let ((conn (sqlite:connect *sqlite-db*)))
+	  (sqlite:execute-non-query conn "pragma journal_mode = wal")
+	  conn))))
 
 (defun sqlite-recreate-tables (&optional (db *sqlite-conn*))
   (setf *print-circle* nil)
@@ -188,7 +191,8 @@
     ((equal :sourceIPAddress field)(getf record :|sourceIPAddress|))
     ((equal :userAgent field)(getf record :|userAgent|))
     ((equal :userIdentity field)(getf record :|userIdentity|))
-    ((equal :userName field)(fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record))
+    ;;((equal :userName field)(fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record))
+    ((equal :userName field)(fetch-value '(:|userIdentity| :|userName|) record))
     (t (format nil "Unknown arg:~A~%" field))))
 
 (defun psql-recreate-tables (&optional db)
