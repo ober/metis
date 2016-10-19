@@ -4,7 +4,7 @@
   (setf *DB* "metis")
   ;;(declare (optimize (safety 3) (speed 0) (debug 3)))
   (defvar *benching* t)
-  (defvar *db-backend* :sqlite)
+  ;;(defvar *db-backend* :sqlite)
   (cloudtrail-report-async "0" "~/test-ct/"))
 
 (defun run-bench ()
