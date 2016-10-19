@@ -1,6 +1,6 @@
 (in-package :metis)
-(defvar *db-backend* :sqlite)
-;;(defvar *db-backend* :postgres)
+;;(defvar *db-backend* :sqlite)
+(defvar *db-backend* :postgres)
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
@@ -76,6 +76,8 @@
   (sqlite:execute-to-list db query))
 
 (defun sqlite-establish-connection ()
+  (setf *print-circle* nil)
+  (format t "~% db-backend:~A~%" *db-backend*)
   (if (equal *db-backend* :sqlite)
       (progn
 	(if (null *sqlite-conn*)
@@ -84,11 +86,14 @@
 	      (sqlite:execute-non-query *sqlite-conn* "pragma journal_mode = wal"))))))
 
 (defun sqlite-emit-conn ()
+  (setf *print-circle* nil)
   (let ((conn (sqlite:connect *sqlite-db*)))
     (sqlite:execute-non-query conn "pragma journal_mode = wal")
     conn))
 
+
 (defun sqlite-recreate-tables (&optional (db *sqlite-conn*))
+  (setf *print-circle* nil)
   (force-output)
   (ignore-errors
     (sqlite-drop-table "files" db)
