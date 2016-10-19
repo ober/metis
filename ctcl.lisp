@@ -28,20 +28,20 @@
 (defun process-ct-file (x)
   "Handle the contents of the json gzip file"
   (when (equal (pathname-type x) "gz")
-    (unless (have-we-seen-this-file x)
-      (progn
-	(let ((*conn* (sqlite-emit-conn)))
-	  (declare (special *conn*))
+    (let ((*conn* (sqlite-emit-conn)))
+      (declare (special *conn*))
+      (unless (have-we-seen-this-file x)
+	(progn
 	  (db-mark-file-processed x)
-	  (parse-ct-contents x))))))
+	  (parse-ct-contents x)
+	  (sqlite:disconnect *conn*))))))
 
 (defun fetch-value (indicators plist)
   "Return the value at the end of the indicators list"
   (reduce #'getf indicators :initial-value plist))
 
 (defun parse-ct-contents (x)
-  (if (equal *db-backend* :sqlite)
-      (defvar myconn (sqlite-emit-conn)))
+  "process the json output"
   (let* ((records (second (read-json-gzip-file x)))
 	 (num (length records))
 	 (btime (get-internal-real-time)))
