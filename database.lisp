@@ -188,7 +188,7 @@
     ((equal :requestParameters field)(getf record :|requestParameters|))
     ((equal :resources field)(getf record :|resources|))
     ((equal :responseElements field)(getf record :|responseElements|))
-    ((equal :sourceIPAddress field)(getf record :|sourceIPAddress|))
+    ((equal :sourceIPAddress field)(get-hostname-by-ip (getf record :|sourceIPAddress|)))
     ((equal :userAgent field)(getf record :|userAgent|))
     ((equal :userIdentity field)(getf record :|userIdentity|))
     ;;((equal :userName field)(fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record))
