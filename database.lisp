@@ -66,13 +66,12 @@
     ((equal :postgres *db-backend*)(psql-do-query query))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
-(defun sqlite-drop-table (table &optional (db *sqlite-conn*))
-  (sqlite:execute-non-query db (format nil "drop table if exists ~A" table)))
+(defun sqlite-drop-table (table &optional (conn *sqlite-conn*))
+  (sqlite:execute-non-query conn (format nil "drop table if exists ~A" table)))
 
 (defun sqlite-do-query (query &optional (db *sqlite-conn*))
   "do query"
   (declare (special *conn*))
-  (format t "*conn*:~A~%" *conn*)
   ;;(format t "~%Q: ~A~%" query)
   (sqlite:execute-to-list db query))
 
@@ -91,7 +90,6 @@
 
 (defun sqlite-recreate-tables (&optional (db *sqlite-conn*))
   (force-output)
-  (format t "Hello~%")
   (ignore-errors
     (sqlite-drop-table "files" db)
     (sqlite-drop-table "log" db)
@@ -240,11 +238,12 @@
 	  (car id)
 	  id))))
 
-(fare-memoization:define-memo-function sqlite-get-or-insert-id (table value &optional (db "/tmp/metis.db"))
+(fare-memoization:define-memo-function sqlite-get-or-insert-id (table value &optional (db *sqlite-conn*))
+  ;;(defun sqlite-get-or-insert-id
   "get or set id"
   ;;(format t "~%sgoii: table:~A value:~A" table value)
   (setf *print-circle* nil)
-  (declare (special *conn*))
+  ;;(declare (special *conn*))
   (let ((insert (format nil "insert or ignore into ~A(value) values('~A')" table value))
 	(query (format nil "select id from ~A where value = '~A'" table value))
         (id nil))
