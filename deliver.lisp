@@ -40,4 +40,23 @@
 (progn
   (let ((lfiles '("package.lisp" "utils.lisp" "ctcl.lisp" "database.lisp" "main.lisp" "bench.lisp" "flows.lisp")))
     (mapcar #'compile-file lfiles)
-    (cl-user::generate-executable "dist/allegro/metis" '("package.fasl" "utils.fasl" "database.fasl" "ctcl.fasl" "main.fasl" "bench.fasl" "flows.fasl"))))
+    (cl-user::generate-executable "dist/allegro/metis" '("package.fasl" "utils.fasl" "database.fasl" "ctcl.fasl" "main.fasl" "bench.fasl" "flows.fasl")
+				  :runtime :partners
+				  :show-window :shownoactivate
+				  :system-dlls-path "system-dlls/"
+				  :temporary-directory #P"/tmp/"
+				  :verbose nil
+				  :discard-compiler nil
+				  :discard-local-name-info t
+				  :discard-source-file-info t
+				  :discard-xref-info t
+				  :ignore-command-line-arguments t
+				  :include-compiler t
+				  :include-composer nil
+				  :include-debugger t
+				  :include-devel-env nil
+				  :include-ide nil
+				  :runtime :partners
+				  :suppress-allegro-cl-banner t
+				  :newspace 16777216
+				  :oldspace 33554432)))

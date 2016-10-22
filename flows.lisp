@@ -148,7 +148,7 @@
 	  (retrieve-from-index 'metis::flow 'dstport value :all t)))
 
 (defun flows-have-we-seen-this-file (file)
-  ;;(format t "seen? ~A~%" file)
+  (format t "seen? ~A~%" file)
   #+allegro (progn
 	      (if (retrieve-from-index 'flow_files 'name (format nil "~A" (get-full-filename file)))
 		  t
@@ -190,18 +190,26 @@
 ;; 	       (uiop:run-program (format nil "zcat ~A" file) :output :string))))))
 
 (defun process-vf-file (file)
-
   (when (equal (pathname-type file) "gz")
     (unless (flows-have-we-seen-this-file file)
       (format t "+")
 
       (flow-mark-file-processed file)
       (gzip-stream:with-open-gzip-file (in file)
-	(loop
+	(let ((i 0)
+	      (btime (get-internal-real-time)))
+	  (loop
 	   for line = (read-line in nil nil)
 	   while line
-	   collect (process-vf-line line)))))
-  #+allegro (db.ac:commit))
+	     collect (progn
+		       (incf i)
+		       (process-vf-line line)))
+	  (let* ((etime (get-internal-real-time))
+		(delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
+		(rps (/ (float i) (float delta))))
+	  (format t "~%rps:~A rows:~A delta:~A" rps i delta))))))
+
+#+allegro (db.ac:commit))
 
 (defun process-vf-line (line)
   (let* ((tokens (split-sequence:split-sequence #\Space line))
@@ -236,39 +244,38 @@
 
   #-allegro
   (progn
-    (unless (boundp 'benching)
-      (let*
-	  ((date-id (get-index-value "dates" (to-epoch date)))
-	   ;;(conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
-	   ;;(version-id (get-index-value "versions" version))
-	   ;;(account_id-id (get-index-value "account_ids" account_id))
-	   (interface_id-id (get-index-value "interface_ids" interface_id))
-	   (srcaddr-id (get-index-value "srcaddrs" srcaddr))
-	   (dstaddr-id (get-index-value "dstaddrs" dstaddr))
-	   (srcport-id (get-index-value "srcports" srcport))
-	   (dstport-id (get-index-value "dstports" dstport))
-	   (protocol-id (get-index-value "protocols" protocol))
-	   (packets-id (get-index-value "packetss" packets))
-	   (bytez-id (get-index-value "bytezs" bytez))
-	   (start-id (get-index-value "starts" start))
-	   (endf-id (get-index-value "endfs" endf))
-	   (action-id (get-index-value "actions" action))
-	   (status-id (get-index-value "statuss" status)))
-	(psql-do-query
-	 (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')"
-		 date-id
-		 interface_id-id
-		 srcaddr-id
-		 dstaddr-id
-		 srcport-id
-		 dstport-id
-		 protocol-id
-		 packets-id
-		 bytez-id
-		 start-id
-		 endf-id
-		 action-id
-		 status-id))))))
+    (let*
+	((date-id (get-index-value "dates" (to-epoch date)))
+	 ;;(conversation-id (create-conversation (srcaddr dstaddr sport dstport)))
+	 ;;(version-id (get-index-value "versions" version))
+	 ;;(account_id-id (get-index-value "account_ids" account_id))
+	 (interface_id-id (get-index-value "interface_ids" interface_id))
+	 (srcaddr-id (get-index-value "srcaddrs" srcaddr))
+	 (dstaddr-id (get-index-value "dstaddrs" dstaddr))
+	 (srcport-id (get-index-value "srcports" srcport))
+	 (dstport-id (get-index-value "dstports" dstport))
+	 (protocol-id (get-index-value "protocols" protocol))
+	 (packets-id (get-index-value "packetss" packets))
+	 (bytez-id (get-index-value "bytezs" bytez))
+	 (start-id (get-index-value "starts" start))
+	 (endf-id (get-index-value "endfs" endf))
+	 (action-id (get-index-value "actions" action))
+	 (status-id (get-index-value "statuss" status)))
+      (psql-do-query
+       (format nil "insert into raw(date, interface_id, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytez, start, endf, action, status) values ('~A','~A','~A','~A', '~A','~A','~A','~A','~A','~A', '~A','~A','~A')"
+	       date-id
+	       interface_id-id
+	       srcaddr-id
+	       dstaddr-id
+	       srcport-id
+	       dstport-id
+	       protocol-id
+	       packets-id
+	       bytez-id
+	       start-id
+	       endf-id
+	       action-id
+	       status-id)))))
 
 ;; (fare-memoization:define-memo-function create-conversation(srcaddr dstaddr srcport dstport)
 ;;   "Create or return the id of the conversation of the passed arguments"
