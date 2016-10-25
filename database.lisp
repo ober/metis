@@ -11,6 +11,7 @@
 ;;(defvar *sqlite-db* ":memory:")
 (defvar *sqlite-db* "/tmp/metis.db")
 (defvar *sqlite-conn* nil)
+(defparameter to-db (pcall-queue:make-queue))
 
 (defvar *fields* '(
 		   :additionalEventData
@@ -303,7 +304,8 @@
 (defun psql-normalize-insert (record)
   (let ((values (psql-get-ids record))
 	(tables (get-tables)))
-    (db-do-query (format nil "insert into log(~{~A~^, ~}) values(~{~A~^, ~})" *fields* values))))
+    (pcall-queue:queue-push
+     (format nil "~{~A~^ #\tab ~}~%" values) to-db)))
 
 (defun load-file-values ()
   (unless *files*
@@ -313,3 +315,24 @@
 		(setf (gethash (car x) *h*) t))
 	    *files*))
   *h*)
+
+(defun emit-drain-file (queue)
+  "Dump the queue to a csv file for import to postgres"
+  (format t "Draining ~A log entries into postgres...~%" (pcall-queue:queue-length queue))
+  (with-open-file (drain "/tmp/loadme.txt" :direction :output :if-exists :supersede)
+    (format drain "\COPY log(event_time, user_name, user_key, event_name, user_agent, source_host) FROM STDIN;~%")
+    (loop while (not (pcall-queue:queue-empty-p queue))
+       do (progn
+	    (format drain "~A~%" (pcall-queue:queue-pop queue))))
+    (format drain "\\.~%"))
+  (uiop:run-program (format nil "cat /tmp/loadme.txt|psql -U metis -d metis"))
+  (format t "Draining complete.~%"))
+
+(defun periodic-sync (q-len)
+  (if (null syncing)
+      (progn
+	(setf syncing t)
+	(format t "Sync limit of ~A hit." q-len)
+	(emit-drain-file to-db)
+	(setf syncing nil))
+      (format t "sync already running...~%")))

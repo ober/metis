@@ -51,14 +51,18 @@
     (let* ((etime (get-internal-real-time))
 	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second))))
       (if (and (> delta 0) (> num 99))
-	  (let ((rps (/ (float num) (float delta))))
-	    (format t "~%rps:~A rows:~A delta:~A" rps num delta))))))
+	  (let ((rps (/ (float num) (float delta)))
+		(q-len (pcall-queue:queue-length to-db)))
+	    (if (> q-len 100000)
+		(periodic-sync q-len))
+	    (format t "~%rps:~A rows:~A delta:~A q:~A" rps num delta q-len))))))
 
 (defun cloudtrail-report-sync (path)
   (sqlite-establish-connection)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
-	     #'sync-ct-file)))
+	     #'sync-ct-file)
+    (periodic-sync)))
 
 (defun cloudtrail-report-async (workers path)
   (sqlite-establish-connection)

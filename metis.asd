@@ -16,6 +16,7 @@
 	       :jonathan
 	       :local-time
 	       :pcall
+	       :pcall-queue
 	       :postmodern
 	       :quicklisp
 	       :split-sequence
