@@ -328,7 +328,7 @@
   (uiop:run-program (format nil "cat /tmp/loadme.txt|psql -U metis -d metis"))
   (format t "Draining complete.~%"))
 
-(defun periodic-sync (q-len)
+(defun periodic-sync (&optional q-len)
   (if (null syncing)
       (progn
 	(setf syncing t)
