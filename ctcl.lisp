@@ -72,4 +72,5 @@
     (let ((cloudtrail-reports (or path "~/CT")))
       (walk-ct cloudtrail-reports
 	       #'async-ct-file))
-    (mapc #'pcall:join *mytasks*)))
+    (mapc #'pcall:join *mytasks*)
+    (periodic-sync)))
