@@ -40,6 +40,10 @@
       t
       nil))
 
+(defun sqlite-disconnect (conn)
+  (if (equal *db-backend* :sqlite)
+      (sqlite:disconnect conn)))
+
 (defun db-mark-file-processed (x)
   (db-do-query
    (format nil "insert into files(value) values ('~A')" (file-namestring x)))

@@ -1,1 +1,3 @@
 dist
+*.fasl
+*.64ufasl
