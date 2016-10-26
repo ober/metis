@@ -306,7 +306,7 @@
   (let ((values (psql-get-ids record))
 	(tables (get-tables)))
     (pcall-queue:queue-push
-     (format nil "~{~A~^ #\tab ~}~%" values) to-db)))
+     (format nil "~{~A~^	 ~}" values) to-db)))
 
 (defun load-file-values ()
   (unless *files*
@@ -333,7 +333,7 @@
   (if (null syncing)
       (progn
 	(setf syncing t)
-	(let ((q-len (pcall-queue:queue-length queue)))
+	(let ((q-len (pcall-queue:queue-length to-db)))
 	  (format t "Sync limit of ~A hit." q-len)
 	  (emit-drain-file to-db)
 	  (setf syncing nil))
