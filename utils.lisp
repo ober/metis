@@ -22,7 +22,7 @@
 	    ip))))
 
 (defun read-json-gzip-file (file)
-  (let* ((json (get-json-gzip-contents file)))
+  (let ((json (get-json-gzip-contents file)))
     (jonathan:parse json)))
 
 #-clojure
@@ -55,35 +55,35 @@
         ,store-var)
      `(cdr (assoc ,item-var ,a-list-var ,@ keys)))))
 
-(defclass queue ()
-  ((list :initform nil)
-   (tail :initform nil)))
+;; (defclass queue ()
+;;   ((list :initform nil)
+;;    (tail :initform nil)))
 
-(defmethod print-object ((queue queue) stream)
-  (print-unreadable-object (queue stream :type t)
-    (with-slots (list tail) queue
-      (cond ((cddddr list)
-	     ;; at least five elements, so print ellipsis
-	     (format stream "(~{~S ~}... ~S)"
-		     (subseq list 0 3) (first tail)))
-	    ;; otherwise print whole list
-	    (t (format stream "~:S" list))))))
+;; (defmethod print-object ((queue queue) stream)
+;;   (print-unreadable-object (queue stream :type t)
+;;     (with-slots (list tail) queue
+;;       (cond ((cddddr list)
+;; 	     ;; at least five elements, so print ellipsis
+;; 	     (format stream "(~{~S ~}... ~S)"
+;; 		     (subseq list 0 3) (first tail)))
+;; 	    ;; otherwise print whole list
+;; 	    (t (format stream "~:S" list))))))
 
-(defmethod dequeue ((queue queue))
-  (with-slots (list) queue
-    (pop list)))
+;; (defmethod dequeue ((queue queue))
+;;   (with-slots (list) queue
+;;     (pop list)))
 
-(defmethod queue-length ((queue queue))
-  (with-slots (list) queue
-    (list-length list)))
+;; (defmethod queue-length ((queue queue))
+;;   (with-slots (list) queue
+;;     (list-length list)))
 
-(defmethod enqueue (new-item (queue queue))
-  (with-slots (list tail) queue
-    (let ((new-tail (list new-item)))
-      (cond ((null list) (setf list new-tail))
-	    (t (setf (cdr tail) new-tail)))
-      (setf tail new-tail)))
-  queue)
+;; (defmethod enqueue (new-item (queue queue))
+;;   (with-slots (list tail) queue
+;;     (let ((new-tail (list new-item)))
+;;       (cond ((null list) (setf list new-tail))
+;; 	    (t (setf (cdr tail) new-tail)))
+;;       (setf tail new-tail)))
+;;   queue)
 
 (defun flatten (obj)
   (do* ((result (list obj))
