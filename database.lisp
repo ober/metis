@@ -8,6 +8,7 @@
 (defvar *pcallers* 5)
 (defvar *files* nil)
 (defvar *conn* nil)
+(defvar syncing nil)
 ;;(defvar *sqlite-db* ":memory:")
 (defvar *sqlite-db* "/tmp/metis.db")
 (defvar *sqlite-conn* nil)
