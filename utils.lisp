@@ -21,22 +21,21 @@
 		  name))
 	    ip))))
 
-#-clozure
 (defun read-json-gzip-file (file)
-  (jonathan:parse
-   (uiop:run-program
-    (format nil "zcat ~A" file)
-    :output :string)))
+  (let* ((json (get-json-gzip-contents file)))
+    (jonathan:parse json)))
+
+#-clojure
+(defun get-json-gzip-contents (file)
+  (uiop:run-program
+   (format nil "zcat ~A" file)
+    :output :string))
 
 #+clozure
-(defun read-json-gzip-file (file)
-  "Read the gzipped json in pure lisp. For systems that have trouble with uiop:run-program"
-  (with-input-from-string
-      (s (apply #'concatenate 'string
-		(gzip-stream:with-open-gzip-file (in file)
-		  (loop for l = (read-line in nil nil)
-		     while l collect l))))
-    (jonathan:parse s)))
+(defun get-json-gzip-contents (file)
+  (first (gzip-stream:with-open-gzip-file (in file)
+    (loop for l = (read-line in nil nil)
+       while l collect l))))
 
 (defun cdr-assoc (item a-list &rest keys)
   (cdr (apply #'assoc item a-list keys)))
