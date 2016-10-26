@@ -53,11 +53,13 @@
       (if (and (> delta 0) (> num 99))
 	  (let ((rps (/ (float num) (float delta)))
 		(q-len (pcall-queue:queue-length to-db)))
-	    (if (> q-len 100000)
-		(periodic-sync q-len))
+	    (if (> q-len 1000)
+		(periodic-sync)
+		(format t "wtf not over 1k ~A~%" q-len))
 	    (format t "~%rps:~A rows:~A delta:~A q:~A" rps num delta q-len))))))
 
 (defun cloudtrail-report-sync (path)
+  (force-output)
   (sqlite-establish-connection)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
@@ -65,8 +67,8 @@
     (periodic-sync)))
 
 (defun cloudtrail-report-async (workers path)
-  (sqlite-establish-connection)
   (force-output)
+  (sqlite-establish-connection)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (let ((cloudtrail-reports (or path "~/CT")))

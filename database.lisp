@@ -321,7 +321,7 @@
   "Dump the queue to a csv file for import to postgres"
   (format t "Draining ~A log entries into postgres...~%" (pcall-queue:queue-length queue))
   (with-open-file (drain "/tmp/loadme.txt" :direction :output :if-exists :supersede)
-    (format drain "\COPY log(event_time, user_name, user_key, event_name, user_agent, source_host) FROM STDIN;~%")
+    (format drain "\COPY log(~{~A~^, ~}) FROM STDIN;~%" *fields*)
     (loop while (not (pcall-queue:queue-empty-p queue))
        do (progn
 	    (format drain "~A~%" (pcall-queue:queue-pop queue))))
@@ -329,11 +329,12 @@
   (uiop:run-program (format nil "cat /tmp/loadme.txt|psql -U metis -d metis"))
   (format t "Draining complete.~%"))
 
-(defun periodic-sync (&optional q-len)
+(defun periodic-sync ()
   (if (null syncing)
       (progn
 	(setf syncing t)
-	(format t "Sync limit of ~A hit." q-len)
-	(emit-drain-file to-db)
-	(setf syncing nil))
-      (format t "sync already running...~%")))
+	(let ((q-len (pcall-queue:queue-length queue)))
+	  (format t "Sync limit of ~A hit." q-len)
+	  (emit-drain-file to-db)
+	  (setf syncing nil))
+	(format t "sync already running...~%"))))
