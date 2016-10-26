@@ -142,15 +142,36 @@
 	(user-name "metis")
 	(password "metis")
 	(host "localhost"))
+    (block-if-syncing)
     (postmodern:with-connection
 	`(,database ,user-name ,password ,host :pooled-p t)
       (postmodern:query query))))
+
+(defun psql-begin ()
+  (if (equal *db-backend* :postgres)
+      (let ((user-name "metis")
+	    (database "metis")
+	    (password "metis")
+	    (host "localhost"))
+	(postmodern:with-connection
+	    `(,database ,user-name ,password ,host :pooled-p t)
+	  (postmodern:query "begin")))))
+
+(defun psql-commit ()
+  (let ((user-name "metis")
+	(database "metis")
+	(password "metis")
+	(host "localhost"))
+    (postmodern:with-connection
+	`(,database ,user-name ,password ,host :pooled-p t)
+      (postmodern:query "commit"))))
 
 (defun psql-do-trans (query &optional db)
   (let ((database (or db "metis"))
 	(user-name "metis")
 	(password "metis")
 	(host "localhost"))
+    (block-if-syncing)
     (postmodern:with-connection
 	`(,database ,user-name ,password ,host :pooled-p t)
       (postmodern:with-transaction ()
@@ -247,7 +268,7 @@
 	   (flatten
 	    (car
 	     (car
-	      (psql-do-trans
+	      (psql-do-query
 	       (format nil "select id from ~A where value = '~A'" table value)))))))
       ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
       (if (listp id)
@@ -282,7 +303,6 @@
 		 (if (null value)
 		     (format t "i:~A val:~A try:~A~%"  i (nth n record) value))
 		 value))))
-
 
 (defun sqlite-get-ids (record)
   (let ((n 0))
@@ -333,8 +353,16 @@
   (if (null syncing)
       (progn
 	(setf syncing t)
+	;;(psql-commit)
 	(let ((q-len (pcall-queue:queue-length to-db)))
 	  (format t "Sync limit of ~A hit." q-len)
 	  (emit-drain-file to-db)
+	  ;;(psql-begin)
 	  (setf syncing nil))
 	(format t "sync already running...~%"))))
+
+(defun block-if-syncing ()
+  (loop while syncing
+     do (progn
+	  (format t "s")
+	  (sleep 1))))

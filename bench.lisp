@@ -5,8 +5,8 @@
   ;;(declare (optimize (safety 3) (speed 0) (debug 3)))
   (defvar *benching* t)
   ;;(defvar *db-backend* :sqlite)
-  ;;(cloudtrail-report-async "2" "~/test-ct/"))
-  (cloudtrail-report-sync "~/test-ct/"))
+  (cloudtrail-report-async "2" "~/test-ct/"))
+  ;;(cloudtrail-report-sync "~/test-ct/"))
 
 (defun run-bench ()
   (sqlite-establish-connection)
