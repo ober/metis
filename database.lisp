@@ -76,7 +76,11 @@
 
 ;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
+;;(defun get-id-or-insert-psql (table value)
   (setf *print-circle* nil)
+  (force-output)
+  (let ((first-id (psql-do-query (format nil "select id from ~A where value = '~A'" table value))))
+    (format t "~%PWP value: ~A table ~A id ~A" value table first-id))
   (psql-do-query (format nil "insert into ~A(value) select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
   (let
       ((id
@@ -115,8 +119,18 @@
 		     user-agent-id #\tab
 		     source-host-id) to-db)))
 
+(defun thread-safe-hash-table ()
+  "Return a thread safe hash table"
+  #+sbcl
+  (make-hash-table :synchronized t :test 'equalp)
+  #+ccl
+  (make-hash-table :shared :lock-free :test 'equalp)
+  #+(or allegro lispworks)
+  (make-hash-table :test 'equalp)
+  )
+
 (defun load-normalized-values (table)
-  (let* ((values-hash (make-hash-table :test 'equalp ))
+  (let* ((values-hash (thread-safe-hash-table))
 	 (query (format nil "select id, value from ~A order by id" table))
 	 (values (psql-do-query query)))
     (mapc
@@ -133,13 +147,11 @@
 	0
       (reduce #'max values))))
 
-
 (defun block-if-syncing ()
   (loop while syncing
      do (progn
 	  (format t "s")
 	  (sleep 1))))
-
 
 (defun get-id-or-update-hash (hash value max)
   "Look up the id value in a hash.
@@ -176,22 +188,37 @@
 
 (defun sync-hash-to-table (table hash)
   ;; just sync.
-  (let* ((query (format nil "select max(id) from ~A" table))
-	 (max-id (car (flatten (psql-do-query query))))
-	 (max-hash-value (hash-max-key hash))
-	 (hash-alist (alexandria:hash-table-alist hash))
-	 )
-    (unless (integerp max-id) (setf max-id 0))
-    (if (> max-hash-value max-id)
-    	(loop for x from (+ max-id 1) to max-hash-value
-	   do (progn
-		(let* ((value (car (rassoc x hash-alist)))
-		       (query (format nil "insert into ~A(value) values(\'~A\')" table value)))
-		  (unless (null value)
-		    (progn
-		      ;;(format t "sql:~A~%" query)
-		      (psql-do-query query)))))))))
-
+  (format t "syncing ~A~%" table)
+  (let ((database "metis")
+	(user-name "metis")
+	(password "metis")
+	(host "localhost"))
+    (postmodern:with-connection
+	`(,database ,user-name ,password ,host :pooled-p t)
+      (postmodern:with-transaction ()
+	(let* ((query (format nil "select max(id) from ~A" table))
+	       (max-id (car (flatten (postmodern:query query))))
+	       (max-hash-value (hash-max-key hash))
+	       (hash-alist (alexandria:hash-table-alist hash))
+	       )
+	  (unless (integerp max-id) (setf max-id 0))
+	  (if (> max-hash-value max-id)
+	      (loop for x from (+ max-id 1) to max-hash-value
+		 do (progn
+		      (let* ((entry (rassoc x hash-alist))
+			     (value-id (cdr entry))
+			     (value (car entry))
+			     (query (format nil "insert into ~A(id, value) values(~A, \'~A\')" table value-id value)))
+			(unless (null value)
+			  (progn
+			    ;;(format t "sql:~A~%" query)
+			    (postmodern:query query)
+			    (let ((db-id (car (flatten (postmodern:query  (format nil "select id from ~A where value = \'~A\'" table value))))))
+			      (unless (and
+				       (= db-id x)
+				       (= value-id x))
+				(format t "~% sync error: table:~A value:~A x:~A value-id:~A maxid:~A db-value:~A" table value x value-id max-id db-id)
+			    )))))))))))))
 (defun sync-world ()
   (format t "~%Syncing world~%")
   (sync-hash-to-table "event_names" event_names)
