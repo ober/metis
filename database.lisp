@@ -52,7 +52,7 @@
     (mapcar
      #'(lambda (x)
 	 (psql-drop-table x database)) tables)
-    (psql-do-query "drop table if exists log" database)
+    (psql-do-query "drop table if exists log cascade" database)
     (mapcar
      #'(lambda (x)
 	 (psql-create-table x database)) tables)
@@ -78,7 +78,8 @@
 (fare-memoization:define-memo-function get-id-or-insert-psql (table value)
   (setf *print-circle* nil)
   (psql-do-query (format nil "insert into ~A(value) select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
-  (let ((id
+  (let
+      ((id
 	 (flatten
 	  (car
 	   (car
