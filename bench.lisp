@@ -4,7 +4,7 @@
   (setf *DB* "metis")
   ;;(declare (optimize (safety 3) (speed 0) (debug 3)))
   (defparameter BENCHING t)
-  (cloudtrail-report-async "4" "~/test-ct/"))
+  (cloudtrail-report-async "2" "~/test-ct/"))
 ;;  (exit))
 
 (defun run-bench ()
