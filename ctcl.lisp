@@ -72,9 +72,11 @@
 	     (ip (cdr-assoc :SOURCE-+IP+-ADDRESS x))
 	     (hostname (get-hostname-by-ip ip))
 	     (user-identity (cdr-assoc :USER-IDENTITY x))
-	     (user-name (cdr-assoc :USER-NAME user-identity))
+	     ;;(user-name  (cdr-assoc :USER-NAME user-identity))
+	     (user-name (cdr-assoc :USER-NAME (cdr-assoc :SESSION-ISSUER (cdr-assoc :SESSION-CONTEXT user-identity))))
 	     (user-key (cdr-assoc :ACCESS-KEY-ID user-identity)))
 	(normalize-insert event-time user-name user-key event-name user-agent (or hostname ip))))
+
     (let* ((etime (get-internal-real-time))
 	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second))))
       (if (and (> delta 0) (> num 99))
