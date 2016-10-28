@@ -109,7 +109,6 @@
        (event-name-id (get-id-or-update-hash event_names event-name "event-name"))
        (user-agent-id (get-id-or-update-hash user_agents user-agent "user-agent"))
        (source-host-id (get-id-or-update-hash source_hosts source-host "source-host")))
-    ;;(format t "q:~A~%" (queue-length to-db))
     (pcall-queue:queue-push (format nil
 		     "~A~C~A~C~A~C~A~C~A~C~A"
 		     event-time-id #\tab
