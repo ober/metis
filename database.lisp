@@ -1,6 +1,6 @@
 (in-package :metis)
-;;(defvar *db-backend* :sqlite)
-(defvar *db-backend* :postgres)
+(defvar *db-backend* :sqlite)
+;;(defvar *db-backend* :postgres)
 
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
@@ -9,8 +9,8 @@
 (defvar *files* nil)
 (defvar *conn* nil)
 (defvar syncing nil)
-;;(defvar *sqlite-db* ":memory:")
-(defvar *sqlite-db* "/tmp/metis.db")
+(defvar *sqlite-db* ":memory:")
+;;(defvar *sqlite-db* "/tmp/metis.db")
 (defvar *sqlite-conn* nil)
 (defparameter to-db (pcall-queue:make-queue))
 
@@ -79,7 +79,7 @@
 (defun sqlite-do-query (query &optional (db *sqlite-conn*))
   "do query"
   (declare (special *conn*))
-  ;;(format t "~%Q: ~A~%" query)
+  ;;(format t "~%Q: ~A ~%" query)
   (sqlite:execute-to-list db query))
 
 (defun sqlite-establish-connection ()
@@ -87,7 +87,7 @@
   (format t "~% db-backend:~A~%" *db-backend*)
   (if (equal *db-backend* :sqlite)
       (progn
-	(format t "~% in sqlite-establish-connection!!!~%")
+	(format t "~%sqlite-db:~A in sqlite-establish-connection!!!~%" *sqlite-db*)
 	(if (null *sqlite-conn*)
 	    (progn
 	      (setf *sqlite-conn* (sqlite:connect *sqlite-db*))
@@ -97,7 +97,7 @@
   (if (equal *db-backend* :sqlite)
       (progn
 	(setf *print-circle* nil)
-	(format t "~% in sqlite-emit-conn!!!~%")
+	;;(format t "~% in sqlite-emit-conn!!!~%")
 	(let ((conn (sqlite:connect *sqlite-db*)))
 	  (sqlite:execute-non-query conn "pragma journal_mode = wal")
 	  conn))))
@@ -284,9 +284,9 @@
   (let ((insert (format nil "insert or ignore into ~A(value) values('~A')" table value))
 	(query (format nil "select id from ~A where value = '~A'" table value))
         (id nil))
-    (sqlite:with-transaction *conn*
-      (sqlite:execute-non-query *conn* insert)
-      (setf id (sqlite:execute-single *conn* query)))
+    ;;(sqlite:with-transaction *sqlite-conn*
+      (sqlite:execute-non-query *sqlite-conn* insert)
+      (setf id (sqlite:execute-single *sqlite-conn* query))
     id))
 
 (defun get-index-value (table value)
@@ -306,8 +306,10 @@
 
 (defun sqlite-get-ids (record)
   (let ((n 0))
+;;    (format t "~%record:~A~%"  record)
     (loop for i in *fields*
        collect (let ((value (sqlite-get-or-insert-id i (format nil "~A" (nth n record)))))
+
 		 (incf n)
 		 (if (null value)
 		     (format t "i:~A val:~A try:~A~%"  i (nth n record) value))

@@ -28,14 +28,13 @@
 (defun process-ct-file (x)
   "Handle the contents of the json gzip file"
   (when (equal (pathname-type x) "gz")
-
     (let ((*conn* (sqlite-emit-conn)))
       (declare (special *conn*))
       (unless (have-we-seen-this-file x)
 	(progn
 	  (db-mark-file-processed x)
-	  (parse-ct-contents x)
-	  (sqlite-disconnect *conn*))))))
+	  (parse-ct-contents x))))))
+;;ll(sqlite-disconnect *conn*))))))
 
 (defun fetch-value (indicators plist)
   "Return the value at the end of the indicators list"
@@ -52,6 +51,7 @@
 	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
 	   (rps (ignore-errors (/ (float num) (float delta))))
 	   (q-len (pcall-queue:queue-length to-db)))
+      (format t "~%rps:~A rows:~A delta:~A q:~A" rps num delta q-len)
       (if (> q-len 100000)
 	  (periodic-sync))
       (if (> num 100)
