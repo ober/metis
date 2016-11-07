@@ -9,6 +9,7 @@
 			    :jonathan
 			    :pcall
 			    :postmodern
+			    :manardb
 			    :s-sql
 			    :sqlite
 			    :uiop
