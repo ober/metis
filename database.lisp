@@ -13,24 +13,24 @@
 (defparameter to-db (pcall-queue:make-queue))
 
 (defvar *fields* '(
-		   ;; :additionalEventData
-		   ;; :awsRegion
-		   ;; :errorCode
-		   ;; :errorMessage
-		   ;; :eventID
-		   ;; :eventName
-		   ;; :eventSource
-		   ;; :eventTime
+		   :additionalEventData
+		   :awsRegion
+		   :errorCode
+		   :errorMessage
+		   :eventID
+		   :eventName
+		   :eventSource
+		   :eventTime
 		   :eventType
-		   ;; :eventVersion
-		   ;; :recipientAccountId
-		   ;; :requestID
-		   ;; :requestParameters
-		   ;; :resources
-		   ;; :responseElements
-		   ;; :sourceIPAddress
-		   ;; :userAgent
-		   ;; :userIdentity
+		   :eventVersion
+		   :recipientAccountId
+		   :requestID
+		   :requestParameters
+		   :resources
+		   :responseElements
+		   :sourceIPAddress
+		   :userAgent
+		   :userIdentity
 		   :userName
 		   ))
 
