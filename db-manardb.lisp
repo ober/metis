@@ -1,6 +1,6 @@
 (in-package :metis)
 
-
+(ql:quickload :manardb)
 (manardb:defmmclass ct ()
    ((additionalEventData :type STRING :initarg :additionalEventData)
    (awsRegion :type STRING :initarg :awsRegion)
