@@ -18,6 +18,7 @@
 	       :pcall
 	       :pcall-queue
 	       :postmodern
+	       :manardb
 	       :quicklisp
 	       :split-sequence
 	       :sqlite

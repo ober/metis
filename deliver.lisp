@@ -6,6 +6,7 @@
 		:fare-memoization
 		:gzip-stream
 		:jonathan
+		:manardb
 		:pcall
 		:postmodern
 		:sqlite
