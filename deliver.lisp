@@ -38,9 +38,31 @@
 
 #+allegro
 (progn
-  (let ((lfiles '("package.lisp" "utils.lisp" "ctcl.lisp" "database.lisp" "main.lisp" "bench.lisp" "flows.lisp")))
+  (let ((lfiles '(
+		  "package.lisp"
+		  "utils.lisp"
+		  "ctcl.lisp"
+		  "database.lisp"
+		  "db-postgres.lisp"
+		  "db-sqlite.lisp"
+		  "db-manardb.lisp"
+		  "main.lisp"
+		  "bench.lisp"
+		  "flows.lisp"
+		  )))
     (mapcar #'compile-file lfiles)
-    (cl-user::generate-executable "dist/allegro/metis" '("package.fasl" "utils.fasl" "database.fasl" "ctcl.fasl" "main.fasl" "bench.fasl" "flows.fasl")
+    (cl-user::generate-executable "dist/allegro/metis" '(
+							 "package.fasl"
+							 "utils.fasl"
+							 "database.fasl"
+							 "db-postgres.fasl"
+							 "db-sqlite.fasl"
+							 "db-manardb.fasl"
+							 "ctcl.fasl"
+							 "main.fasl"
+							 "bench.fasl"
+							 "flows.fasl"
+							 )
 				  :runtime :partners
 				  :show-window :shownoactivate
 				  :system-dlls-path "system-dlls/"
