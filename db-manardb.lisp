@@ -36,3 +36,7 @@
 (defun manardb-drop-table (query)
   (format t "manardb-drop-table query:~A~%" query)
   )
+
+(defun manardb-do-query (query)
+  (format t "manardb-do-query query:~A~%" query)
+  )
