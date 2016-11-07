@@ -70,6 +70,7 @@
   (cond
     ((equal :sqlite *db-backend*) (sqlite-do-query query))
     ((equal :postgres *db-backend*)(psql-do-query query))
+    ((equal :manardb *db-backend*)(manardb-do-query query))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-drop-table (query)
