@@ -62,8 +62,7 @@
   (sqlite-establish-connection)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
-	     #'sync-ct-file)
-    (periodic-sync)))
+	     #'sync-ct-file)))
 
 (defun cloudtrail-report-async (workers path)
   ;;(psql-begin)
@@ -74,5 +73,4 @@
     (let ((cloudtrail-reports (or path "~/CT")))
       (walk-ct cloudtrail-reports
 	       #'async-ct-file))
-    (mapc #'pcall:join *mytasks*)
-    (periodic-sync)))
+    (mapc #'pcall:join *mytasks*)))
