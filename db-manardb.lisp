@@ -2,12 +2,12 @@
 
 ;;(ql:quickload :manardb)
 (manardb:use-mmap-dir "~/ct-manardb/")
-(manardb:defmmclass files ()
- ((file :type STRING :initarg :file)))
+
+;; (manardb:defmmclass files ()
+;;  ((file :type STRING :initarg :file)))
 
 (manardb:defmmclass ct ()
-  (
-   (additionalEventData :type STRING :initarg :additionalEventData :accessor additionalEventData)
+  ((additionalEventData :type STRING :initarg :additionalEventData :accessor additionalEventData)
    (awsRegion :type STRING :initarg :awsRegion :accessor awsRegion)
    (errorCode :type STRING :initarg :errorCode :accessor errorCode)
    (errorMessage :type STRING :initarg :errorMessage :accessor errorMessage)
@@ -25,8 +25,13 @@
    (sourceIPAddress :type STRING :initarg :sourceIPAddress :accessor sourceIPAddress)
    (userAgent :type STRING :initarg :userAgent :accessor userAgent)
    (userIdentity :type STRING :initarg :userIdentity :accessor userIdentity)
-   (userName :type STRING :initarg :userName :accessor userName)
+   (userName :type STRING :initarg :userName :accessor username)
    ))
+
+(defun get-by-name (name)
+  (remove-if-not
+   (lambda (x) (string-equal name (slot-value x 'userName)))
+   (manardb:retrieve-all-instances 'metis::ct)))
 
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))
@@ -94,5 +99,5 @@
   )
 
 (defun manardb-do-query (query)
-  (format t "manardb-do-query query:~A~%" query)
+  (format nil "manardb-do-query query:~A~%" query)
   )
