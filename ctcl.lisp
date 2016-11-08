@@ -34,7 +34,6 @@
 	(progn
 	  (db-mark-file-processed x)
 	  (parse-ct-contents x))))))
-;;ll(sqlite-disconnect *conn*))))))
 
 (defun fetch-value (indicators plist)
   "Return the value at the end of the indicators list"

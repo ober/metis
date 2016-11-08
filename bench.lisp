@@ -5,7 +5,7 @@
   (declaim (optimize (safety 3) (speed 0) (debug 3)))
   (defvar *benching* t)
   (defvar *db-backend* :manardb)
-  ;;(cloudtrail-report-async "2" "~/test-ct/"))
+  ;;(cloudtrail-report-async "3" "~/test-ct/"))
   (cloudtrail-report-sync "~/test-ct/"))
 
 (defun run-bench ()
