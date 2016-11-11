@@ -3,8 +3,8 @@
 ;;(ql:quickload :manardb)
 (manardb:use-mmap-dir "~/ct-manardb/")
 
-;; (manardb:defmmclass files ()
-;;  ((file :type STRING :initarg :file)))
+(manardb:defmmclass files ()
+  ((file :type STRING :initarg :file)))
 
 (manardb:defmmclass ct ()
   ((additionalEventData :type STRING :initarg :additionalEventData :accessor additionalEventData)
@@ -27,6 +27,24 @@
    (userIdentity :type STRING :initarg :userIdentity :accessor userIdentity)
    (userName :type STRING :initarg :userName :accessor username)
    ))
+
+(defun manardb-have-we-seen-this-file (file)
+  (let ((name (file-namestring file)))
+    (format t "seen? ~A~%" name)
+    (let ((found (manardb-get-files name)))
+      (if found
+	  t
+	  nil))))
+
+(defun manardb-get-files (file)
+  (remove-if-not
+   (lambda (x) (string-equal (file-namestring file) (slot-value x 'file)))
+   (manardb:retrieve-all-instances 'metis::files)))
+
+(defun manardb-mark-file-processed (file)
+  (let ((name (ignore-errors (file-namestring file))))
+    (format t "mark: ~A~%" name)
+    (make-instance 'files :file name)))
 
 (defun get-by-name (name)
   (remove-if-not
@@ -86,7 +104,7 @@
   		   :userName userName
   		   )
     )
-;;  (print (length (manardb:retrieve-all-instances 'ct)))
+  ;;  (print (length (manardb:retrieve-all-instances 'ct)))
   )
 
 

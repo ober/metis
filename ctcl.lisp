@@ -3,17 +3,11 @@
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
-  ;;(format t ".")
-  (let ((them (load-file-values)))
-    (if (gethash (file-namestring file) them)
-  	t
+  (let ((found (db-have-we-seen-this-file file)))
+    (if found
+	t
 	nil)))
 
-;; (defun have-we-seen-this-value (var value)
-;;   (let ((them (load-values var)))
-;;     (if (gethash var them)
-;;   	t
-;; 	nil)))
 
 (defun walk-ct (path fn)
   (cl-fad:walk-directory path fn))
@@ -30,7 +24,7 @@
   (when (equal (pathname-type x) "gz")
     (let ((*conn* (sqlite-emit-conn)))
       (declare (special *conn*))
-      (unless (have-we-seen-this-file x)
+      (unless (db-have-we-seen-this-file x)
 	(progn
 	  (db-mark-file-processed x)
 	  (parse-ct-contents x))))))

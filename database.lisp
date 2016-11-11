@@ -34,16 +34,19 @@
 		   :userName
 		   ))
 
-(defun db-have-we-seen-this-file (x)
-  (format t ".")
-  (if (db-do-query (format nil "select id from files where value = '~A'" (file-namestring x)))
-      t
-      nil))
+(defun db-have-we-seen-this-file (file)
+  (cond
+    ((equal :sqlite *db-backend*) (sqlite-have-we-seen-this-file file))
+    ((equal :postgres *db-backend*)(sqlite-have-we-seen-this-file file))
+    ((equal :manardb *db-backend*)(manardb-have-we-seen-this-file file))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
-(defun db-mark-file-processed (x)
-  (db-do-query
-   (format nil "insert into files(value) values ('~A')" (file-namestring x)))
-  (setf (gethash (file-namestring x) *h*) t))
+(defun db-mark-file-processed (file)
+  (cond
+    ((equal :sqlite *db-backend*) (sqlite-mark-file-processed file))
+    ((equal :postgres *db-backend*)(psql-mark-file-processed file))
+    ((equal :manardb *db-backend*)(manardb-mark-file-processed file))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-recreate-tables (db)
   (cond
