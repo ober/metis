@@ -50,7 +50,7 @@
     (format t "Got: app:~A verb:~A workers:~A dir:~A~%" a b c d)
     (cond
       ((equal "sa" verb)(metis::find-by-srcaddr a))
-      ((equal "sn" verb)(time (metis::get-by-name workers)))
+      ((equal "sn" verb)(time (metis::get-by-name a)))
       ((equal "da" verb)(metis::find-by-dstaddr a))
       ((equal "sp" verb)(metis::find-by-srcport a))
       ((equal "dp" verb)(metis::find-by-dstport a))
