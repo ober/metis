@@ -1,6 +1,6 @@
 (in-package :metis)
 
-(defvar *db-backend* :manardb) ;; :sqlite :postgres
+(defvar *db-backend* :postgres) ;;manardb) ;; :sqlite :postgres
 
 (defvar *mytasks* (list))
 

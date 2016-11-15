@@ -1,7 +1,9 @@
 (in-package :metis)
 
 ;;(ql:quickload :manardb)
-(manardb:use-mmap-dir "~/ct-manardb/")
+
+(defun init-manard()
+  (manardb:use-mmap-dir "~/ct-manardb/"))
 
 (manardb:defmmclass files ()
   ((file :type STRING :initarg :file)))
@@ -29,6 +31,8 @@
    ))
 
 (defun manardb-have-we-seen-this-file (file)
+  (unless (boundp 'manardb:use-mmap-dir)
+    (init-manard))
   (let ((name (file-namestring file)))
     (format t "seen? ~A~%" name)
     (let ((found (manardb-get-files name)))
