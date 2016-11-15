@@ -16,7 +16,7 @@
   ;;(format t "~%Q: ~A ~%" query)
   (sqlite:execute-to-list db query))
 
-(defun sqlite-have-we-seen-thos-file (file)
+(defun sqlite-have-we-seen-this-file (file)
   t)
 
 (defun sqlite-establish-connection ()
