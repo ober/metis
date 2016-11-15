@@ -16,6 +16,9 @@
   ;;(format t "~%Q: ~A ~%" query)
   (sqlite:execute-to-list db query))
 
+(defun sqlite-have-we-seen-thos-file (file)
+  t)
+
 (defun sqlite-establish-connection ()
   (setf *print-circle* nil)
   (format t "~% db-backend:~A~%" *db-backend*)
