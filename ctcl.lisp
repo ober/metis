@@ -1,5 +1,7 @@
 (in-package :metis)
 
+(defvar *db-backend* :manardb) ;; :sqlite :postgres
+
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
