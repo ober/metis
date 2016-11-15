@@ -1,7 +1,5 @@
 (in-package :metis)
 
-(defvar *db-backend* :manardb) ;; :sqlite :postgres
-
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (make-hash-table :test 'equalp))
 (defvar *db* nil)
