@@ -1,6 +1,6 @@
 (in-package :metis)
 
-(defvar *db-backend* :postgres) ;;manardb) ;; :sqlite :postgres
+(defvar *db-backend* :manardb) ;; :sqlite :postgres
 
 (defvar *mytasks* (list))
 
@@ -9,7 +9,6 @@
     (if found
 	t
 	nil)))
-
 
 (defun walk-ct (path fn)
   (cl-fad:walk-directory path fn))

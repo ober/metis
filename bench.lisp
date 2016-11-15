@@ -5,8 +5,8 @@
   (declaim (optimize (safety 3) (speed 0) (debug 3)))
   (defvar *benching* t)
   ;;(defvar *db-backend* :manardb)
-  (cloudtrail-report-async "1" "~/nov/"))
-;;(cloudtrail-report-sync "~/test-ct/"))
+  ;;(cloudtrail-report-async "1" "~/nov/"))
+  (cloudtrail-report-sync "~/nov/"))
 
 (defun run-bench ()
   (sqlite-establish-connection)
