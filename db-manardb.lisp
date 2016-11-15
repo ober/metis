@@ -51,9 +51,22 @@
     (make-instance 'files :file name)))
 
 (defun get-by-name (name)
-  (remove-if-not
-   (lambda (x) (string-equal name (slot-value x 'userName)))
-   (manardb:retrieve-all-instances 'metis::ct)))
+  (mapcar
+   #'(lambda (x)
+       (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+	       (slot-value x 'eventTime)
+	       (slot-value x 'eventName)
+	       (slot-value x 'eventSource)
+	       (slot-value x 'sourceIPAddress)
+	       (slot-value x 'userAgent)
+	       (slot-value x 'errorMessage)
+	       (slot-value x 'errorCode)
+	       ;;(slot-value x 'userIdentity)
+	       )
+  	 )
+   (remove-if-not
+    (lambda (x) (string-equal name (slot-value x 'userName)))
+    (manardb:retrieve-all-instances 'metis::ct))))
 
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))

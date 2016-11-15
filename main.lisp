@@ -15,6 +15,7 @@
 
 
 (defun main ()
+  (init-manard)
   (format t "XXX: ~A~%" (type-of (argv)))
   (let* ((args (argv))
 	 (verb (nth 1 args))
@@ -25,7 +26,8 @@
       ((equal "a" verb)(time (cloudtrail-report-async workers dir)))
       ((equal "v" verb)(time (vpc-flows-report-async workers dir)))
       ((equal "b" verb)(time (bench-vpc-flows-report-async workers dir)))
-      ((equal "s" verb)(time (cloudtrail-report-sync dir)))
+      ((equal "s" verb)(time (cloudtrail-report-sync workers)))
+      ((equal "sn" verb)(time (get-by-name workers)))
       ((equal "r" verb)(time (run-bench)))
       (t (progn
 	   (format t "Usage: <~A> <function> <args>~%" (nth 0 args))
