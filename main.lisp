@@ -16,7 +16,6 @@
 
 (defun main ()
   (init-manard)
-  (format t "XXX: ~A~%" (type-of (argv)))
   (let* ((args (argv))
 	 (verb (nth 1 args))
 	 (workers (nth 2 args))
