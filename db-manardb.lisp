@@ -3,7 +3,10 @@
 ;;(ql:quickload :manardb)
 
 (defun init-manard()
-  (manardb:use-mmap-dir "~/ct-manardb/"))
+  (unless (boundp 'manardb:use-mmap-dir)
+    (manardb:use-mmap-dir "~/ct-manardb/"))
+  (unless (boundp '*manard-files*)
+    (allocate-files-hash)))
 
 (manardb:defmmclass files ()
   ((file :type STRING :initarg :file)))
@@ -31,8 +34,6 @@
    ))
 
 (defun manardb-have-we-seen-this-file (file)
-  (unless (boundp 'manardb:use-mmap-dir)
-    (init-manard))
   (let ((name (file-namestring file)))
     (format t "seen? ~A~%" name)
     (let ((found (manardb-get-files name)))
@@ -50,19 +51,31 @@
     (format t "mark: ~A~%" name)
     (make-instance 'files :file name)))
 
+(defun print-record-a (x)
+  (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+	  (slot-value x 'eventTime)
+	  (slot-value x 'eventName)
+	  (slot-value x 'eventSource)
+	  (slot-value x 'sourceIPAddress)
+	  (slot-value x 'userAgent)
+	  (slot-value x 'errorMessage)
+	  (slot-value x 'errorCode)
+	  ;;(slot-value x 'userIdentity)
+	  ))
+
+
+(defun allocate-file-hash ()
+  (defvar *manard-files* (make-hash-table :test 'equalp))
+  (init-manard)
+  (mapc
+   #'(lambda (x)
+       (setf (gethash (slow-value x 'file) *manard-files*) t))
+   (manardb:retrieve-all-instances 'metis:files)))
+
 (defun get-by-name (name)
   (mapcar
    #'(lambda (x)
-       (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-	       (slot-value x 'eventTime)
-	       (slot-value x 'eventName)
-	       (slot-value x 'eventSource)
-	       (slot-value x 'sourceIPAddress)
-	       (slot-value x 'userAgent)
-	       (slot-value x 'errorMessage)
-	       (slot-value x 'errorCode)
-	       ;;(slot-value x 'userIdentity)
-	       )
+       (print-record-a x)
   	 )
    (remove-if-not
     (lambda (x) (string-equal name (slot-value x 'userName)))

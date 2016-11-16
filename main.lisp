@@ -40,6 +40,7 @@
 
 #+allegro
 (defun main (&rest args)
+  (init-manard)
   ;;(db.ac:open-network-database "localhost" 2222)
   (format t "args :~s %" args)
   (let ((verb (or (nth 1 args) nil))
