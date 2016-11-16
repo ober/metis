@@ -2,7 +2,7 @@
 
 (defun argv ()
   (or
-   Z#+clisp (ext:argv)
+   #+clisp (ext:argv)
    #+sbcl sb-ext:*posix-argv*
    #+abcl ext:*command-line-argument-list*
    #+clozure (ccl::command-line-arguments)
@@ -42,6 +42,7 @@
 (defun main (&rest args)
   (metis::init-manard)
   ;;(db.ac:open-network-database "localhost" 2222)
+
   (format t "args :~s %" args)
   (let ((verb (or (nth 1 args) nil))
 	(a (or (nth 2 args) nil))
