@@ -61,7 +61,6 @@
 	  ;;(slot-value x 'userIdentity)
 	  ))
 
-
 (defun allocate-file-hash ()
   (print "allocate-file-hash")
   (defvar *manard-files* (make-hash-table :test 'equalp))
@@ -72,13 +71,19 @@
    (manardb:retrieve-all-instances 'metis::files)))
 
 (defun get-by-name (name)
-  (mapcar
-   #'(lambda (x)
-       (print-record-a x)
-  	 )
-   (remove-if-not
-    (lambda (x) (string-equal name (slot-value x 'userName)))
-    (manardb:retrieve-all-instances 'metis::ct))))
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+    (manardb:with-cached-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
+      (if (string-equal name userName)
+	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
+
+;; (defun get-by-name (name)
+;;   (mapcar
+;;    (lambda (x)
+;;        (print-record-a x)
+;;   	 )
+;;    (remove-if-not
+;;     (lambda (x) (string-equal name (slot-value x 'userName)))
+;;     (manardb:retrieve-all-instances 'metis::ct))))
 
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))
