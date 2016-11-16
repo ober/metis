@@ -73,9 +73,8 @@
 (defun get-by-name (name)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
     (if (string-equal name (slot-value x 'userName))
-	;;(with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
-	  (format t ".~%"))))
-	  ;;(format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
+	(with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
+	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
 
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))
