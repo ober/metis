@@ -4,9 +4,7 @@
 
 (defun init-manard()
   (unless (boundp 'manardb:use-mmap-dir)
-    (manardb:use-mmap-dir "~/ct-manardb/"))
-  (unless (boundp '*manard-files*)
-    (allocate-file-hash)))
+    (manardb:use-mmap-dir "~/ct-manardb/")))
 
 (manardb:defmmclass files ()
   ((file :type STRING :initarg :file)))
@@ -34,6 +32,8 @@
    ))
 
 (defun manardb-have-we-seen-this-file (file)
+  (unless (boundp '*manard-files*)
+    (allocate-file-hash))
   (multiple-value-bind (id seen)
       (gethash (file-namestring file) *manard-files*)
     seen))
