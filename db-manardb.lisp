@@ -6,7 +6,7 @@
   (unless (boundp 'manardb:use-mmap-dir)
     (manardb:use-mmap-dir "~/ct-manardb/"))
   (unless (boundp '*manard-files*)
-    (allocate-files-hash)))
+    (allocate-file-hash)))
 
 (manardb:defmmclass files ()
   ((file :type STRING :initarg :file)))
@@ -34,12 +34,9 @@
    ))
 
 (defun manardb-have-we-seen-this-file (file)
-  (let ((name (file-namestring file)))
-    (format t "seen? ~A~%" name)
-    (let ((found (manardb-get-files name)))
-      (if found
-	  t
-	  nil))))
+  (multiple-value-bind (id seen)
+      (gethash (file-namestring file) *manard-files*)
+    seen))
 
 (defun manardb-get-files (file)
   (remove-if-not
@@ -49,6 +46,7 @@
 (defun manardb-mark-file-processed (file)
   (let ((name (ignore-errors (file-namestring file))))
     (format t "mark: ~A~%" name)
+    (setf (gethash name *manard-files*) t)
     (make-instance 'files :file name)))
 
 (defun print-record-a (x)
@@ -65,12 +63,13 @@
 
 
 (defun allocate-file-hash ()
+  (print "allocate-file-hash")
   (defvar *manard-files* (make-hash-table :test 'equalp))
   (init-manard)
   (mapc
    #'(lambda (x)
-       (setf (gethash (slow-value x 'file) *manard-files*) t))
-   (manardb:retrieve-all-instances 'metis:files)))
+       (setf (gethash (slot-value x 'file) *manard-files*) t))
+   (manardb:retrieve-all-instances 'metis::files)))
 
 (defun get-by-name (name)
   (mapcar
