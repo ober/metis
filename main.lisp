@@ -27,6 +27,7 @@
       ((equal "b" verb)(time (bench-vpc-flows-report-async workers dir)))
       ((equal "s" verb)(time (cloudtrail-report-sync workers)))
       ((equal "sn" verb)(time (get-by-name workers)))
+      ((equal "ln" verb)(time (get-name-list)))
       ((equal "r" verb)(time (run-bench)))
       (t (progn
 	   (format t "Usage: <~A> <function> <args>~%" (nth 0 args))
