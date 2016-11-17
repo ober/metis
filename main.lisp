@@ -28,6 +28,10 @@
       ((equal "s" verb)(time (cloudtrail-report-sync workers)))
       ((equal "sn" verb)(time (get-by-name workers)))
       ((equal "ln" verb)(time (get-name-list)))
+      ((equal "lev" verb)(time (get-event-list)))
+      ((equal "sev" verb)(time (get-by-event workers)))
+      ((equal "sec" verb)(time (get-by-errorcode workers)))
+      ((equal "lec" verb)(time (get-errorcode-list)))
       ((equal "r" verb)(time (run-bench)))
       (t (progn
 	   (format t "Usage: <~A> <function> <args>~%" (nth 0 args))
