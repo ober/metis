@@ -72,30 +72,50 @@
 
 (defun get-by-name (name)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (if (string-equal name (slot-value x 'userName))
-	(with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
-	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
+		   (if (string-equal name (slot-value x 'userName))
+		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
+			 (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
 
-;; (defun get-name-list ()
-;;   "Return uniqure list of users"
-;;   (let ((names (list)))
-;;     (manardb:doclass (x 'metis::ct :fresh-instances nil)
-;;       (with-slots (userName) x
-;; 	(if userName
-;; 	    (unless (member userName names :test 'string-equal)
-;; 	      (pushnew userName names :test 'string-equal))))
-;;       (delete-duplicates names :test 'string-equal)
-;;       (format t "~{~A~^, ~}" names))))
+(defun get-by-event (name)
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+		   (if (string-equal name (slot-value x 'eventName))
+		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
+			 (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
 
+(defun get-by-errorcode (name)
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+		   (if (string-equal name (slot-value x 'errorCode))
+		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+			 (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventName eventSource sourceIPAddress userAgent errorMessage)))))
+
+  ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
+
+(defun get-errorcode-list ()
+  "Return uniqure list of users"
+  (let ((names (make-hash-table :test 'equalp)))
+    (manardb:doclass (x 'metis::ct :fresh-instances nil)
+		     (with-slots (errorCode) x
+		       (unless (gethash errorCode names)
+			 (setf (gethash errorCode names) t))))
+    (format t "~{~A~^, ~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 (defun get-name-list ()
   "Return uniqure list of users"
   (let ((names (make-hash-table :test 'equalp)))
     (manardb:doclass (x 'metis::ct :fresh-instances nil)
-      (with-slots (userName) x
-	(unless (gethash userName names)
-	  (setf (gethash userName names) t))))
-    (format t "~{~A~^, ~}" (alexandria:hash-table-keys names))))
+		     (with-slots (userName) x
+		       (unless (gethash userName names)
+			 (setf (gethash userName names) t))))
+    (format t "~{~A~^, ~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
+
+(defun get-event-list ()
+  "Return uniqure list of events"
+  (let ((names (make-hash-table :test 'equalp)))
+    (manardb:doclass (x 'metis::ct :fresh-instances nil)
+		     (with-slots (eventName) x
+		       (unless (gethash eventName names)
+			 (setf (gethash eventName names) t))))
+    (format t "~{~A~^, ~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))
