@@ -76,6 +76,27 @@
 	(with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
 	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
 
+;; (defun get-name-list ()
+;;   "Return uniqure list of users"
+;;   (let ((names (list)))
+;;     (manardb:doclass (x 'metis::ct :fresh-instances nil)
+;;       (with-slots (userName) x
+;; 	(if userName
+;; 	    (unless (member userName names :test 'string-equal)
+;; 	      (pushnew userName names :test 'string-equal))))
+;;       (delete-duplicates names :test 'string-equal)
+;;       (format t "~{~A~^, ~}" names))))
+
+
+(defun get-name-list ()
+  "Return uniqure list of users"
+  (let ((names (make-hash-table :test 'equalp)))
+    (manardb:doclass (x 'metis::ct :fresh-instances nil)
+      (with-slots (userName) x
+	(unless (gethash userName names)
+	  (setf (gethash userName names) t))))
+    (format t "~{~A~^, ~}" (alexandria:hash-table-keys names))))
+
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))
 
