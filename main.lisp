@@ -29,6 +29,7 @@
       ((equal "sn" verb)(time (get-by-name workers)))
       ((equal "ln" verb)(time (get-name-list)))
       ((equal "lev" verb)(time (get-event-list)))
+      ((equal "seca" verb)(time (get-all-errorcodes)))
       ((equal "sev" verb)(time (get-by-event workers)))
       ((equal "sec" verb)(time (get-by-errorcode workers)))
       ((equal "lec" verb)(time (get-errorcode-list)))

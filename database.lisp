@@ -111,8 +111,8 @@
     ((equal :sourceIPAddress field)(get-hostname-by-ip (getf record :|sourceIPAddress|)))
     ((equal :userAgent field)(getf record :|userAgent|))
     ((equal :userIdentity field)(getf record :|userIdentity|))
-    ;;((equal :userName field)(fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record))
-    ((equal :userName field)(fetch-value '(:|userIdentity| :|userName|) record))
+    ((equal :userName field)(fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record))
+    ;;((equal :userName field)(fetch-value '(:|userIdentity| :|userName|) record))
     (t (format nil "Unknown arg:~A~%" field))))
 
 

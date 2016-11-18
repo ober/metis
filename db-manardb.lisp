@@ -88,6 +88,15 @@
 		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
 			 (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventName eventSource sourceIPAddress userAgent errorMessage)))))
 
+
+(defun get-all-errorcodes ()
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+		   (unless (string-equal "NIL" (slot-value x 'errorCode))
+		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+			 (if (string-equal "NIL" userName)
+			     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%" eventTime errorCode (fetch-value '(:|sessionContext| :|sessionIssuer| :|userName|) userIdentity) eventName eventSource sourceIPAddress userAgent errorMessage)
+  			     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%" eventTime errorCode userName eventName eventSource sourceIPAddress userAgent errorMessage))))))
+
   ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
 (defun get-errorcode-list ()
