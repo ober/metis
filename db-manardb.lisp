@@ -106,7 +106,7 @@
 		     (with-slots (errorCode) x
 		       (unless (gethash errorCode names)
 			 (setf (gethash errorCode names) t))))
-    (format t "~{~A~^, ~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
+    (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 (defun get-name-list ()
   "Return uniqure list of users"
@@ -115,7 +115,7 @@
 		     (with-slots (userName) x
 		       (unless (gethash userName names)
 			 (setf (gethash userName names) t))))
-    (format t "~{~A~^, ~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
+    (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 (defun get-event-list ()
   "Return uniqure list of events"
@@ -124,7 +124,7 @@
 		     (with-slots (eventName) x
 		       (unless (gethash eventName names)
 			 (setf (gethash eventName names) t))))
-    (format t "~{~A~^, ~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
+    (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))
