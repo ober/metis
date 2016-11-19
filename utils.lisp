@@ -25,13 +25,13 @@
   (let ((json (get-json-gzip-contents file)))
     (jonathan:parse json)))
 
-#-clozure
+#-(or allegro clozure sbcl)
 (defun get-json-gzip-contents (file)
   (uiop:run-program
    (format nil "zcat ~A" file)
     :output :string))
 
-#+clozure
+#+(or clozure allegro sbcl)
 (defun get-json-gzip-contents (file)
   (first (gzip-stream:with-open-gzip-file (in file)
     (loop for l = (read-line in nil nil)

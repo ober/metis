@@ -32,6 +32,7 @@
       ((equal "seca" verb)(time (get-all-errorcodes)))
       ((equal "sev" verb)(time (get-by-event workers)))
       ((equal "sec" verb)(time (get-by-errorcode workers)))
+      ((equal "st" verb)(time (get-stats)))
       ((equal "lec" verb)(time (get-errorcode-list)))
       ((equal "r" verb)(time (run-bench)))
       (t (progn
@@ -69,6 +70,7 @@
       ((equal "sa" verb)(metis::find-by-srcaddr a))
       ((equal "sec" verb)(time (metis::get-by-errorcode workers)))
       ((equal "seca" verb)(time (metis::get-all-errorcodes)))
+      ((equal "st" verb)(time (metis::get-stats)))
       ((equal "sev" verb)(time (metis::get-by-event workers)))
       ((equal "sn" verb)(time (metis::get-by-name workers)))
       ((equal "sp" verb)(metis::find-by-srcport a))

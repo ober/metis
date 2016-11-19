@@ -88,6 +88,8 @@
 		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
 			 (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventName eventSource sourceIPAddress userAgent errorMessage)))))
 
+(defun get-stats ()
+  (format t "Totals ct:~A files:~A~%" (manardb:count-all-instances 'metis::ct) (manardb:count-all-instances 'metis::files)))
 
 (defun get-all-errorcodes ()
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
