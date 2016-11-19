@@ -25,7 +25,7 @@
   (let ((json (get-json-gzip-contents file)))
     (jonathan:parse json)))
 
-#-clojure
+#-clozure
 (defun get-json-gzip-contents (file)
   (uiop:run-program
    (format nil "zcat ~A" file)
