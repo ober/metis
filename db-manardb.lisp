@@ -96,27 +96,27 @@
 	 (b (fetch-value '(:|sessionContext| :|userName|) userIdentity))
 	 (c (fetch-value '(:|userName|) userIdentity))
 	 (d (fetch-value '(:|type|) userIdentity))
-	 (len (length userIdentity))
-	 (sending (or a b c d userIdentity)))
-    (or a b c d)))
+	 (len (length userIdentity)))
+    (or a b c d userIdentity)))
     ;;(if (and (null a) (null b) (null c) (null d))
     ;;(format t "a: ~A b:~A c:~A d:~A len:~A username:~A sending:~A  ui:~A~%" a b c d len (fetch-value '(:|userName|) userIdentity) sending userIdentity)))
 
 
 (defun get-all-errorcodes ()
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (unless (string-equal "NIL" (slot-value x 'errorCode))
-		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-			 (let ((userName2 (find-username userIdentity)))
-			   (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
-				   eventTime
-				   errorCode
-				   (or userName Username2)
-				   eventName
-				   eventSource
-				   sourceIPAddress
-				   userAgent
-				   errorMessage)))))
+  (manardb:doclass
+   (x 'metis::ct :fresh-instances nil)
+   (unless (string-equal "NIL" (slot-value x 'errorCode))
+     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+       (let ((userName2 (find-username userIdentity)))
+	 (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+		 eventTime
+		 errorCode
+		 (or userName userName2)
+		 eventName
+		 eventSource
+		 sourceIPAddress
+		 userAgent
+		 errorMessage))))))
 
   ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
