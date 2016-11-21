@@ -91,13 +91,33 @@
 (defun get-stats ()
   (format t "Totals ct:~A files:~A~%" (manardb:count-all-instances 'metis::ct) (manardb:count-all-instances 'metis::files)))
 
+(defun find-username (userIdentity)
+  (let* ((a (fetch-value '(:|sessionContext| :|sessionIssuer| :|userName|) userIdentity))
+	 (b (fetch-value '(:|sessionContext| :|userName|) userIdentity))
+	 (c (fetch-value '(:|userName|) userIdentity))
+	 (d (fetch-value '(:|type|) userIdentity))
+	 (len (length userIdentity))
+	 (sending (or a b c d userIdentity)))
+    (or a b c d)))
+    ;;(if (and (null a) (null b) (null c) (null d))
+    ;;(format t "a: ~A b:~A c:~A d:~A len:~A username:~A sending:~A  ui:~A~%" a b c d len (fetch-value '(:|userName|) userIdentity) sending userIdentity)))
+
+
 (defun get-all-errorcodes ()
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
 		   (unless (string-equal "NIL" (slot-value x 'errorCode))
 		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-			 (if (string-equal "NIL" userName)
-			     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%" eventTime errorCode (fetch-value '(:|sessionContext| :|sessionIssuer| :|userName|) userIdentity) eventName eventSource sourceIPAddress userAgent errorMessage)
-  			     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%" eventTime errorCode userName eventName eventSource sourceIPAddress userAgent errorMessage))))))
+			 (let ((userName2 (find-username userIdentity)))
+			   (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+				   eventTime
+				   errorCode
+				   (or userName Username2)
+				   eventName
+				   eventSource
+				   sourceIPAddress
+				   userAgent
+				   errorMessage
+				   userIdentity)))))
 
   ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
