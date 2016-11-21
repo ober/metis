@@ -108,7 +108,7 @@
 		   (unless (string-equal "NIL" (slot-value x 'errorCode))
 		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
 			 (let ((userName2 (find-username userIdentity)))
-			   (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+			   (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
 				   eventTime
 				   errorCode
 				   (or userName Username2)
@@ -116,8 +116,7 @@
 				   eventSource
 				   sourceIPAddress
 				   userAgent
-				   errorMessage
-				   userIdentity)))))
+				   errorMessage)))))
 
   ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
