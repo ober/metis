@@ -91,15 +91,14 @@
 (defun get-stats ()
   (format t "Totals ct:~A files:~A~%" (manardb:count-all-instances 'metis::ct) (manardb:count-all-instances 'metis::files)))
 
-(defun find-username (userIdentity)
-  (let* ((a (fetch-value '(:|sessionContext| :|sessionIssuer| :|userName|) userIdentity))
+(fare-memoization:define-memo-function  find-username (userIdentity)
+  (let ((a (fetch-value '(:|sessionContext| :|sessionIssuer| :|userName|) userIdentity))
 	 (b (fetch-value '(:|sessionContext| :|userName|) userIdentity))
 	 (c (fetch-value '(:|userName|) userIdentity))
 	 (d (fetch-value '(:|type|) userIdentity))
 	 (len (length userIdentity)))
-    (or a b c d userIdentity)))
-    ;;(if (and (null a) (null b) (null c) (null d))
-    ;;(format t "a: ~A b:~A c:~A d:~A len:~A username:~A sending:~A  ui:~A~%" a b c d len (fetch-value '(:|userName|) userIdentity) sending userIdentity)))
+    ;;(format t "a: ~A b:~A c:~A d:~A len:~A username:~A" a b c d len username)
+    (or a b c d)))
 
 
 (defun get-all-errorcodes ()
@@ -107,16 +106,15 @@
    (x 'metis::ct :fresh-instances nil)
    (unless (string-equal "NIL" (slot-value x 'errorCode))
      (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-       (let ((userName2 (find-username userIdentity)))
-	 (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
-		 eventTime
-		 errorCode
-		 (or userName userName2)
-		 eventName
-		 eventSource
-		 sourceIPAddress
-		 userAgent
-		 errorMessage))))))
+       (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+	       eventTime
+	       errorCode
+	       (find-username userIdentity userName)
+	       eventName
+	       eventSource
+	       sourceIPAddress
+	       userAgent
+	       errorMessage)))))
 
   ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
@@ -131,18 +129,23 @@
 
 (defun get-name-list ()
   "Return uniqure list of users"
-  (let ((names (make-hash-table :test 'equalp)))
+  (let ((names (make-hash-table :test 'equalp))
+	(name nil))
     (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		     (with-slots (userName) x
+		     (with-slots (userName userIdentity) x
+		       ;;(time (setf name  (find-username userIdentity userName)))
+		       ;;(format t "~%userName:~A name:~A" userName name)
+		       (if (string-equal userName "NIL")
+			   (setf userName (find-username useridentity)))
 		       (unless (gethash userName names)
-			 (setf (gethash userName names) t))))
+			   (setf (gethash userName names) userIdentity))))
     (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 (defun get-event-list ()
   "Return uniqure list of events"
   (let ((names (make-hash-table :test 'equalp)))
     (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		     (with-slots (eventName) x
+		     (with-slots (eventName userIdentity) x
 		       (unless (gethash eventName names)
 			 (setf (gethash eventName names) t))))
     (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
@@ -175,25 +178,25 @@
   		       )
       record
     (make-instance 'ct
-  		   :additionalEventData additionalEventData
-  		   :awsRegion awsRegion
-  		   :errorCode errorCode
-  		   :errorMessage errorMessage
-  		   :eventID eventID
-  		   :eventName eventName
-  		   :eventSource eventSource
-  		   :eventTime eventTime
-  		   :eventType eventType
-  		   :eventVersion eventVersion
-  		   :recipientAccountId recipientAccountId
-  		   :requestID requestID
-  		   :requestParameters requestParameters
-  		   :resources resources
-  		   :responseElements responseElements
-  		   :sourceIPAddress sourceIPAddress
-  		   :userAgent userAgent
-  		   :userIdentity userIdentity
-  		   :userName userName
+  		   :additionalEventData (if (null additionalEventData) (string additionalEventData) additionalEventData)
+  		   :awsRegion (if (null awsRegion) (string awsRegion) awsRegion)
+  		   :errorCode (if (null errorCode) (string errorCode) errorCode)
+  		   :errorMessage (if (null errorMessage) (string errorMessage) errorMessage)
+  		   :eventID (if (null eventID) (string eventID) eventID)
+  		   :eventName (if (null eventName) (string eventName) eventName)
+  		   :eventSource (if (null eventSource) (string eventSource) eventSource)
+  		   :eventTime (if (null eventTime) (string eventTime) eventTime)
+  		   :eventType (if (null eventType) (string eventType) eventType)
+  		   :eventVersion (if (null eventVersion) (string eventVersion) eventVersion)
+  		   :recipientAccountId (if (null recipientAccountId) (string recipientAccountId) recipientAccountId)
+  		   :requestID (if (null requestID) (string requestID) requestID)
+  		   :requestParameters (if (null requestParameters) (string requestParameters) requestParameters)
+  		   :resources (if (null resources) (string resources) resources)
+  		   :responseElements (if (null responseElements) (string responseElements) responseElements)
+  		   :sourceIPAddress (if (null sourceIPAddress) (string sourceIPAddress) sourceIPAddress)
+  		   :userAgent (if (null userAgent) (string userAgent) userAgent)
+  		   :userIdentity (if (null userIdentity) (string userIdentity) userIdentity)
+  		   :userName (if (null userName) (string userName) userName)
   		   )
     )
   ;;  (print (length (manardb:retrieve-all-instances 'ct)))
