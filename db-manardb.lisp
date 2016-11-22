@@ -106,10 +106,12 @@
    (x 'metis::ct :fresh-instances nil)
    (unless (string-equal "NIL" (slot-value x 'errorCode))
      (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+       (if (string-equal userName "NIL")
+	   (setf userName (find-username userIdentity)))
        (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
 	       eventTime
 	       errorCode
-	       (find-username userIdentity userName)
+	       userName
 	       eventName
 	       eventSource
 	       sourceIPAddress
