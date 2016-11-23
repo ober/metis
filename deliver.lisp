@@ -8,8 +8,8 @@
 		:jonathan
 		:manardb
 		:pcall
-		:postmodern
-		:sqlite
+		;;:postmodern
+		;;:sqlite
 		:uiop
 		))
 
@@ -44,8 +44,8 @@
 		  "utils.lisp"
 		  "ctcl.lisp"
 		  "database.lisp"
-		  "db-postgres.lisp"
-		  "db-sqlite.lisp"
+		  ;;"db-postgres.lisp"
+		  ;;"db-sqlite.lisp"
 		  "db-manardb.lisp"
 		  "main.lisp"
 		  "bench.lisp"
@@ -56,8 +56,8 @@
 							 "package.fasl"
 							 "utils.fasl"
 							 "database.fasl"
-							 "db-postgres.fasl"
-							 "db-sqlite.fasl"
+							 ;;"db-postgres.fasl"
+							 ;;"db-sqlite.fasl"
 							 "db-manardb.fasl"
 							 "ctcl.fasl"
 							 "main.fasl"

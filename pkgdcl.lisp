@@ -4,8 +4,9 @@
 		:cl-fad
 		:gzip-stream
 		:cl-json
-		:s-sql
+		;;:s-sql
 		:pcall
 		:uiop
 		:cl-date-time-parser
-		:postmodern))
+		;;:postmodern
+		))

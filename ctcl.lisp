@@ -54,7 +54,7 @@
 (defun cloudtrail-report-sync (path)
   ;;(psql-begin)
   (force-output)
-  (sqlite-establish-connection)
+  ;;(sqlite-establish-connection)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
 	     #'sync-ct-file)))
@@ -62,7 +62,7 @@
 (defun cloudtrail-report-async (workers path)
   ;;(psql-begin)
   (force-output)
-  (sqlite-establish-connection)
+  ;;(sqlite-establish-connection)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (let ((cloudtrail-reports (or path "~/CT")))

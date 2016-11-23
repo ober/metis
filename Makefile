@@ -30,6 +30,10 @@ allegro:
 	@ mv metis/* dist/allegro
 	@ rm -rf metis
 
+abcl:
+	@ mkdir -p dist/abcl || true
+	@ cat deliver.lisp|abcl
+
 cmucl:
 	@ cat deliver.lisp|/usr/cmucl/bin/lisp
 

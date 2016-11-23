@@ -179,7 +179,8 @@
 		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
 		     (if (cl-ppcre:all-matches ip (slot-value x 'sourceIPAddress))
 			 (progn
-			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventName eventSource sourceIPAddress userAgent errorMessage))))))
+			   (let ((name (or userName (find-username userIdentity))))
+			     (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime name eventName eventSource sourceIPAddress userAgent errorMessage)))))))
 
 (defun get-sourceips-list ()
   "Return uniqure list of events"

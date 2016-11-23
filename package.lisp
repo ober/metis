@@ -8,10 +8,10 @@
 			    :gzip-stream
 			    :jonathan
 			    :pcall
-			    :postmodern
+			    ;;:postmodern
 			    :manardb
-			    :s-sql
-			    :sqlite
+			    ;;:s-sql
+			    ;;:sqlite
 			    :uiop
 			    )))
 
