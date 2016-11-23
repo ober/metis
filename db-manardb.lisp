@@ -93,9 +93,8 @@
 		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
 		     (if (cl-ppcre:all-matches date (slot-value x 'eventTime))
 			 (progn
-			   (if (string-equal userName "NIL")
-			       (setf userName (find-username userIdentity)))
-			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventName eventSource sourceIPAddress userAgent errorMessage))))))
+			   (let  ((name  (or userName (find-username userIdentity))))
+			     (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime name eventName eventSource sourceIPAddress userAgent errorMessage)))))))
 
 (defun get-stats ()
   (format t "Totals ct:~A files:~A~%" (manardb:count-all-instances 'metis::ct) (manardb:count-all-instances 'metis::files)))
@@ -115,17 +114,16 @@
    (x 'metis::ct :fresh-instances nil)
    (unless (string-equal "NIL" (slot-value x 'errorCode))
      (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-       (if (string-equal userName "NIL")
-	   (setf userName (find-username userIdentity)))
-       (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+       (let  ((name  (or userName (find-username userIdentity))))
+	 (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
 	       eventTime
 	       errorCode
-	       userName
+	       name
 	       eventName
 	       eventSource
 	       sourceIPAddress
 	       userAgent
-	       errorMessage)))))
+	       errorMessage))))))
 
 ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
@@ -140,13 +138,14 @@
 
 (defun get-name-list ()
   "Return uniqure list of users"
-  (let ((names (make-hash-table :test 'equalp)))
+  (let ((names (make-hash-table :test 'equalp))
+	(name nil))
     (manardb:doclass (x 'metis::ct :fresh-instances nil)
 		     (with-slots (userName userIdentity) x
 		       (if (string-equal userName "NIL")
-			   (setf userName (find-username userIdentity)))
-		       (unless (gethash userName names)
-			 (setf (gethash userName names) userIdentity))))
+			   (setf name (find-username userIdentity)))
+		       (unless (gethash (or userName name) names)
+			 (setf (gethash (or userName name) names) userIdentity))))
     (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 (defun get-useridentity-by-name (name)
@@ -221,26 +220,26 @@
 
     #+ccl
     (make-instance 'ct
-		   :additionalEventData (cleanse additionalEventData)
-		   :awsRegion (cleanse awsRegion)
-		   :errorCode (cleanse errorCode)
-		   :errorMessage (cleanse errorMessage)
-		   :eventID (cleanse eventID)
-		   :eventName (cleanse eventName)
-		   :eventSource (cleanse eventSource)
-		   :eventTime (cleanse eventTime)
-		   :eventType (cleanse eventType)
-		   :eventVersion (cleanse eventVersion)
-		   :recipientAccountId (cleanse recipientAccountId)
-		   :requestID (cleanse requestID)
-		   :requestParameters (cleanse requestParameters)
-		   :resources (cleanse resources)
-		   :responseElements (cleanse responseElements)
-		   :sourceIPAddress (cleanse sourceIPAddress)
-		   :userAgent (cleanse userAgent)
-		   :userIdentity (cleanse userIdentity)
-		   :userName (cleanse userName)
-		   )
+    		   :additionalEventData (cleanse additionalEventData)
+    		   :awsRegion (cleanse awsRegion)
+    		   :errorCode (cleanse errorCode)
+    		   :errorMessage (cleanse errorMessage)
+    		   :eventID (cleanse eventID)
+    		   :eventName (cleanse eventName)
+    		   :eventSource (cleanse eventSource)
+    		   :eventTime (cleanse eventTime)
+    		   :eventType (cleanse eventType)
+    		   :eventVersion (cleanse eventVersion)
+    		   :recipientAccountId (cleanse recipientAccountId)
+    		   :requestID (cleanse requestID)
+    		   :requestParameters (cleanse requestParameters)
+    		   :resources (cleanse resources)
+    		   :responseElements (cleanse responseElements)
+    		   :sourceIPAddress (cleanse sourceIPAddress)
+    		   :userAgent (cleanse userAgent)
+    		   :userIdentity (cleanse userIdentity)
+    		   :userName (cleanse userName)
+    		   )
     #-ccl
     (make-instance 'ct
 		   :additionalEventData additionalEventData
