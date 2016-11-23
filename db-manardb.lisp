@@ -219,25 +219,51 @@
 		       )
       record
     (make-instance 'ct
-		   :additionalEventData (if (null additionalEventData) (string additionalEventData) additionalEventData)
-		   :awsRegion (if (null awsRegion) (string awsRegion) awsRegion)
-		   :errorCode (if (null errorCode) (string errorCode) errorCode)
-		   :errorMessage (if (null errorMessage) (string errorMessage) errorMessage)
-		   :eventID (if (null eventID) (string eventID) eventID)
-		   :eventName (if (null eventName) (string eventName) eventName)
-		   :eventSource (if (null eventSource) (string eventSource) eventSource)
-		   :eventTime (if (null eventTime) (string eventTime) eventTime)
-		   :eventType (if (null eventType) (string eventType) eventType)
-		   :eventVersion (if (null eventVersion) (string eventVersion) eventVersion)
-		   :recipientAccountId (if (null recipientAccountId) (string recipientAccountId) recipientAccountId)
-		   :requestID (if (null requestID) (string requestID) requestID)
-		   :requestParameters (if (null requestParameters) (string requestParameters) requestParameters)
-		   :resources (if (null resources) (string resources) resources)
-		   :responseElements (if (null responseElements) (string responseElements) responseElements)
-		   :sourceIPAddress (if (null sourceIPAddress) (string sourceIPAddress) sourceIPAddress)
-		   :userAgent (if (null userAgent) (string userAgent) userAgent)
-		   :userIdentity (if (null userIdentity) (string userIdentity) userIdentity)
-		   :userName (if (null userName) (string userName) userName)
+		   :additionalEventData  additionalEventData
+		   :awsRegion  awsRegion
+		   :errorCode  errorCode
+		   :errorMessage  errorMessage
+		   :eventID  eventID
+		   :eventName  eventName
+		   :eventSource  eventSource
+		   :eventTime  eventTime
+		   :eventType  eventType
+		   :eventVersion  eventVersion
+		   :recipientAccountId  recipientAccountId
+		   :requestID  requestID
+		   :requestParameters  requestParameters
+		   :resources  resources
+		   :responseElements  responseElements
+		   :sourceIPAddress  sourceIPAddress
+		   :userAgent  userAgent
+		   :userIdentity  userIdentity
+		   :userName  userName
+		   ;; :additionalEventData (if (null additionalEventData) (string additionalEventData) additionalEventData)
+		   ;; :awsRegion (if (null awsRegion) (string awsRegion) awsRegion)
+		   ;; :errorCode (if (null errorCode) (string errorCode) errorCode)
+		   ;; :errorMessage (if (null errorMessage) (string errorMessage) errorMessage)
+		   ;; :eventID (if (null eventID) (string eventID) eventID)
+		   ;; :eventName (if (null eventName) (string eventName) eventName)
+		   ;; :eventSource (if (null eventSource) (string eventSource) eventSource)
+		   ;; :eventTime (if (null eventTime) (string eventTime) eventTime)
+		   ;; :eventType (if (null eventType) (string eventType) eventType)
+		   ;; :eventVersion (if (null eventVersion) (string eventVersion) eventVersion)
+		   ;; :recipientAccountId (if (null recipientAccountId) (string recipientAccountId) recipientAccountId)
+		   ;; :requestID (if (null requestID) (string requestID) requestID)
+		   ;; :requestParameters (if (null requestParameters) (string requestParameters) requestParameters)
+		   ;; :resources (if (null resources) (string resources) resources)
+		   ;; :responseElements (if (null responseElements) (string responseElements) responseElements)
+		   ;; :sourceIPAddress (if (null sourceIPAddress) (string sourceIPAddress) sourceIPAddress)
+		   ;; :userAgent (if (null userAgent) (string userAgent) userAgent)
+		   ;; :userIdentity (if (null userIdentity) (string userIdentity) userIdentity)
+		   ;; :userName (if (null userName) (string userName) userName)
+
+
+
+
+
+
+
 		   )
     )
   ;;  (print (length (manardb:retrieve-all-instances 'ct)))
