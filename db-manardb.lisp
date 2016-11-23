@@ -218,6 +218,30 @@
 		       userName
 		       )
       record
+
+    #+ccl
+    (make-instance 'ct
+		   :additionalEventData (cleanse additionalEventData)
+		   :awsRegion (cleanse awsRegion)
+		   :errorCode (cleanse errorCode)
+		   :errorMessage (cleanse errorMessage)
+		   :eventID (cleanse eventID)
+		   :eventName (cleanse eventName)
+		   :eventSource (cleanse eventSource)
+		   :eventTime (cleanse eventTime)
+		   :eventType (cleanse eventType)
+		   :eventVersion (cleanse eventVersion)
+		   :recipientAccountId (cleanse recipientAccountId)
+		   :requestID (cleanse requestID)
+		   :requestParameters (cleanse requestParameters)
+		   :resources (cleanse resources)
+		   :responseElements (cleanse responseElements)
+		   :sourceIPAddress (cleanse sourceIPAddress)
+		   :userAgent (cleanse userAgent)
+		   :userIdentity (cleanse userIdentity)
+		   :userName (cleanse userName)
+		   )
+    #-ccl
     (make-instance 'ct
 		   :additionalEventData additionalEventData
 		   :awsRegion awsRegion
@@ -238,30 +262,15 @@
 		   :userAgent userAgent
 		   :userIdentity userIdentity
 		   :userName userName
-		   ;; :additionalEventData (if (null additionalEventData) (string additionalEventData) additionalEventData)
-		   ;; :awsRegion (if (null awsRegion) (string awsRegion) awsRegion)
-		   ;; :errorCode (if (null errorCode) (string errorCode) errorCode)
-		   ;; :errorMessage (if (null errorMessage) (string errorMessage) errorMessage)
-		   ;; :eventID (if (null eventID) (string eventID) eventID)
-		   ;; :eventName (if (null eventName) (string eventName) eventName)
-		   ;; :eventSource (if (null eventSource) (string eventSource) eventSource)
-		   ;; :eventTime (if (null eventTime) (string eventTime) eventTime)
-		   ;; :eventType (if (null eventType) (string eventType) eventType)
-		   ;; :eventVersion (if (null eventVersion) (string eventVersion) eventVersion)
-		   ;; :recipientAccountId (if (null recipientAccountId) (string recipientAccountId) recipientAccountId)
-		   ;; :requestID (if (null requestID) (string requestID) requestID)
-		   ;; :requestParameters (if (null requestParameters) (string requestParameters) requestParameters)
-		   ;; :resources (if (null resources) (string resources) resources)
-		   ;; :responseElements (if (null responseElements) (string responseElements) responseElements)
-		   ;; :sourceIPAddress (if (null sourceIPAddress) (string sourceIPAddress) sourceIPAddress)
-		   ;; :userAgent (if (null userAgent) (string userAgent) userAgent)
-		   ;; :userIdentity (if (null userIdentity) (string userIdentity) userIdentity)
-		   ;; :userName (if (null userName) (string userName) userName)
 		   )
-    )
-  ;;  (print (length (manardb:retrieve-all-instances 'ct)))
-  )
+    ))
 
+
+(defun cleanse (var)
+  (typecase var
+    (null (string var))
+    (string var)
+    (list (format nil "~{~s = ~s~%~}" var))))
 
 (defun manardb-get-or-insert-id (table value)
   (format t "manard-get-or-insert-id table:~A value:~A~%" table value)
