@@ -74,16 +74,14 @@
       ((equal "lip" verb)(time (metis::get-sourceips-list)))
       ((equal "sip" verb)(time (metis::get-by-sourceip a)))
       ((equal "sa" verb)(metis::find-by-srcaddr a))
-      ((equal "sec" verb)(time (metis::get-by-errorcode workers)))
+      ((equal "sec" verb)(time (metis::get-by-errorcode a)))
+      ((equal "sd" verb)(time (metis::get-by-date a)))
       ((equal "seca" verb)(time (metis::get-all-errorcodes)))
       ((equal "st" verb)(time (metis::get-stats)))
-      ((equal "sev" verb)(time (metis::get-by-event workers)))
-      ((equal "sn" verb)(time (metis::get-by-name workers)))
+      ((equal "sev" verb)(time (metis::get-by-event a)))
+      ((equal "sn" verb)(time (metis::get-by-name a)))
       ((equal "sp" verb)(metis::find-by-srcport a))
       ((equal "v" verb)(time (metis::vpc-flows-report-async a b)))
-
-
-
       ((equal "r" verb)(time (metis:run-bench)))
       (t (format t "Usage <~A> <p or s> <directory of logs>" app)))))
 ;; ;;(cl-store:store *q* "~/q.store"))
