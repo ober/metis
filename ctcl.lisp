@@ -23,12 +23,10 @@
 (defun process-ct-file (x)
   "Handle the contents of the json gzip file"
   (when (equal (pathname-type x) "gz")
-    (let ((*conn* (sqlite-emit-conn)))
-      (declare (special *conn*))
-      (unless (db-have-we-seen-this-file x)
-	(progn
-	  (db-mark-file-processed x)
-	  (parse-ct-contents x))))))
+    (unless (db-have-we-seen-this-file x)
+      (progn
+	(db-mark-file-processed x)
+	(parse-ct-contents x)))))
 
 (defun fetch-value (indicators plist)
   "Return the value at the end of the indicators list"
