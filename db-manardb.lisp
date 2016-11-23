@@ -219,25 +219,25 @@
 		       )
       record
     (make-instance 'ct
-		   :additionalEventData  additionalEventData
-		   :awsRegion  awsRegion
-		   :errorCode  errorCode
-		   :errorMessage  errorMessage
-		   :eventID  eventID
-		   :eventName  eventName
-		   :eventSource  eventSource
-		   :eventTime  eventTime
-		   :eventType  eventType
-		   :eventVersion  eventVersion
-		   :recipientAccountId  recipientAccountId
-		   :requestID  requestID
-		   :requestParameters  requestParameters
-		   :resources  resources
-		   :responseElements  responseElements
-		   :sourceIPAddress  sourceIPAddress
-		   :userAgent  userAgent
-		   :userIdentity  userIdentity
-		   :userName  userName
+		   :additionalEventData additionalEventData
+		   :awsRegion awsRegion
+		   :errorCode errorCode
+		   :errorMessage errorMessage
+		   :eventID eventID
+		   :eventName eventName
+		   :eventSource eventSource
+		   :eventTime eventTime
+		   :eventType eventType
+		   :eventVersion eventVersion
+		   :recipientAccountId recipientAccountId
+		   :requestID requestID
+		   :requestParameters requestParameters
+		   :resources resources
+		   :responseElements responseElements
+		   :sourceIPAddress sourceIPAddress
+		   :userAgent userAgent
+		   :userIdentity userIdentity
+		   :userName userName
 		   ;; :additionalEventData (if (null additionalEventData) (string additionalEventData) additionalEventData)
 		   ;; :awsRegion (if (null awsRegion) (string awsRegion) awsRegion)
 		   ;; :errorCode (if (null errorCode) (string errorCode) errorCode)
@@ -257,13 +257,6 @@
 		   ;; :userAgent (if (null userAgent) (string userAgent) userAgent)
 		   ;; :userIdentity (if (null userIdentity) (string userIdentity) userIdentity)
 		   ;; :userName (if (null userName) (string userName) userName)
-
-
-
-
-
-
-
 		   )
     )
   ;;  (print (length (manardb:retrieve-all-instances 'ct)))
