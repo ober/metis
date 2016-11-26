@@ -72,30 +72,30 @@
 
 (defun get-by-name (name)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (let ((name2 (or userName (find-username userIdentity))))
-		       (if (string-equal name name2)
-			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode))))))
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+      (let ((name2 (or userName (find-username userIdentity))))
+	(if (string-equal name name2)
+	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode))))))
 
 (defun get-by-event (name)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (if (string-equal name (slot-value x 'eventName))
-		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
-			 (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
+    (if (string-equal name (slot-value x 'eventName))
+	(with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
+	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
 
 (defun get-by-errorcode (name)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (if (string-equal name (slot-value x 'errorCode))
-		       (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-			 (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventName eventSource sourceIPAddress userAgent errorMessage)))))
+    (if (string-equal name (slot-value x 'errorCode))
+	(with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventName eventSource sourceIPAddress userAgent errorMessage)))))
 
 (defun get-by-date (date)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (if (cl-ppcre:all-matches date (slot-value x 'eventTime))
-			 (progn
-			   (let  ((name  (or userName (find-username userIdentity))))
-			     (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime name eventName eventSource sourceIPAddress userAgent errorMessage)))))))
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+      (if (cl-ppcre:all-matches date (slot-value x 'eventTime))
+	  (progn
+	    (let  ((name  (or userName (find-username userIdentity))))
+	      (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime name eventName eventSource sourceIPAddress userAgent errorMessage)))))))
 
 (defun get-stats ()
   (format t "Totals ct:~A files:~A~%" (manardb:count-all-instances 'metis::ct) (manardb:count-all-instances 'metis::files)))
@@ -112,19 +112,19 @@
 
 (defun get-all-errorcodes ()
   (manardb:doclass
-   (x 'metis::ct :fresh-instances nil)
-   (unless (string-equal "NIL" (slot-value x 'errorCode))
-     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-       (let  ((name  (or userName (find-username userIdentity))))
-	 (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
-	       eventTime
-	       errorCode
-	       name
-	       eventName
-	       eventSource
-	       sourceIPAddress
-	       userAgent
-	       errorMessage))))))
+      (x 'metis::ct :fresh-instances nil)
+    (unless (string-equal "NIL" (slot-value x 'errorCode))
+      (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+	(let  ((name  (or userName (find-username userIdentity))))
+	  (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+		  eventTime
+		  errorCode
+		  name
+		  eventName
+		  eventSource
+		  sourceIPAddress
+		  userAgent
+		  errorMessage))))))
 
 ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
@@ -132,9 +132,9 @@
   "Return uniqure list of users"
   (let ((names (make-hash-table :test 'equalp)))
     (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		     (with-slots (errorCode) x
-		       (unless (gethash errorCode names)
-			 (setf (gethash errorCode names) t))))
+      (with-slots (errorCode) x
+	(unless (gethash errorCode names)
+	  (setf (gethash errorCode names) t))))
     (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 (defun get-name-list ()
@@ -142,53 +142,53 @@
   (let ((names (make-hash-table :test 'equalp))
 	(name nil))
     (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		     (with-slots (userName userIdentity) x
-		       (if (string-equal userName "NIL")
-			   (setf name (find-username userIdentity)))
-		       (unless (gethash (or userName name) names)
-			 (setf (gethash (or userName name) names) userIdentity))))
+      (with-slots (userName userIdentity) x
+	(if (string-equal userName "NIL")
+	    (setf name (find-username userIdentity)))
+	(unless (gethash (or userName name) names)
+	  (setf (gethash (or userName name) names) userIdentity))))
     (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 (defun get-useridentity-by-name (name)
   "Return any entries with username in useridentity"
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (if (cl-ppcre:all-matches name userIdentity)
-			 (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
-				 eventTime
-				 errorCode
-				 userName
-				 eventName
-				 eventSource
-				 sourceIPAddress
-				 userAgent
-				 errorMessage)))))
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+      (if (cl-ppcre:all-matches name userIdentity)
+	  (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+		  eventTime
+		  errorCode
+		  userName
+		  eventName
+		  eventSource
+		  sourceIPAddress
+		  userAgent
+		  errorMessage)))))
 
 
 (defun get-event-list ()
   "Return uniqure list of events"
   (let ((names (make-hash-table :test 'equalp)))
     (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		     (with-slots (eventName userIdentity) x
-		       (unless (gethash eventName names)
-			 (setf (gethash eventName names) t))))
+      (with-slots (eventName userIdentity) x
+	(unless (gethash eventName names)
+	  (setf (gethash eventName names) t))))
     (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 (defun get-by-sourceip (ip)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (if (cl-ppcre:all-matches ip (slot-value x 'sourceIPAddress))
-			 (progn
-			   (let ((name (or userName (find-username userIdentity))))
-			     (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime name eventName eventSource sourceIPAddress userAgent errorMessage)))))))
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+      (if (cl-ppcre:all-matches ip (slot-value x 'sourceIPAddress))
+	  (progn
+	    (let ((name (or userName (find-username userIdentity))))
+	      (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime name eventName eventSource sourceIPAddress userAgent errorMessage)))))))
 
 (defun get-sourceips-list ()
   "Return uniqure list of events"
   (let ((names (make-hash-table :test 'equalp)))
     (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		     (with-slots (sourceIPAddress userIdentity) x
-		       (unless (gethash sourceIPAddress names)
-			 (setf (gethash sourceIpAddress names) t))))
+      (with-slots (sourceIPAddress userIdentity) x
+	(unless (gethash sourceIPAddress names)
+	  (setf (gethash sourceIpAddress names) t))))
     (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
 
 
