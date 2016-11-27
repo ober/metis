@@ -45,7 +45,7 @@
 
 (defun manardb-mark-file-processed (file)
   (let ((name (ignore-errors (file-namestring file))))
-    (format t "mark: ~A~%" name)
+    ;;(format t "mark: ~A~%" name)
     (setf (gethash name *manard-files*) t)
     (make-instance 'files :file name)))
 
@@ -79,23 +79,21 @@
 
 (defun get-by-event (name)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (if (string-equal name (slot-value x 'eventName))
-	(with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
-	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
+		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
+		     (if (string-equal name eventName)
+			 (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
 
 (defun get-by-errorcode (name)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (if (string-equal name (slot-value x 'errorCode))
-	(with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+    (if (string-equal name errorCode)
 	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventName eventSource sourceIPAddress userAgent errorMessage)))))
 
 (defun get-by-date (date)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (if (cl-ppcre:all-matches date (slot-value x 'eventTime))
-	  (progn
-	    (let  ((name  (or userName (find-username userIdentity))))
-	      (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime name eventName eventSource sourceIPAddress userAgent errorMessage)))))))
+      (if (cl-ppcre:all-matches date eventTime)
+	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime (or userName (find-username userIdentity)) eventName eventSource sourceIPAddress userAgent errorMessage)))))
 
 (defun get-stats ()
   (format t "Totals ct:~A files:~A~%" (manardb:count-all-instances 'metis::ct) (manardb:count-all-instances 'metis::files)))
