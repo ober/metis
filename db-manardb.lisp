@@ -10,7 +10,7 @@
   ((file :type STRING :initarg :file)))
 
 (manardb:defmmclass ct ()
-  ((additionalEventData :type STRING :initarg :additionalEventData :accessor additionalEventData)
+  ((addiionalEventData :type STRING :initarg :additionalEventData :accessor additionalEventData)
    (awsRegion :type STRING :initarg :awsRegion :accessor awsRegion)
    (errorCode :type STRING :initarg :errorCode :accessor errorCode)
    (errorMessage :type STRING :initarg :errorMessage :accessor errorMessage)
@@ -45,7 +45,6 @@
 
 (defun manardb-mark-file-processed (file)
   (let ((name (ignore-errors (file-namestring file))))
-    ;;(format t "mark: ~A~%" name)
     (setf (gethash name *manard-files*) t)
     (make-instance 'files :file name)))
 
