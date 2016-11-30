@@ -7,10 +7,10 @@
     (manardb:use-mmap-dir "~/ct-manardb/")))
 
 (manardb:defmmclass files ()
-  ((file :type STRING :initarg :file)))
+  ((file :type STRING :initarg :file :accessor file)))
 
 (manardb:defmmclass ct ()
-  ((addiionalEventData :type STRING :initarg :additionalEventData :accessor additionalEventData)
+  ((addionalEventData :type STRING :initarg :additionalEventData :accessor additionalEventData)
    (awsRegion :type STRING :initarg :awsRegion :accessor awsRegion)
    (errorCode :type STRING :initarg :errorCode :accessor errorCode)
    (errorMessage :type STRING :initarg :errorMessage :accessor errorMessage)
@@ -160,7 +160,6 @@
 		  sourceIPAddress
 		  userAgent
 		  errorMessage)))))
-
 
 (defun get-event-list ()
   "Return uniqure list of events"
