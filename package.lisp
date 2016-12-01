@@ -16,7 +16,10 @@
 
 
 (defpackage :metis
-  (:use :cl )
+  (:use :cl
+	#+allegro :prof
+	)
+
   (:export
    #:main
    #:run-bench))

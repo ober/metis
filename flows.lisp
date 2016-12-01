@@ -1,4 +1,5 @@
 (in-package :metis)
+(declaim (optimize (debug 3)))
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
 
@@ -41,11 +42,10 @@
     (progn
       (hcl:set-up-profiler :package '(metis))
       (hcl:profile (vpc-flows-report-async workers path)))
-    #+allegro
-    ;;(progn
-    ;;(prof::with-profiling (:type :space)
-    (time (vpc-flows-report-async workers path))
-    ;;(prof::show-flat-profile))
+    #+allegro (progn
+		(prof:start-profiler :type :time :count t)
+		(time (vpc-flows-report-async workers path))
+		(prof::show-flat-profile))
     #+(or clozure abcl ecl) (time (vpc-flows-report-async workers path))
     (let* ((etime (get-internal-real-time))
 	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
