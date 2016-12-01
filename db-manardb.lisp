@@ -95,7 +95,11 @@
 	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime (or userName (find-username userIdentity)) eventName eventSource sourceIPAddress userAgent errorMessage)))))
 
 (defun get-stats ()
-  (format t "Totals ct:~A files:~A~%" (manardb:count-all-instances 'metis::ct) (manardb:count-all-instances 'metis::files)))
+  (format t "Totals ct:~A files:~A flows:~A vpc-files:~A~%"
+	  (manardb:count-all-instances 'metis::ct)
+	  (manardb:count-all-instances 'metis::files)
+	  (manardb:count-all-instances 'metis::flow)
+	  (manardb:count-all-instances 'metis::flow-files)))
 
 (fare-memoization:define-memo-function  find-username (userIdentity)
   (let ((a (fetch-value '(:|sessionContext| :|sessionIssuer| :|userName|) userIdentity))
