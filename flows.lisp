@@ -6,9 +6,6 @@
 (manardb:defmmclass conversation ()
   ((file :initarg :name :reader file)))
 
-
-
-
 (manardb:defmmclass flow ()
   ((date :initarg :date :accessor date)
    ;;(version :initarg version )
@@ -97,12 +94,9 @@
 ;; 		 (format t "xxx: ~A ~%" x))
 ;; 	     (retrieve-from-index 'metis::flow (quote ,field) "53" :all t))))
 
-(defun find-by-srcaddr (value)
-  (mapcar #'(lambda (x)
-	      (format t "xxx: ~A ~%" x))
-	  (retrieve-from-index 'metis::flow 'srcaddr value :all t)))
 
-(defun get-by-date (date)
+
+(defun find-by-srcaddr (value)
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
     (with-slots (
 		 interface_id
@@ -118,10 +112,50 @@
 		 action
 		 status
 		 ) x
-      (if (cl-ppcre:all-matches date eventTime)
-	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime (or userName (find-username userIdentity)) eventName eventSource sourceIPAddress userAgent errorMessage)))))
+      (if (cl-ppcre:all-matches value srcaddr)
+	  (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
+		 interface_id
+		 srcaddr
+		 dstaddr
+		 srcport
+		 dstport
+		 protocol
+		 packets
+		 bytez
+		 start
+		 endf
+		 action
+		 status)))))
 
-
+(defun list-all-vpc ()
+  (manardb:doclass (x 'metis::flow :fresh-instances nil)
+    (with-slots (
+		 interface_id
+		 srcaddr
+		 dstaddr
+		 srcport
+		 dstport
+		 protocol
+		 packets
+		 bytez
+		 start
+		 endf
+		 action
+		 status
+		 ) x
+      (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
+	      interface_id
+	      srcaddr
+	      dstaddr
+	      srcport
+	      dstport
+	      protocol
+	      packets
+	      bytez
+	      start
+	      endf
+	      action
+	      status))))
 
 ;; #+allegro
 ;; (defun find-by-dstaddr (value)
