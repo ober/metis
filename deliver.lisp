@@ -55,7 +55,6 @@
     (cl-user::generate-executable "dist/allegro/metis" '(
 							 "package.fasl"
 							 "utils.fasl"
-							 "prof.fasl"
 							 "database.fasl"
 							 ;;"db-postgres.fasl"
 							 ;;"db-sqlite.fasl"
