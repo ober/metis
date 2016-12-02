@@ -351,46 +351,46 @@
       record
 
     (let (
-;;	  (additionalEventData-i (get-obj 'metis::additionalEventData additionalEventData))
-;;	  (awsRegion-i (get-obj 'metis::awsRegion awsRegion))
-;;	  (errorCode-i (get-obj 'metis::errorCode errorCode))
-;;	  (errorMessage-i (get-obj 'metis::errorMessage errorMessage))
-;;	  (eventID-i (get-obj 'metis::eventID eventID))
-;;	  (eventName-i (get-obj 'metis::eventName eventName))
-;;	  (eventSource-i (get-obj 'metis::eventSource eventSource))
-;;	  (eventTime-i (get-obj 'metis::eventTime eventTime))
-;;	  (eventType-i (get-obj 'metis::eventType eventType))
-;;	  (eventVersion-i (get-obj 'metis::eventVersion eventVersion))
-;;	  (recipientAccountId-i (get-obj 'metis::recipientAccountId recipientAccountId))
+	  (additionalEventData-i (get-obj 'metis::additionalEventData additionalEventData))
+	  (awsRegion-i (get-obj 'metis::awsRegion awsRegion))
+	  (errorCode-i (get-obj 'metis::errorCode errorCode))
+	  (errorMessage-i (get-obj 'metis::errorMessage errorMessage))
+	  (eventID-i (get-obj 'metis::eventID eventID))
+	  (eventName-i (get-obj 'metis::eventName eventName))
+	  (eventSource-i (get-obj 'metis::eventSource eventSource))
+	  (eventTime-i (get-obj 'metis::eventTime eventTime))
+	  (eventType-i (get-obj 'metis::eventType eventType))
+	  (eventVersion-i (get-obj 'metis::eventVersion eventVersion))
+	  (recipientAccountId-i (get-obj 'metis::recipientAccountId recipientAccountId))
 	  (requestID-i (get-obj 'metis::requestID requestID))
-;;	  (requestParameters-i (get-obj 'metis::requestParameters requestParameters))
-;;	  (resources-i (get-obj 'metis::resources resources))
-;;	  (responseElements-i (get-obj 'metis::responseElements responseElements))
-;;	  (sourceIPAddress-i (get-obj 'metis::sourceIPAddress sourceIPAddress))
-;;	  (userAgent-i (get-obj 'metis::userAgent userAgent))
-;;	  (userIdentity-i (get-obj 'metis::userIdentity userIdentity))
-	  ;;	  (userName-i (get-obj 'metis::userName userName)))
+	  (requestParameters-i (get-obj 'metis::requestParameters requestParameters))
+	  (resources-i (get-obj 'metis::resources resources))
+	  (responseElements-i (get-obj 'metis::responseElements responseElements))
+	  (sourceIPAddress-i (get-obj 'metis::sourceIPAddress sourceIPAddress))
+	  (userAgent-i (get-obj 'metis::userAgent userAgent))
+	  (userIdentity-i (get-obj 'metis::userIdentity userIdentity))
+	  (userName-i (get-obj 'metis::userName userName)))
 	  )
       (make-instance 'ct
-		     :additionalEventData additionalEventData
-		     :awsRegion awsRegion
-		     :errorCode errorCode
-		     :errorMessage errorMessage
-		     :eventID eventID
-		     :eventName eventName
-		     :eventSource eventSource
-		     :eventTime eventTime
-		     :eventType eventType
-		     :eventVersion eventVersion
-		     :recipientAccountId recipientAccountId
+		     :additionalEventData additionalEventData-i
+		     :awsRegion awsRegion-i
+		     :errorCode errorCode-i
+		     :errorMessage errorMessage-i
+		     :eventID eventID-i
+		     :eventName eventName-i
+		     :eventSource eventSource-i
+		     :eventTime eventTime-i
+		     :eventType eventType-i
+		     :eventVersion eventVersion-i
+		     :recipientAccountId recipientAccountId-i
 		     :requestID requestID-i
-		     :requestParameters requestParameters
-		     :resources resources
-		     :responseElements responseElements
-		     :sourceIPAddress sourceIPAddress
-		     :userAgent userAgent
-		     :userIdentity userIdentity
-		     :userName userName
+		     :requestParameters requestParameters-i
+		     :resources resources-i
+		     :responseElements responseElements-i
+		     :sourceIPAddress sourceIPAddress-i
+		     :userAgent userAgent-i
+		     :userIdentity userIdentity-i
+		     :userName userName-i
 		     )
       )))
 
