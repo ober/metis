@@ -9,27 +9,96 @@
 (manardb:defmmclass files ()
   ((file :type STRING :initarg :file :accessor file)))
 
+(manardb:defmmclass additionalEventData ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass awsRegion ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass errorCode ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass errorMessage ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass eventID ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass eventName ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass eventSource ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass eventTime ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass eventType ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass eventVersion ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass recipientAccountId ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass requestID ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass requestParameters ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass resources ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass responseElements ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass sourceIPAddress ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass userAgent ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass userIdentity ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass userName ()
+  ((value :initarg :value :accessor value)))
+
 (manardb:defmmclass ct ()
-  ((addionalEventData :type STRING :initarg :additionalEventData :accessor additionalEventData)
-   (awsRegion :type STRING :initarg :awsRegion :accessor awsRegion)
-   (errorCode :type STRING :initarg :errorCode :accessor errorCode)
-   (errorMessage :type STRING :initarg :errorMessage :accessor errorMessage)
-   (eventID :type STRING :initarg :eventID :accessor eventID)
-   (eventName :type STRING :initarg :eventName :accessor eventName)
-   (eventSource :type STRING :initarg :eventSource :accessor eventSource)
-   (eventTime :type STRING :initarg :eventTime :accessor eventTime)
-   (eventType :type STRING :initarg :eventType :accessor eventType)
-   (eventVersion :type STRING :initarg :eventVersion :accessor eventVersion)
-   (recipientAccountId :type STRING :initarg :recipientAccountId :accessor recipientAccountId)
-   (requestID :type STRING :initarg :requestID :accessor requestID)
-   (requestParameters :type STRING :initarg :requestParameters :accessor requestParameters)
-   (resources :type STRING :initarg :resources :accessor resources)
-   (responseElements :type STRING :initarg :responseElements :accessor responseElements)
-   (sourceIPAddress :type STRING :initarg :sourceIPAddress :accessor sourceIPAddress)
-   (userAgent :type STRING :initarg :userAgent :accessor userAgent)
-   (userIdentity :type STRING :initarg :userIdentity :accessor userIdentity)
-   (userName :type STRING :initarg :userName :accessor username)
+  ((addionalEventData :initarg :additionalEventData :accessor additionalEventData)
+   (awsRegion :initarg :awsRegion :accessor awsRegion)
+   (errorCode :initarg :errorCode :accessor errorCode)
+   (errorMessage :initarg :errorMessage :accessor errorMessage)
+   (eventID :initarg :eventID :accessor eventID)
+   (eventName :initarg :eventName :accessor eventName)
+   (eventSource :initarg :eventSource :accessor eventSource)
+   (eventTime :initarg :eventTime :accessor eventTime)
+   (eventType :initarg :eventType :accessor eventType)
+   (eventVersion :initarg :eventVersion :accessor eventVersion)
+   (recipientAccountId :initarg :recipientAccountId :accessor recipientAccountId)
+   (requestID :initarg :requestID :accessor requestID)
+   (requestParameters :initarg :requestParameters :accessor requestParameters)
+   (resources :initarg :resources :accessor resources)
+   (responseElements :initarg :responseElements :accessor responseElements)
+   (sourceIPAddress :initarg :sourceIPAddress :accessor sourceIPAddress)
+   (userAgent :initarg :userAgent :accessor userAgent)
+   (userIdentity :initarg :userIdentity :accessor userIdentity)
+   (userName :initarg :userName :accessor username)
    ))
+
+(fare-memoization:define-memo-function get-obj (klass new-value)
+  "Return the object for a given value of klass"
+  ;;(format t "~% get-obj: klass:~A new-value:~A" klass new-value)
+  (unless (or (null klass) (null new-value))
+    (progn
+      (manardb:doclass (x klass :fresh-instances nil)
+	(with-slots (value) x
+	  (if (string-equal new-value value)
+	      x
+	      (make-instance klass :value new-value)))))
+    nil))
 
 (defun manardb-have-we-seen-this-file (file)
   (unless (boundp '*manard-files*)
@@ -78,14 +147,14 @@
 
 (defun get-by-event (name)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
-		     (if (string-equal name eventName)
-			 (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
+      (if (string-equal name eventName)
+	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
 
 (defun get-by-errorcode (name)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-    (if (string-equal name errorCode)
+      (if (string-equal name errorCode)
 	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventName eventSource sourceIPAddress userAgent errorMessage)))))
 
 (defun get-by-date (date)
@@ -220,51 +289,48 @@
 		       )
       record
 
-    #+ccl
-    (make-instance 'ct
-    		   :additionalEventData (cleanse additionalEventData)
-    		   :awsRegion (cleanse awsRegion)
-    		   :errorCode (cleanse errorCode)
-    		   :errorMessage (cleanse errorMessage)
-    		   :eventID (cleanse eventID)
-    		   :eventName (cleanse eventName)
-    		   :eventSource (cleanse eventSource)
-    		   :eventTime (cleanse eventTime)
-    		   :eventType (cleanse eventType)
-    		   :eventVersion (cleanse eventVersion)
-    		   :recipientAccountId (cleanse recipientAccountId)
-    		   :requestID (cleanse requestID)
-    		   :requestParameters (cleanse requestParameters)
-    		   :resources (cleanse resources)
-    		   :responseElements (cleanse responseElements)
-    		   :sourceIPAddress (cleanse sourceIPAddress)
-    		   :userAgent (cleanse userAgent)
-    		   :userIdentity (cleanse userIdentity)
-    		   :userName (cleanse userName)
-    		   )
-    #-ccl
-    (make-instance 'ct
-		   :additionalEventData additionalEventData
-		   :awsRegion awsRegion
-		   :errorCode errorCode
-		   :errorMessage errorMessage
-		   :eventID eventID
-		   :eventName eventName
-		   :eventSource eventSource
-		   :eventTime eventTime
-		   :eventType eventType
-		   :eventVersion eventVersion
-		   :recipientAccountId recipientAccountId
-		   :requestID requestID
-		   :requestParameters requestParameters
-		   :resources resources
-		   :responseElements responseElements
-		   :sourceIPAddress sourceIPAddress
-		   :userAgent userAgent
-		   :userIdentity userIdentity
-		   :userName userName
-		   )
-    ))
+    (let (
+	  (additionalEventData-i (get-obj 'metis::additionalEventData additionalEventData))
+	  (awsRegion-i (get-obj 'metis::awsRegion awsRegion))
+	  (errorCode-i (get-obj 'metis::errorCode errorCode))
+	  (errorMessage-i (get-obj 'metis::errorMessage errorMessage))
+	  (eventID-i (get-obj 'metis::eventID eventID))
+	  (eventName-i (get-obj 'metis::eventName eventName))
+	  (eventSource-i (get-obj 'metis::eventSource eventSource))
+	  (eventTime-i (get-obj 'metis::eventTime eventTime))
+	  (eventType-i (get-obj 'metis::eventType eventType))
+	  (eventVersion-i (get-obj 'metis::eventVersion eventVersion))
+	  (recipientAccountId-i (get-obj 'metis::recipientAccountId recipientAccountId))
+	  (requestID-i (get-obj 'metis::requestID requestID))
+	  (requestParameters-i (get-obj 'metis::requestParameters requestParameters))
+	  (resources-i (get-obj 'metis::resources resources))
+	  (responseElements-i (get-obj 'metis::responseElements responseElements))
+	  (sourceIPAddress-i (get-obj 'metis::sourceIPAddress sourceIPAddress))
+	  (userAgent-i (get-obj 'metis::userAgent userAgent))
+	  (userIdentity-i (get-obj 'metis::userIdentity userIdentity))
+	  (userName-i (get-obj 'metis::userName userName)))
+      (make-instance 'ct
+		     :additionalEventData additionalEventData-i
+		     :awsRegion awsRegion-i
+		     :errorCode errorCode-i
+		     :errorMessage errorMessage-i
+		     :eventID eventID-i
+		     :eventName eventName-i
+		     :eventSource eventSource-i
+		     :eventTime eventTime-i
+		     :eventType eventType-i
+		     :eventVersion eventVersion-i
+		     :recipientAccountId recipientAccountId-i
+		     :requestID requestID-i
+		     :requestParameters requestParameters-i
+		     :resources resources-i
+		     :responseElements responseElements-i
+		     :sourceIPAddress sourceIPAddress-i
+		     :userAgent userAgent-i
+		     :userIdentity userIdentity-i
+		     :userName userName-i
+		     )
+      )))
 
 
 (defun cleanse (var)
