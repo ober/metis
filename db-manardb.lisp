@@ -97,8 +97,13 @@
       (progn
 	(manardb:doclass (x (find-class klass) :fresh-instances nil)
 	  (with-slots (value) x
-	    (if (string-equal new-value value)
-		(setf obj x))))
+	    (if (stringp new-value)
+		(if (string-equal new-value value)
+		    (setf obj x)))
+	    (if (consp new-value)
+		(if (equal new-value value)
+		    (setf obj x)))
+	    ))
 	(if (null obj)
 	    (setf obj (make-instance (find-class klass) :value new-value)))))
     (format t "~% get-obj: klass:~A new-value:~A obj:~A" klass new-value obj)
