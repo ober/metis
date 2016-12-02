@@ -47,6 +47,7 @@
       )))
 
 (defun cloudtrail-report-sync (path)
+  ;;(trace get-obj)
   (force-output)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
