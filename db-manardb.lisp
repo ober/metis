@@ -301,28 +301,28 @@
 		       userName
 		       )
       record
-      (make-instance 'ct
-		     :additionalEventData additionalEventData
-		     :awsRegion awsRegion
-		     :errorCode errorCode
-		     :errorMessage errorMessage
-		     :eventID eventID
-		     :eventName eventName
-		     :eventSource eventSource
-		     :eventTime eventTime
-		     :eventType eventType
-		     :eventVersion eventVersion
-		     :recipientAccountId recipientAccountId
-		     :requestID requestID
-		     :requestParameters requestParameters
-		     :resources resources
-		     :responseElements responseElements
-		     :sourceIPAddress sourceIPAddress
-		     :userAgent userAgent
-		     :userIdentity userIdentity
-		     :userName userName
-		     )
-      ))
+    (make-instance 'ct
+		   :additionalEventData additionalEventData
+		   :awsRegion awsRegion
+		   :errorCode errorCode
+		   :errorMessage errorMessage
+		   :eventID eventID
+		   :eventName eventName
+		   :eventSource eventSource
+		   :eventTime eventTime
+		   :eventType eventType
+		   :eventVersion eventVersion
+		   :recipientAccountId recipientAccountId
+		   :requestID requestID
+		   :requestParameters requestParameters
+		   :resources resources
+		   :responseElements responseElements
+		   :sourceIPAddress sourceIPAddress
+		   :userAgent userAgent
+		   :userIdentity userIdentity
+		   :userName userName
+		   )
+    ))
 
 
 (defun manardb-normalize-insert (record)
@@ -370,7 +370,7 @@
 	  (userAgent-i (get-obj 'metis::userAgent userAgent))
 	  (userIdentity-i (get-obj 'metis::userIdentity userIdentity))
 	  (userName-i (get-obj 'metis::userName userName)))
-	  )
+
       (make-instance 'ct
 		     :additionalEventData additionalEventData-i
 		     :awsRegion awsRegion-i
@@ -391,8 +391,7 @@
 		     :userAgent userAgent-i
 		     :userIdentity userIdentity-i
 		     :userName userName-i
-		     )
-      )))
+		     ))))
 
 
 (defun cleanse (var)
