@@ -298,6 +298,54 @@
 		       userName
 		       )
       record
+      (make-instance 'ct
+		     :additionalEventData additionalEventData
+		     :awsRegion awsRegion
+		     :errorCode errorCode
+		     :errorMessage errorMessage
+		     :eventID eventID
+		     :eventName eventName
+		     :eventSource eventSource
+		     :eventTime eventTime
+		     :eventType eventType
+		     :eventVersion eventVersion
+		     :recipientAccountId recipientAccountId
+		     :requestID requestID
+		     :requestParameters requestParameters
+		     :resources resources
+		     :responseElements responseElements
+		     :sourceIPAddress sourceIPAddress
+		     :userAgent userAgent
+		     :userIdentity userIdentity
+		     :userName userName
+		     )
+      ))
+
+
+(defun manardb-normalize-insert-split (record)
+  ;;manardb-nomalize-insert (NIL us-west-1 NIL NIL 216e957f-230e-42ea-bfc7-e0d07d321a8b DescribeDBInstances rds.amazonaws.com 2015-08-07T19:04:52Z AwsApiCall 1.03 224108527019 2f1d4165-3d37-11e5-aae4-c1965b0823e9 NIL NIL NIL bogus.example.com signin.amazonaws.com (invokedBy signin.amazonaws.com sessionContext (attributes (creationDate 2015-08-07T11:17:07Z mfaAuthenticated true)) userName meylor accessKeyId ASIAIOHLZS2V2QON52LA accountId 224108527019 arn arn:aws:iam::224108527019:user/meylor principalId AIDAJVKKNU5BSTZIOF3EU type IAMUser) meylor)
+  (destructuring-bind (
+		       additionalEventData
+		       awsRegion
+		       errorCode
+		       errorMessage
+		       eventID
+		       eventName
+		       eventSource
+		       eventTime
+		       eventType
+		       eventVersion
+		       recipientAccountId
+		       requestID
+		       requestParameters
+		       resources
+		       responseElements
+		       sourceIPAddress
+		       userAgent
+		       userIdentity
+		       userName
+		       )
+      record
 
     (let (
 	  (additionalEventData-i (get-obj 'metis::additionalEventData additionalEventData))
