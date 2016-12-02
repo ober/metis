@@ -46,7 +46,9 @@
 	   (format t "Usage: <~A> <function> <args>~%" (nth 0 args))
 	   (format t "Function is (s) for single threaded, and (a) for multithreaded~%")
 	   (format t "ex: ~A a 10 ~~/CT/ # Would run 10 works on ~~/CT/~%" (nth 0 args))
-	   (format t "ex: ~A s ~~CT/ # Would run 10 works on ~~/CT/~%" (nth 0 args)))))))
+	   (format t "ex: ~A s ~~CT/ # Would run 10 works on ~~/CT/~%" (nth 0 args))))))
+  (manardb:close-all-mmaps)
+  )
   ;;(cl-store:store *q* "~/q.store"))
 
 #+allegro
