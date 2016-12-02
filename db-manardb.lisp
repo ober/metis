@@ -1,5 +1,5 @@
 (in-package :metis)
-
+(declaim (optimize (speed 3)))
 ;;(ql:quickload :manardb)
 
 (defun init-manard()
@@ -88,9 +88,8 @@
    (userName :initarg :userName :accessor username)
    ))
 
-;;(fare-memoization:define-memo-function get-obj (klass new-value)
-
-(defun get-obj (klass new-value)
+(fare-memoization:define-memo-function get-obj (klass new-value)
+;;(defun get-obj (klass new-value)
   "Return the object for a given value of klass"
   (let ((obj nil))
     (unless (or (null klass) (null new-value))
