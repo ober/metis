@@ -106,7 +106,7 @@
 	    ))
 	(if (null obj)
 	    (setf obj (make-instance (find-class klass) :value new-value)))))
-    (format t "~% get-obj: klass:~A new-value:~A obj:~A" klass new-value obj)
+    ;;(format t "~% get-obj: klass:~A new-value:~A obj:~A" klass new-value obj)
     obj))
 
 (defun manardb-have-we-seen-this-file (file)
