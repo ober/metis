@@ -88,17 +88,21 @@
    (userName :initarg :userName :accessor username)
    ))
 
-(fare-memoization:define-memo-function get-obj (klass new-value)
+;;(fare-memoization:define-memo-function get-obj (klass new-value)
+
+(defun get-obj (klass new-value)
   "Return the object for a given value of klass"
-  ;;(format t "~% get-obj: klass:~A new-value:~A" klass new-value)
-  (unless (or (null klass) (null new-value))
-    (progn
-      (manardb:doclass (x klass :fresh-instances nil)
-	(with-slots (value) x
-	  (if (string-equal new-value value)
-	      x
-	      (make-instance klass :value new-value)))))
-    nil))
+  (let ((obj nil))
+    (unless (or (null klass) (null new-value))
+      (progn
+	(manardb:doclass (x (find-class klass) :fresh-instances nil)
+	  (with-slots (value) x
+	    (if (string-equal new-value value)
+		(setf obj x))))
+	(if (null obj)
+	    (setf obj (make-instance (find-class klass) :value new-value)))))
+    (format t "~% get-obj: klass:~A new-value:~A obj:~A" klass new-value obj)
+    obj))
 
 (defun manardb-have-we-seen-this-file (file)
   (unless (boundp '*manard-files*)
@@ -164,11 +168,13 @@
 	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime (or userName (find-username userIdentity)) eventName eventSource sourceIPAddress userAgent errorMessage)))))
 
 (defun get-stats ()
-  (format t "Totals ct:~A files:~A flows:~A vpc-files:~A~%"
+  (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A~%"
 	  (manardb:count-all-instances 'metis::ct)
 	  (manardb:count-all-instances 'metis::files)
 	  (manardb:count-all-instances 'metis::flow)
-	  (manardb:count-all-instances 'metis::flow-files)))
+	  (manardb:count-all-instances 'metis::flow-files)
+	  (manardb:count-all-instances 'metis::errorCode)
+	  ))
 
 (fare-memoization:define-memo-function  find-username (userIdentity)
   (let ((a (fetch-value '(:|sessionContext| :|sessionIssuer| :|userName|) userIdentity))
