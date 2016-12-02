@@ -1,10 +1,12 @@
 (in-package :metis)
-(declaim (optimize (speed 3)))
+(declaim (optimize (debug 3) (safety 3)))
 ;;(ql:quickload :manardb)
 
 (defun init-manard()
   (unless (boundp 'manardb:use-mmap-dir)
-    (manardb:use-mmap-dir "~/ct-manardb/")))
+    (manardb:use-mmap-dir "~/ct-manardb/"))
+  (unless (boundp '*metis-fields*)
+    (defvar *metis-fields* (make-hash-table :test 'equalp))))
 
 (manardb:defmmclass files ()
   ((file :type STRING :initarg :file :accessor file)))
@@ -88,24 +90,25 @@
    (userName :initarg :userName :accessor username)
    ))
 
-(fare-memoization:define-memo-function get-obj (klass new-value)
-;;(defun get-obj (klass new-value)
+
+;;(fare-memoization:define-memo-function get-obj (klass new-value)
+(defun get-obj (klass new-value)
   "Return the object for a given value of klass"
   (let ((obj nil))
     (unless (or (null klass) (null new-value))
       (progn
-	(manardb:doclass (x (find-class klass) :fresh-instances nil)
-	  (with-slots (value) x
-	    (if (stringp new-value)
-		(if (string-equal new-value value)
-		    (setf obj x)))
-	    (if (consp new-value)
-		(if (equal new-value value)
-		    (setf obj x)))
-	    ))
-	(if (null obj)
-	    (setf obj (make-instance (find-class klass) :value new-value)))))
-    ;;(format t "~% get-obj: klass:~A new-value:~A obj:~A" klass new-value obj)
+	(multiple-value-bind (id1 seen1)
+	    (gethash klass *metis-fields*)
+	  (unless seen1
+	    (setf (gethash klass *metis-fields*)
+		  (make-hash-table :test 'equalp))))
+	(multiple-value-bind (id seen)
+	    (gethash new-value (gethash klass *metis-fields*))
+	  (unless seen
+	    (progn
+	      (setf obj (make-instance klass :value new-value))
+	      (setf (gethash new-value (gethash klass *metis-fields*)) obj))
+	    (setf obj id)))))
     obj))
 
 (defun manardb-have-we-seen-this-file (file)
@@ -274,7 +277,7 @@
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))
 
-(defun manardb-normalize-insert (record)
+(defun manardb-normalize-insert-2 (record)
   ;;manardb-nomalize-insert (NIL us-west-1 NIL NIL 216e957f-230e-42ea-bfc7-e0d07d321a8b DescribeDBInstances rds.amazonaws.com 2015-08-07T19:04:52Z AwsApiCall 1.03 224108527019 2f1d4165-3d37-11e5-aae4-c1965b0823e9 NIL NIL NIL bogus.example.com signin.amazonaws.com (invokedBy signin.amazonaws.com sessionContext (attributes (creationDate 2015-08-07T11:17:07Z mfaAuthenticated true)) userName meylor accessKeyId ASIAIOHLZS2V2QON52LA accountId 224108527019 arn arn:aws:iam::224108527019:user/meylor principalId AIDAJVKKNU5BSTZIOF3EU type IAMUser) meylor)
   (destructuring-bind (
 		       additionalEventData
@@ -322,7 +325,7 @@
       ))
 
 
-(defun manardb-normalize-insert-split (record)
+(defun manardb-normalize-insert (record)
   ;;manardb-nomalize-insert (NIL us-west-1 NIL NIL 216e957f-230e-42ea-bfc7-e0d07d321a8b DescribeDBInstances rds.amazonaws.com 2015-08-07T19:04:52Z AwsApiCall 1.03 224108527019 2f1d4165-3d37-11e5-aae4-c1965b0823e9 NIL NIL NIL bogus.example.com signin.amazonaws.com (invokedBy signin.amazonaws.com sessionContext (attributes (creationDate 2015-08-07T11:17:07Z mfaAuthenticated true)) userName meylor accessKeyId ASIAIOHLZS2V2QON52LA accountId 224108527019 arn arn:aws:iam::224108527019:user/meylor principalId AIDAJVKKNU5BSTZIOF3EU type IAMUser) meylor)
   (destructuring-bind (
 		       additionalEventData
@@ -348,45 +351,46 @@
       record
 
     (let (
-	  (additionalEventData-i (get-obj 'metis::additionalEventData additionalEventData))
-	  (awsRegion-i (get-obj 'metis::awsRegion awsRegion))
-	  (errorCode-i (get-obj 'metis::errorCode errorCode))
-	  (errorMessage-i (get-obj 'metis::errorMessage errorMessage))
-	  (eventID-i (get-obj 'metis::eventID eventID))
-	  (eventName-i (get-obj 'metis::eventName eventName))
-	  (eventSource-i (get-obj 'metis::eventSource eventSource))
-	  (eventTime-i (get-obj 'metis::eventTime eventTime))
-	  (eventType-i (get-obj 'metis::eventType eventType))
-	  (eventVersion-i (get-obj 'metis::eventVersion eventVersion))
-	  (recipientAccountId-i (get-obj 'metis::recipientAccountId recipientAccountId))
+;;	  (additionalEventData-i (get-obj 'metis::additionalEventData additionalEventData))
+;;	  (awsRegion-i (get-obj 'metis::awsRegion awsRegion))
+;;	  (errorCode-i (get-obj 'metis::errorCode errorCode))
+;;	  (errorMessage-i (get-obj 'metis::errorMessage errorMessage))
+;;	  (eventID-i (get-obj 'metis::eventID eventID))
+;;	  (eventName-i (get-obj 'metis::eventName eventName))
+;;	  (eventSource-i (get-obj 'metis::eventSource eventSource))
+;;	  (eventTime-i (get-obj 'metis::eventTime eventTime))
+;;	  (eventType-i (get-obj 'metis::eventType eventType))
+;;	  (eventVersion-i (get-obj 'metis::eventVersion eventVersion))
+;;	  (recipientAccountId-i (get-obj 'metis::recipientAccountId recipientAccountId))
 	  (requestID-i (get-obj 'metis::requestID requestID))
-	  (requestParameters-i (get-obj 'metis::requestParameters requestParameters))
-	  (resources-i (get-obj 'metis::resources resources))
-	  (responseElements-i (get-obj 'metis::responseElements responseElements))
-	  (sourceIPAddress-i (get-obj 'metis::sourceIPAddress sourceIPAddress))
-	  (userAgent-i (get-obj 'metis::userAgent userAgent))
-	  (userIdentity-i (get-obj 'metis::userIdentity userIdentity))
-	  (userName-i (get-obj 'metis::userName userName)))
+;;	  (requestParameters-i (get-obj 'metis::requestParameters requestParameters))
+;;	  (resources-i (get-obj 'metis::resources resources))
+;;	  (responseElements-i (get-obj 'metis::responseElements responseElements))
+;;	  (sourceIPAddress-i (get-obj 'metis::sourceIPAddress sourceIPAddress))
+;;	  (userAgent-i (get-obj 'metis::userAgent userAgent))
+;;	  (userIdentity-i (get-obj 'metis::userIdentity userIdentity))
+	  ;;	  (userName-i (get-obj 'metis::userName userName)))
+	  )
       (make-instance 'ct
-		     :additionalEventData additionalEventData-i
-		     :awsRegion awsRegion-i
-		     :errorCode errorCode-i
-		     :errorMessage errorMessage-i
-		     :eventID eventID-i
-		     :eventName eventName-i
-		     :eventSource eventSource-i
-		     :eventTime eventTime-i
-		     :eventType eventType-i
-		     :eventVersion eventVersion-i
-		     :recipientAccountId recipientAccountId-i
+		     :additionalEventData additionalEventData
+		     :awsRegion awsRegion
+		     :errorCode errorCode
+		     :errorMessage errorMessage
+		     :eventID eventID
+		     :eventName eventName
+		     :eventSource eventSource
+		     :eventTime eventTime
+		     :eventType eventType
+		     :eventVersion eventVersion
+		     :recipientAccountId recipientAccountId
 		     :requestID requestID-i
-		     :requestParameters requestParameters-i
-		     :resources resources-i
-		     :responseElements responseElements-i
-		     :sourceIPAddress sourceIPAddress-i
-		     :userAgent userAgent-i
-		     :userIdentity userIdentity-i
-		     :userName userName-i
+		     :requestParameters requestParameters
+		     :resources resources
+		     :responseElements responseElements
+		     :sourceIPAddress sourceIPAddress
+		     :userAgent userAgent
+		     :userIdentity userIdentity
+		     :userName userName
 		     )
       )))
 
