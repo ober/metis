@@ -228,31 +228,29 @@
   "Return uniqure list of events"
   (get-unique-values 'metis::username))
 
-
 (defun get-val (obj)
   (if (null obj)
       obj
       (slot-value obj 'value)))
 
 (defun get-obj-by-val (klass val)
-  ;;(let ((obj-list nil))
-  (let ((obj nil))
+  (let ((obj-list nil))
+    ;;(let ((obj nil))
     (manardb:doclass (x klass :fresh-instances nil)
       (with-slots (value) x
 	(if (string-equal val value)
-	    (setf obj x))))
-    obj))
-;;obj-list))
+	    ;;(setf obj x))))
+    	    (push x obj-list))))
+    ;;obj))
+    obj-list))
 
 
 (defun get-by-name (name)
   ;;(let ((obj-list (get-obj-by-val 'username name)))
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      ;;(format t "obj-list:~A obj:~A~%" obj-list userName)
       (let ((name2 (slot-value userName 'value)))
 	(if (string-equal name2 name)
-	    ;;(if (eql userName obj-list)
 	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
 		    (get-val eventTime)
 		    name2
@@ -260,8 +258,8 @@
 		    (get-val sourceIPAddress)
 		    (get-val userAgent)
 		    (get-val errorMessage)
-		    (get-val errorCode)
-		    ))))))
+		    (get-val errorCode))
+	    )))))
 
 (defun get-useridentity-by-name (name)
   "Return any entries with username in useridentity"
