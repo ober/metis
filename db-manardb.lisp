@@ -150,12 +150,6 @@
        (setf (gethash (slot-value x 'file) *manard-files*) t))
    (manardb:retrieve-all-instances 'metis::files)))
 
-(defun get-by-name (name)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (let ((name2 (or userName (find-username userIdentity))))
-	(if (string-equal name name2)
-	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode))))))
 
 (defun get-by-event (name)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
@@ -212,19 +206,48 @@
 
 ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
-(defun get-errorcode-list ()
-  "Return uniqure list of users"
-  (manardb:doclass (x 'metis::errorcode :fresh-instances nil)
-    (with-slots (value) x
-      (format t "~A~%" value))))
-
-(defun get-name-list ()
-  "Return uniqure list of users"
+(defun get-unique-values (klass)
+  "Return uniqure list of klass objects"
   (let ((values nil))
-    (manardb:doclass (x 'metis::username :fresh-instances nil)
+    (manardb:doclass (x klass :fresh-instances nil)
       (with-slots (value) x
 	(push value values)))
     (format t "~{~A~^~%~}" (delete-duplicates (sort values #'string-lessp) :test 'string-equal))))
+
+;; uniques
+
+(defun get-event-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::eventname))
+
+(defun get-errorcode-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::errorcode))
+
+(defun get-name-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::username))
+
+
+(defun get-val (obj)
+  (if (null obj)
+      obj
+      (slot-value obj 'value)))
+
+(defun get-by-name (name)
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+      (let ((name2 (slot-value userName 'value)))
+	(if (string-equal name name2)
+	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+		    (get-val eventTime)
+		    name2
+		    (get-val eventSource)
+		    (get-val sourceIPAddress)
+		    (get-val userAgent)
+		    (get-val errorMessage)
+		    (get-val errorCode)
+		    ))))))
 
 (defun get-useridentity-by-name (name)
   "Return any entries with username in useridentity"
@@ -241,11 +264,6 @@
 		  userAgent
 		  errorMessage)))))
 
-(defun get-event-list ()
-  "Return uniqure list of events"
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (value) x
-      (format t "~A~%" value))))
 
 (defun get-by-sourceip (ip)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
