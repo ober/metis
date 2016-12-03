@@ -224,7 +224,7 @@
     (manardb:doclass (x 'metis::username :fresh-instances nil)
       (with-slots (value) x
 	(push value values)))
-    (format t "~{~A~^~%~}" (remove-duplicates (sort values #'string-lessp))))
+    (format t "~{~A~^~%~}" (delete-duplicates (sort values #'string-lessp) :test 'string-equal))))
 
 (defun get-useridentity-by-name (name)
   "Return any entries with username in useridentity"
@@ -245,7 +245,7 @@
   "Return uniqure list of events"
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
     (with-slots (value) x
-      (format "~A~%" value))))
+      (format t "~A~%" value))))
 
 (defun get-by-sourceip (ip)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
@@ -360,7 +360,7 @@
 	  (sourceIPAddress-i (get-obj 'metis::sourceIPAddress sourceIPAddress))
 	  (userAgent-i (get-obj 'metis::userAgent userAgent))
 	  (userIdentity-i (get-obj 'metis::userIdentity userIdentity))
-	  (userName-i (get-obj 'metis::userName userName)))
+	  (userName-i (get-obj 'metis::userName (or userName (find-username userIdentity)))))
 
       (make-instance 'ct
 		     :additionalEventData additionalEventData-i
