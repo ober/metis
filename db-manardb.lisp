@@ -1,5 +1,6 @@
 (in-package :metis)
-(declaim (optimize (debug 3) (safety 3)))
+;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
+
 ;;(ql:quickload :manardb)
 
 (defun init-manard()
@@ -89,10 +90,9 @@
    (userIdentity :initarg :userIdentity :accessor userIdentity)
    (userName :initarg :userName :accessor username)
    ))
+;;(defun get-obj (klass new-value)
 
-
-;;(fare-memoization:define-memo-function get-obj (klass new-value)
-(defun get-obj (klass new-value)
+(fare-memoization:define-memo-function get-obj (klass new-value)
   "Return the object for a given value of klass"
   (let ((obj nil))
     (unless (or (null klass) (null new-value))
@@ -214,24 +214,17 @@
 
 (defun get-errorcode-list ()
   "Return uniqure list of users"
-  (let ((names (make-hash-table :test 'equalp)))
-    (manardb:doclass (x 'metis::ct :fresh-instances nil)
-      (with-slots (errorCode) x
-	(unless (gethash errorCode names)
-	  (setf (gethash errorCode names) t))))
-    (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
+  (manardb:doclass (x 'metis::errorcode :fresh-instances nil)
+    (with-slots (value) x
+      (format t "~A~%" value))))
 
 (defun get-name-list ()
   "Return uniqure list of users"
-  (let ((names (make-hash-table :test 'equalp))
-	(name nil))
-    (manardb:doclass (x 'metis::ct :fresh-instances nil)
-      (with-slots (userName userIdentity) x
-	(if (string-equal userName "NIL")
-	    (setf name (find-username userIdentity)))
-	(unless (gethash (or userName name) names)
-	  (setf (gethash (or userName name) names) userIdentity))))
-    (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
+  (let ((values nil))
+    (manardb:doclass (x 'metis::username :fresh-instances nil)
+      (with-slots (value) x
+	(push value values)))
+    (format t "~{~A~^~%~}" (remove-duplicates (sort values #'string-lessp))))
 
 (defun get-useridentity-by-name (name)
   "Return any entries with username in useridentity"
@@ -250,12 +243,9 @@
 
 (defun get-event-list ()
   "Return uniqure list of events"
-  (let ((names (make-hash-table :test 'equalp)))
-    (manardb:doclass (x 'metis::ct :fresh-instances nil)
-      (with-slots (eventName userIdentity) x
-	(unless (gethash eventName names)
-	  (setf (gethash eventName names) t))))
-    (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+    (with-slots (value) x
+      (format "~A~%" value))))
 
 (defun get-by-sourceip (ip)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
