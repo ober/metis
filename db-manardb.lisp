@@ -104,11 +104,12 @@
 		  (make-hash-table :test 'equalp))))
 	(multiple-value-bind (id seen)
 	    (gethash new-value (gethash klass *metis-fields*))
-	  (unless seen
-	    (progn
-	      (setf obj (make-instance klass :value new-value))
-	      (setf (gethash new-value (gethash klass *metis-fields*)) obj))
-	    (setf obj id)))))
+	  (if seen
+	      (setf obj id)
+	      (progn
+		(setf obj (make-instance klass :value new-value))
+		(setf (gethash new-value (gethash klass *metis-fields*)) obj))))))
+    ;;(format t "get-obj: klass:~A new-value:~A obj:~A~%" klass new-value obj)
     obj))
 
 (defun manardb-have-we-seen-this-file (file)
@@ -355,14 +356,14 @@
 	  (awsRegion-i (get-obj 'metis::awsRegion awsRegion))
 	  (errorCode-i (get-obj 'metis::errorCode errorCode))
 	  (errorMessage-i (get-obj 'metis::errorMessage errorMessage))
-	  (eventID-i (get-obj 'metis::eventID eventID))
+	  ;;(eventID-i (get-obj 'metis::eventID eventID))
 	  (eventName-i (get-obj 'metis::eventName eventName))
 	  (eventSource-i (get-obj 'metis::eventSource eventSource))
 	  (eventTime-i (get-obj 'metis::eventTime eventTime))
 	  (eventType-i (get-obj 'metis::eventType eventType))
 	  (eventVersion-i (get-obj 'metis::eventVersion eventVersion))
 	  (recipientAccountId-i (get-obj 'metis::recipientAccountId recipientAccountId))
-	  (requestID-i (get-obj 'metis::requestID requestID))
+	  ;;(requestID-i (get-obj 'metis::requestID requestID))
 	  (requestParameters-i (get-obj 'metis::requestParameters requestParameters))
 	  (resources-i (get-obj 'metis::resources resources))
 	  (responseElements-i (get-obj 'metis::responseElements responseElements))
@@ -376,14 +377,14 @@
 		     :awsRegion awsRegion-i
 		     :errorCode errorCode-i
 		     :errorMessage errorMessage-i
-		     :eventID eventID-i
+		     :eventID eventID
 		     :eventName eventName-i
 		     :eventSource eventSource-i
 		     :eventTime eventTime-i
 		     :eventType eventType-i
 		     :eventVersion eventVersion-i
 		     :recipientAccountId recipientAccountId-i
-		     :requestID requestID-i
+		     :requestID requestID
 		     :requestParameters requestParameters-i
 		     :resources resources-i
 		     :responseElements responseElements-i
