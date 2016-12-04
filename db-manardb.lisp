@@ -113,6 +113,7 @@
     obj))
 
 (defun manardb-have-we-seen-this-file (file)
+  (declare (special *manard-files*))
   (unless (boundp '*manard-files*)
     (allocate-file-hash))
   (multiple-value-bind (id seen)
@@ -149,25 +150,6 @@
    #'(lambda (x)
        (setf (gethash (slot-value x 'file) *manard-files*) t))
    (manardb:retrieve-all-instances 'metis::files)))
-
-
-(defun get-by-event (name)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode) x
-      (if (string-equal name eventName)
-	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventSource sourceIPAddress userAgent errorMessage errorCode)))))
-
-(defun get-by-errorcode (name)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (if (string-equal name errorCode)
-	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime userName eventName eventSource sourceIPAddress userAgent errorMessage)))))
-
-(defun get-by-date (date)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (if (cl-ppcre:all-matches date eventTime)
-	  (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime (or userName (find-username userIdentity)) eventName eventSource sourceIPAddress userAgent errorMessage)))))
 
 (defun get-stats ()
   (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A~%"
@@ -228,7 +210,11 @@
   "Return uniqure list of events"
   (get-unique-values 'metis::username))
 
-(defun get-val (obj)
+(defun get-sourceips-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::sourceIPAddress))
+
+(fare-memoization:define-memo-function get-val (obj)
   (if (null obj)
       obj
       (slot-value obj 'value)))
@@ -244,22 +230,110 @@
     ;;obj))
     obj-list))
 
-
-(defun get-by-name (name)
-  ;;(let ((obj-list (get-obj-by-val 'username name)))
+(defun get-by-name (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (let ((name2 (slot-value userName 'value)))
-	(if (string-equal name2 name)
+      (let ((val2 (slot-value username 'value)))
+	(if (string-equal val val2)
 	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
 		    (get-val eventTime)
-		    name2
+		    (get-val userName)
 		    (get-val eventSource)
 		    (get-val sourceIPAddress)
 		    (get-val userAgent)
 		    (get-val errorMessage)
 		    (get-val errorCode))
 	    )))))
+
+(defun get-by-event (val)
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+      (let ((val2 (slot-value eventname 'value)))
+	(if (string-equal val val2)
+	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+		    (get-val eventTime)
+		    (get-val userName)
+		    (get-val eventSource)
+		    (get-val sourceIPAddress)
+		    (get-val userAgent)
+		    (get-val errorMessage)
+		    (get-val errorCode))
+	    )))))
+
+(defun get-by-errorcode (val)
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+      (let ((val2 (slot-value errorcode 'value)))
+	(if (string-equal val val2)
+	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+		    (get-val eventTime)
+		    (get-val userName)
+		    (get-val eventSource)
+		    (get-val sourceIPAddress)
+		    (get-val userAgent)
+		    (get-val errorMessage)
+		    (get-val errorCode))
+	    )))))
+
+(defun get-by-date (val)
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+      (let ((val2 (slot-value eventTime 'value)))
+	(if (string-equal val val2)
+	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+		    (get-val eventTime)
+		    (get-val userName)
+		    (get-val eventSource)
+		    (get-val sourceIPAddress)
+		    (get-val userAgent)
+		    (get-val errorMessage)
+		    (get-val errorCode))
+	    )))))
+
+(defun get-by-sourceip (val)
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+      (let ((val2 (slot-value sourceipaddress 'value)))
+	(if (string-equal val val2)
+	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+		    (get-val eventTime)
+		    (get-val userName)
+		    (get-val eventSource)
+		    (get-val sourceIPAddress)
+		    (get-val userAgent)
+		    (get-val errorMessage)
+		    (get-val errorCode))
+	    )))))
+
+(defun get-by-ip (val)
+  (manardb:doclass (x 'metis::ct :fresh-instances nil)
+    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+      (let ((val2 (slot-value eventSource 'value)))
+	(if (string-equal val val2)
+	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+		    (get-val eventTime)
+		    (get-val userName)
+		    (get-val eventSource)
+		    (get-val sourceIPAddress)
+		    (get-val userAgent)
+		    (get-val errorMessage)
+		    (get-val errorCode))
+	    )))))
+
+;; (let ((obj-list (get-obj-by-val 'username name)))
+  ;;   (manardb:doclass (x 'metis::ct :fresh-instances nil)
+  ;;     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+  ;; 	(let ((name2 (slot-value userName 'value)))
+  ;; 	  (if (string-equal name2 name)
+  ;; 	      (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+  ;; 		      (get-val eventTime)
+  ;; 		      name2
+  ;; 		      (get-val eventSource)
+  ;; 		      (get-val sourceIPAddress)
+  ;; 		      (get-val userAgent)
+  ;; 		      (get-val errorMessage)
+  ;; 		      (get-val errorCode))
+  ;; 	      ))))))
 
 (defun get-useridentity-by-name (name)
   "Return any entries with username in useridentity"
@@ -275,25 +349,6 @@
 		  sourceIPAddress
 		  userAgent
 		  errorMessage)))))
-
-
-(defun get-by-sourceip (ip)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (if (cl-ppcre:all-matches ip (slot-value x 'sourceIPAddress))
-	  (progn
-	    (let ((name (or userName (find-username userIdentity))))
-	      (format t "|~A|~A|~A|~A|~A|~A|~A|~%" eventTime name eventName eventSource sourceIPAddress userAgent errorMessage)))))))
-
-(defun get-sourceips-list ()
-  "Return uniqure list of events"
-  (let ((names (make-hash-table :test 'equalp)))
-    (manardb:doclass (x 'metis::ct :fresh-instances nil)
-      (with-slots (sourceIPAddress userIdentity) x
-	(unless (gethash sourceIPAddress names)
-	  (setf (gethash sourceIpAddress names) t))))
-    (format t "~{~A~^~%~}" (sort (alexandria:hash-table-keys names) #'string-lessp))))
-
 
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))
