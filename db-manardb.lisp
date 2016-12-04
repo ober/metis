@@ -431,14 +431,14 @@
 	  (awsRegion-i (get-obj 'metis::awsRegion awsRegion))
 	  (errorCode-i (get-obj 'metis::errorCode errorCode))
 	  (errorMessage-i (get-obj 'metis::errorMessage errorMessage))
-	  ;;(eventID-i (get-obj 'metis::eventID eventID))
+	  (eventID-i (get-obj 'metis::eventID eventID))
 	  (eventName-i (get-obj 'metis::eventName eventName))
 	  (eventSource-i (get-obj 'metis::eventSource eventSource))
 	  (eventTime-i (get-obj 'metis::eventTime eventTime))
 	  (eventType-i (get-obj 'metis::eventType eventType))
 	  (eventVersion-i (get-obj 'metis::eventVersion eventVersion))
 	  (recipientAccountId-i (get-obj 'metis::recipientAccountId recipientAccountId))
-	  ;;(requestID-i (get-obj 'metis::requestID requestID))
+	  (requestID-i (get-obj 'metis::requestID requestID))
 	  (requestParameters-i (get-obj 'metis::requestParameters requestParameters))
 	  (resources-i (get-obj 'metis::resources resources))
 	  (responseElements-i (get-obj 'metis::responseElements responseElements))
@@ -452,14 +452,14 @@
 		     :awsRegion awsRegion-i
 		     :errorCode errorCode-i
 		     :errorMessage errorMessage-i
-		     :eventID eventID
+		     :eventID eventID-i
 		     :eventName eventName-i
 		     :eventSource eventSource-i
 		     :eventTime eventTime-i
 		     :eventType eventType-i
 		     :eventVersion eventVersion-i
 		     :recipientAccountId recipientAccountId-i
-		     :requestID requestID
+		     :requestID requestID-i
 		     :requestParameters requestParameters-i
 		     :resources resources-i
 		     :responseElements responseElements-i
