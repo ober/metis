@@ -58,12 +58,10 @@
 (defun main (&rest args)
   (metis::init-manard)
 
-  (format t "args :~s %" args)
   (let ((verb (or (nth 1 args) nil))
 	(a (or (nth 2 args) nil))
 	(b (or (nth 3 args) nil))
 	(c (or (nth 4 args) nil)))
-    (format t "Got: app:~A verb:~A workers:~A dir:~A~%" a b c)
     (cond
       ((equal "a" verb)(time (metis::cloudtrail-report-async a b)))
       ((equal "b" verb)(time (metis::bench-vpc-flows-report-async a b)))
