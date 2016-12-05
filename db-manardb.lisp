@@ -115,7 +115,7 @@
 (defun manardb-have-we-seen-this-file (file)
   (declare (special *manard-files*))
   (unless (boundp '*manard-files*)
-    (allocate-file-hash))
+    (time (allocate-file-hash)))
   (multiple-value-bind (id seen)
       (gethash (file-namestring file) *manard-files*)
     seen))
@@ -146,10 +146,8 @@
   (print "allocate-file-hash")
   (defvar *manard-files* (make-hash-table :test 'equalp))
   (init-manard)
-  (mapc
-   #'(lambda (x)
-       (setf (gethash (slot-value x 'file) *manard-files*) t))
-   (manardb:retrieve-all-instances 'metis::files)))
+  (manardb:doclass (x 'metis::files :fresh-instances nil)
+    (setf (gethash (slot-value x 'file) *manard-files*) t)))
 
 (defun get-stats ()
   (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A~%"
@@ -400,6 +398,7 @@
 
 
 (defun manardb-normalize-insert (record)
+  (declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
   ;;manardb-nomalize-insert (NIL us-west-1 NIL NIL 216e957f-230e-42ea-bfc7-e0d07d321a8b DescribeDBInstances rds.amazonaws.com 2015-08-07T19:04:52Z AwsApiCall 1.03 224108527019 2f1d4165-3d37-11e5-aae4-c1965b0823e9 NIL NIL NIL bogus.example.com signin.amazonaws.com (invokedBy signin.amazonaws.com sessionContext (attributes (creationDate 2015-08-07T11:17:07Z mfaAuthenticated true)) userName meylor accessKeyId ASIAIOHLZS2V2QON52LA accountId 224108527019 arn arn:aws:iam::224108527019:user/meylor principalId AIDAJVKKNU5BSTZIOF3EU type IAMUser) meylor)
   (destructuring-bind (
 		       additionalEventData
