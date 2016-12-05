@@ -169,7 +169,6 @@
     ;;(format t "a: ~A b:~A c:~A d:~A len:~A username:~A" a b c d len username)
     (or a b c d)))
 
-
 (defun get-all-errorcodes ()
   (manardb:doclass
       (x 'metis::ct :fresh-instances nil)
@@ -232,11 +231,11 @@
 (defun get-by-name (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (let ((val2 (slot-value username 'value)))
+      (let ((val2 (get-val userName)))
 	(if (string-equal val val2)
 	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
 		    (get-val eventTime)
-		    (get-val userName)
+		    val2
 		    (get-val eventSource)
 		    (get-val sourceIPAddress)
 		    (get-val userAgent)
@@ -424,7 +423,6 @@
 		       userName
 		       )
       record
-
     (let (
 	  (additionalEventData-i (get-obj 'metis::additionalEventData additionalEventData))
 	  (awsRegion-i (get-obj 'metis::awsRegion awsRegion))
