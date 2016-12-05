@@ -277,6 +277,7 @@
       (let ((val2 (get-val eventTime)))
 	(if (cl-ppcre:all-matches val val2)
 	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+		    val2
 		    (get-val userName)
 		    (get-val eventSource)
 		    (get-val sourceIPAddress)
