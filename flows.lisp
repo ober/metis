@@ -6,6 +6,45 @@
 (manardb:defmmclass conversation ()
   ((file :initarg :name :reader file)))
 
+(manardb:defmmclass date ()
+  ((file :initarg :name :reader file)))
+
+(manardb:defmmclass interface_id ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass srcaddr ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass dstaddr ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass srcport ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass dstport ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass protocol ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass packets ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass bytez ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass start ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass endf ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass action ()
+  ((value :initarg :value :accessor value)))
+
+(manardb:defmmclass status ()
+  ((value :initarg :value :accessor value)))
+
 (manardb:defmmclass flow ()
   ((date :initarg :date :accessor date)
    ;;(version :initarg version )
@@ -264,21 +303,38 @@
 
 
 (defun insert-flows( date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
-  (let ((date2 (to-epoch date)))
+  (let (
+	(date2 (to-epoch date))
+	(interface_id-i (get-obj 'metis::interface_id interface_id))
+	(srcaddr-i (get-obj 'metis::srcaddr srcaddr))
+	(dstaddr-i (get-obj 'metis::dstaddr dstaddr))
+	(srcport-i (get-obj 'metis::srcport srcport))
+	(dstport-i (get-obj 'metis::dstport dstport))
+	(protocol-i (get-obj 'metis::protocol protocol))
+	(packets-i (get-obj 'metis::packets packets))
+	(bytez-i (get-obj 'metis::bytez bytez))
+	(start-i (get-obj 'metis::start start))
+	(endf-i (get-obj 'metis::endf endf))
+	(action-i (get-obj 'metis::action action))
+	(status-i (get-obj 'metis::status status))
+	)
+
+
     (make-instance 'flow
 		   :date date2
-		   ;;:interface_id interface_id
-		   :srcaddr srcaddr
-		   :dstaddr dstaddr
-		   :srcport srcport
-		   :dstport dstport
-		   :protocol protocol
-		   :packets packets
-		   :bytez bytez
-		   :start start
-		   :endf endf
-		   :action action
-		   :status status)
+		   :interface_id interface_id-i
+		   :srcaddr srcaddr-i
+		   :dstaddr dstaddr-i
+		   :srcport srcport-i
+		   :dstport dstport-i
+		   :protocol protocol-i
+		   :packets packets-i
+		   :bytez bytez-i
+		   :start start-i
+		   :endf endf-i
+		   :action action-i
+		   :status status-i
+		   )
     ))
 
   ;; (fare-memoization:define-memo-function create-conversation(srcaddr dstaddr srcport dstport)
