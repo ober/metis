@@ -221,6 +221,8 @@
 ;; 	      (format t "xxx: ~A ~%" x))
 ;; 	  (retrieve-from-index 'metis::flow 'dstport value :all t)))
 
+
+
 (defun allocate-vpc-file-hash ()
   (print "allocate-file-hash")
   (defvar *manard-flow-files* (make-hash-table :test 'equalp))
@@ -241,6 +243,46 @@
   (let ((name (ignore-errors (file-namestring file))))
     (setf (gethash name *manard-flow-files*) t)
     (make-instance 'flow-files :file name)))
+
+(defun get-vpc-date-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::date))
+
+(defun get-vpc-interface_id-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::interface_id))
+
+(defun get-vpc-srcaddr-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::srcaddr))
+
+(defun get-vpc-dstaddr-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::dstaddr))
+
+(defun get-vpc-srcport-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::srcport))
+
+(defun get-vpc-dstport-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::dstport))
+
+(defun get-vpc-protocols-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::protocols))
+
+(defun get-vpc-action-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::action))
+
+(defun geft-vpc-status-list ()
+  "Return uniqure list of events"
+  (get-unique-values 'metis::status))
+
+
+
+
 
 ;; (defun flows-get-hash (hash file)
 ;;   (let ((fullname (get-full-filename file))
