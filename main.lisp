@@ -25,7 +25,7 @@
       ((equal "a" verb)(time (cloudtrail-report-async workers dir)))
       ((equal "vs" verb)(time (vpc-flows-report-sync workers)))
       ((equal "va" verb)(time (vpc-flows-report-async workers dir)))
-      ((equal "b" verb)(time (bench-vpc-flows-report-async workers dir)))
+      ((equal "b" verb)(time (bench-vpc-flows-report-sync dir)))
       ((equal "s" verb)(time (cloudtrail-report-sync workers)))
       ((equal "sn" verb)(time (get-by-name workers)))
       ((equal "ln" verb)(time (get-name-list)))
@@ -74,7 +74,7 @@
 	(c (or (nth 4 args) nil)))
     (cond
       ((equal "a" verb)(time (metis::cloudtrail-report-async a b)))
-      ((equal "b" verb)(time (metis::bench-vpc-flows-report-async a b)))
+      ((equal "b" verb)(time (metis::bench-vpc-flows-report-sync a )))
       ((equal "da" verb)(metis::find-by-dstaddr a))
       ((equal "date" verb)(metis::find-by-date a))
       ((equal "dp" verb)(metis::find-by-dstport a))
