@@ -23,7 +23,8 @@
     (cond
       ((equal "main" verb) (main))
       ((equal "a" verb)(time (cloudtrail-report-async workers dir)))
-      ((equal "v" verb)(time (vpc-flows-report-sync dir)))
+      ((equal "vs" verb)(time (vpc-flows-report-sync workers)))
+      ((equal "va" verb)(time (vpc-flows-report-async workers dir)))
       ((equal "b" verb)(time (bench-vpc-flows-report-async workers dir)))
       ((equal "s" verb)(time (cloudtrail-report-sync workers)))
       ((equal "sn" verb)(time (get-by-name workers)))

@@ -14,7 +14,6 @@
    )
   )
 
-
 (fare-memoization:define-memo-function get-obj-conversation (interface-id srcaddr srcport dstaddr dstport protocol)
   "Return the object for a given value of klass"
   (let ((obj nil)
@@ -141,6 +140,14 @@
 	     ))
      *mytasks*))
   )
+
+(defun get-unique-conversation (klass)
+  "Return uniqure list of klass objects"
+  (let ((values nil))
+    (manardb:doclass (x klass :fresh-instances nil)
+      (with-slots (value) x
+	(push value values)))
+    (format t "~{~A~^~%~}" (delete-duplicates (sort values #'string-lessp) :test 'string-equal))))
 
 (defun vpc-flows-report-sync (path)
   (force-output)
