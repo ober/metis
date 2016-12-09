@@ -11,7 +11,8 @@
    (dstaddr :initarg :dstaddr :reader dstaddr)
    (dstport :initarg :dstport :reader dstport)
    (protocol :initarg :protocol :reader protocol)
-   ))
+   )
+  )
 
 
 (fare-memoization:define-memo-function get-obj-conversation (interface-id srcaddr srcport dstaddr dstport protocol)
@@ -141,23 +142,10 @@
      *mytasks*))
   )
 
-(defun vpc-flows-report-async (path)
+(defun vpc-flows-report-sync (path)
   (force-output)
   (unless (null path)
-    (walk-ct path #'async-vf-file)
-    (mapc
-     #'(lambda (x)
-	 (if (typep x 'pcall::task)
-	     (progn
-	       ;;(format t "~%here:~A" (type-of x))
-	       (pcall:join x))
-	     (format t "~%not ~A" (type-of x))
-	     ))
-     *mytasks*))
-  )
-
-
-
+    (walk-ct path #'sync-vf-file)))
 
 (defun async-vf-file (x)
   (push (pcall:pexec
