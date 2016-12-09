@@ -90,7 +90,6 @@
    (userIdentity :initarg :userIdentity :accessor userIdentity)
    (userName :initarg :userName :accessor username)
    ))
-;;(defun get-obj (klass new-value)
 
 (fare-memoization:define-memo-function get-obj (klass new-value)
   "Return the object for a given value of klass"
@@ -150,12 +149,13 @@
     (setf (gethash (slot-value x 'file) *manard-files*) t)))
 
 (defun get-stats ()
-  (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A~%"
+  (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A convs:~A~%"
 	  (manardb:count-all-instances 'metis::ct)
 	  (manardb:count-all-instances 'metis::files)
 	  (manardb:count-all-instances 'metis::flow)
 	  (manardb:count-all-instances 'metis::flow-files)
 	  (manardb:count-all-instances 'metis::errorCode)
+	  (manardb:count-all-instances 'metis::conversation)
 	  ))
 
 (fare-memoization:define-memo-function  find-username (userIdentity)
