@@ -49,7 +49,7 @@
       ((equal "sp" verb)(find-by-srcport workers))
       ((equal "sd" verb)(time (get-by-date workers)))
       ((equal "sec" verb)(time (get-by-errorcode workers)))
-      ((equal "st" verb)(time (get-stats)))
+      ((equal "st" verb)(get-stats))
       ((equal "lec" verb)(time (get-errorcode-list)))
       ((equal "r" verb)(time (run-bench)))
       (t (progn
