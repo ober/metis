@@ -1,5 +1,6 @@
 (in-package :metis)
-(declaim (optimize (debug 3)))
+;;(declaim (optimize (debug 3)))
+(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
 
@@ -101,30 +102,31 @@
 
 (defparameter flow-tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow-files :ips :ports))
 
-(defun bench-vpc-flows-report-async (workers path)
+(defun bench-vpc-flows-report-sync (path)
   ;;(defvar benching t)
   (let ((btime (get-internal-real-time))
 	(benching t))
     #+sbcl
     (progn
-      (sb-sprof:with-profiling (:report :flat) (vpc-flows-report-async workers path)))
+      (sb-sprof:with-profiling (:report :flat) (vpc-flows-report-sync path)))
     #+lispworks
     (progn
       (hcl:set-up-profiler :package '(metis))
-      (hcl:profile (vpc-flows-report-async workers path)))
+      (hcl:profile (vpc-flows-report-sync path)))
     #+allegro (progn
 		(prof:start-profiler :type :time :count t)
-		(time (vpc-flows-report-async workers path))
+		(time (vpc-flows-report-sync path))
 		(prof::show-flat-profile))
-    #+(or clozure abcl ecl) (time (vpc-flows-report-async workers path))
+    #+(or clozure abcl ecl) (time (vpc-flows-report-sync path))
     (let* ((etime (get-internal-real-time))
 	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
 	   (rows (manardb:count-all-instances 'metis::flow))
+	   (convs (manardb:count-all-instances 'metis::conversation))
 	   (files (manardb:count-all-instances 'metis::flow-files)))
       ;;      (if (and delta rows)
       ;;(let ((rps (/ (float rows) (float delta))))
       ;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
-      (format t "~%delta~A rows:~A files:~A" delta (caar rows) (caar files)))))
+      (format t "~%delta~A rows:~A files:~A convs:~A" delta (caar rows) (caar files) convs))))
 
 (defun vpc-flows-report-async (workers path)
   (let ((workers (parse-integer workers)))
