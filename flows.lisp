@@ -102,31 +102,32 @@
 
 (defparameter flow-tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow-files :ips :ports))
 
-(defun bench-vpc-flows-report-sync (path)
-  ;;(defvar benching t)
-  (let ((btime (get-internal-real-time))
-	(benching t))
-    #+sbcl
-    (progn
-      (sb-sprof:with-profiling (:report :flat) (vpc-flows-report-sync path)))
-    #+lispworks
-    (progn
-      (hcl:set-up-profiler :package '(metis))
-      (hcl:profile (vpc-flows-report-sync path)))
-    #+allegro (progn
-		(prof:start-profiler :type :time :count t)
-		(time (vpc-flows-report-sync path))
-		(prof::show-flat-profile))
-    #+(or clozure abcl ecl) (time (vpc-flows-report-sync path))
-    (let* ((etime (get-internal-real-time))
-	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
-	   (rows (manardb:count-all-instances 'metis::flow))
-	   (convs (manardb:count-all-instances 'metis::conversation))
-	   (files (manardb:count-all-instances 'metis::flow-files)))
-      ;;      (if (and delta rows)
-      ;;(let ((rps (/ (float rows) (float delta))))
-      ;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
-      (format t "~%delta~A rows:~A files:~A convs:~A" delta (caar rows) (caar files) convs))))
+(defun bench-vpc-flows-report-sync ()
+  (let ((path "~/vpctiny"))
+    ;;(defvar benching t)
+    (let ((btime (get-internal-real-time))
+	  (benching t))
+      #+sbcl
+      (progn
+	(sb-sprof:with-profiling (:report :flat) (vpc-flows-report-sync path)))
+      #+lispworks
+      (progn
+	(hcl:set-up-profiler :package '(metis))
+	(hcl:profile (vpc-flows-report-sync path)))
+      #+allegro (progn
+		  (prof:start-profiler :type :time :count t)
+		  (time (vpc-flows-report-sync path))
+		  (prof::show-flat-profile))
+      #+(or clozure abcl ecl) (time (vpc-flows-report-sync path))
+      (let* ((etime (get-internal-real-time))
+	     (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
+	     (rows (manardb:count-all-instances 'metis::flow))
+	     (convs (manardb:count-all-instances 'metis::conversation))
+	     (files (manardb:count-all-instances 'metis::flow-files)))
+	;;      (if (and delta rows)
+	;;(let ((rps (/ (float rows) (float delta))))
+	;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
+	(format t "~%delta~A rows:~A files:~A convs:~A" delta (caar rows) (caar files) convs)))))
 
 (defun vpc-flows-report-async (workers path)
   (let ((workers (parse-integer workers)))
@@ -143,13 +144,17 @@
      *mytasks*))
   )
 
-(defun get-unique-conversation (klass)
+(defun get-unique-conversation ()
   "Return uniqure list of klass objects"
-  (let ((values nil))
-    (manardb:doclass (x klass :fresh-instances nil)
-      (with-slots (value) x
-	(push value values)))
-    (format t "~{~A~^~%~}" (delete-duplicates (sort values #'string-lessp) :test 'string-equal))))
+  (manardb:doclass (x 'metis::conversation :fresh-instances nil)
+    (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
+      (format t "int:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"
+	      interface-id
+	      srcaddr
+	      dstaddr
+	      srcport
+	      dstport
+	      protocol))))
 
 (defun vpc-flows-report-sync (path)
   (force-output)
@@ -274,7 +279,6 @@
 ;; 	  (retrieve-from-index 'metis::flow 'dstport value :all t)))
 
 
-
 (defun allocate-vpc-file-hash ()
   (print "allocate-file-hash")
   (defvar *manard-flow-files* (make-hash-table :test 'equalp))
@@ -285,14 +289,16 @@
    (manardb:retrieve-all-instances 'metis::flow-files)))
 
 (defun flows-have-we-seen-this-file (file)
-  (unless (boundp '*manard-flow-files*)
-    (allocate-vpc-file-hash))
-  (multiple-value-bind (id seen)
-      (gethash (file-namestring file) *manard-flow-files*)
-    seen))
+  (let ((name (get-full-filename file)))
+    (unless (boundp '*manard-flow-files*)
+      (allocate-vpc-file-hash))
+    (multiple-value-bind (id seen)
+	(gethash name *manard-flow-files*)
+      seen)))
 
 (defun flow-mark-file-processed (file)
-  (let ((name (ignore-errors (file-namestring file))))
+  (let ((name (get-full-filename file)))
+    (format t "~% mark:~A file:~A" name file)
     (setf (gethash name *manard-flow-files*) t)
     (make-instance 'flow-files :file name)))
 
@@ -332,10 +338,6 @@
   "Return uniqure list of events"
   (get-unique-values 'metis::status))
 
-
-
-
-
 ;; (defun flows-get-hash (hash file)
 ;;   (let ((fullname (get-full-filename file))
 ;; 	(them (load-file-flow-values)))
@@ -367,22 +369,23 @@
 (defun process-vf-file (file)
   (when (equal (pathname-type file) "gz")
     (unless (flows-have-we-seen-this-file file)
-      (format t "+")
-
-      (flow-mark-file-processed file)
-      (gzip-stream:with-open-gzip-file (in file)
-	(let ((i 0)
-	      (btime (get-internal-real-time)))
-	  (loop
-	     for line = (read-line in nil nil)
-	     while line
-	     collect (progn
-		       (incf i)
-		       (process-vf-line line)))
-	  (let* ((etime (get-internal-real-time))
-		 (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
-		 (rps (/ (float i) (float delta))))
-	    (format t "~%rps:~A rows:~A delta:~A" rps i delta)))))))
+      (progn
+	(format t "+")
+	(flow-mark-file-processed file)
+	(gzip-stream:with-open-gzip-file (in file)
+	  (let ((i 0)
+		(btime (get-internal-real-time)))
+	    (loop
+	       for line = (read-line in nil nil)
+	       while line
+	       collect (progn
+			 (incf i)
+			 (process-vf-line line)))
+	    (let* ((etime (get-internal-real-time))
+		   (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
+		   (rps (/ (float i) (float delta))))
+	      (format t "~%rps:~A rows:~A delta:~A" rps i delta)))))
+      (format t "-"))))
 
 (defun process-vf-line (line)
   (let* ((tokens (split-sequence:split-sequence #\Space line))
