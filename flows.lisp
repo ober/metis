@@ -298,7 +298,6 @@
 
 (defun flow-mark-file-processed (file)
   (let ((name (get-full-filename file)))
-    (format t "~% mark:~A file:~A" name file)
     (setf (gethash name *manard-flow-files*) t)
     (make-instance 'flow-files :file name)))
 
