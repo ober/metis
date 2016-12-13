@@ -173,12 +173,6 @@
 ;;    (format nil "zcat ~A" file)
 ;;    :output :string))
 
-(defun get-full-filename (x)
-  (let* ((split (split-sequence:split-sequence #\/ (directory-namestring x)))
-	 (length (list-length split))
-	 (dir1 (nth (- length 2) split))
-	 (dir2 (nth (- length 3) split)))
-    (format nil "~A/~A/~A" dir2 dir1 (file-namestring x))))
 
 ;; (defmacro find-by-field (class field value)
 ;;   `(let ((myclass (intern (string-upcase class)))
