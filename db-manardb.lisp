@@ -116,16 +116,16 @@
   (unless (boundp '*manard-files*)
     (time (allocate-file-hash)))
   (multiple-value-bind (id seen)
-      (gethash (file-namestring file) *manard-files*)
+      (gethash (get-full-filename file) *manard-files*)
     seen))
 
 (defun manardb-get-files (file)
   (remove-if-not
-   (lambda (x) (string-equal (file-namestring file) (slot-value x 'file)))
+   (lambda (x) (string-equal (get-full-filename file) (slot-value x 'file)))
    (manardb:retrieve-all-instances 'metis::files)))
 
 (defun manardb-mark-file-processed (file)
-  (let ((name (ignore-errors (file-namestring file))))
+  (let ((name (get-full-filename file)))
     (setf (gethash name *manard-files*) t)
     (make-instance 'files :file name)))
 
