@@ -119,6 +119,6 @@ is replaced with replacement."
   (let* ((split (split-sequence:split-sequence #\/ (directory-namestring x)))
 	 (length (list-length split))
 	 (dir1 (nth (- length 2) split))
-	 (dir2 (nth (- length 3) split)))
+	 (dir2 (nth (- length 3) split))
 	 (dir3 (nth (- length 4) split)))
     (format nil "~A/~A/~A/~A" dir3 dir2 dir1 (file-namestring x))))
