@@ -27,7 +27,7 @@
 	(alpha (nth 2 args))
 	(beta (nth 3 args))
 	)
-    (format t "main:~A verb:~A alpha:~A beta:~A" (nth 0 args) verb alpha beta)
+    ;;(format t "main:~A verb:~A alpha:~A beta:~A" (nth 0 args) verb alpha beta)
     (cond
       ((equal "a" verb)(time (cloudtrail-report-async alpha beta)))
       ((equal "lc" verb)(time (get-unique-conversation)))
