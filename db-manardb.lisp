@@ -2,11 +2,12 @@
 ;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
 (defvar *manard-files* (make-hash-table :test 'equalp))
 (defvar *metis-fields* (make-hash-table :test 'equalp))
+(defvar *metis-need-files* nil)
 
 (defun init-manardb()
   (unless (boundp 'manardb:use-mmap-dir)
     (manardb:use-mmap-dir "~/ct-manardb/"))
-  (if (eql (hash-table-count *manard-files*) 0)
+  (if (and (eql (hash-table-count *manard-files*) 0) *metis-need-files*)
       (allocate-file-hash)))
 
 (manardb:defmmclass files ()

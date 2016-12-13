@@ -52,13 +52,15 @@
       )))
 
 (defun cloudtrail-report-sync (path)
-  ;;(trace get-obj)
+  (setf *metis-need-files* t)
+  (init-manardb)
   (force-output)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
 	     #'sync-ct-file)))
 
 (defun cloudtrail-report-async (workers path)
+  (setf *metis-need-files* t)
   (init-manardb)
   (force-output)
   (let ((workers (parse-integer workers)))
