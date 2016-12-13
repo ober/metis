@@ -2,7 +2,7 @@
 ;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
 (defvar *manard-files* (make-hash-table :test 'equalp))
 
-(defun init-manard()
+(defun init-manardb()
   (unless (boundp 'manardb:use-mmap-dir)
     (manardb:use-mmap-dir "~/ct-manardb/"))
   (if (eql (hash-table-count *manard-files*) 0)
@@ -140,9 +140,8 @@
 	  ))
 
 (defun allocate-file-hash ()
-  (print "allocate-file-hash")
   (manardb:doclass (x 'metis::files :fresh-instances nil)
-    (setf (gethash (slot-value x 'file) *manard-files*) t)))
+		   (setf (gethash (slot-value x 'file) *manard-files*) t)))
 
 (defun get-stats ()
   (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A convs:~A~%"
