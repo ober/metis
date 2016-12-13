@@ -1,11 +1,12 @@
 (in-package :metis)
 ;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
-
-;;(ql:quickload :manardb)
+(defvar *manard-files* (make-hash-table :test 'equalp))
 
 (defun init-manard()
   (unless (boundp 'manardb:use-mmap-dir)
     (manardb:use-mmap-dir "~/ct-manardb/"))
+  (if (eql (hash-table-count *manard-files*) 0)
+      (allocate-file-hash))
   (unless (boundp '*metis-fields*)
     (defvar *metis-fields* (make-hash-table :test 'equalp))))
 
@@ -112,9 +113,6 @@
     obj))
 
 (defun manardb-have-we-seen-this-file (file)
-  (declare (special *manard-files*))
-  (unless (boundp '*manard-files*)
-    (time (allocate-file-hash)))
   (multiple-value-bind (id seen)
       (gethash (get-full-filename file) *manard-files*)
     seen))
@@ -143,8 +141,6 @@
 
 (defun allocate-file-hash ()
   (print "allocate-file-hash")
-  (defvar *manard-files* (make-hash-table :test 'equalp))
-  (init-manard)
   (manardb:doclass (x 'metis::files :fresh-instances nil)
     (setf (gethash (slot-value x 'file) *manard-files*) t)))
 
