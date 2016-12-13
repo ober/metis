@@ -54,6 +54,7 @@
 	     #'sync-ct-file)))
 
 (defun cloudtrail-report-async (workers path)
+  (init-manardb)
   (force-output)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)

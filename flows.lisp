@@ -276,7 +276,7 @@
 (defun allocate-vpc-file-hash ()
   (print "allocate-file-hash")
   (defvar *manard-flow-files* (make-hash-table :test 'equalp))
-  (init-manard)
+  (init-manardb)
   (mapc
    #'(lambda (x)
        (setf (gethash (slot-value x 'file) *manard-flow-files*) t))

@@ -15,7 +15,7 @@
 
 
 (defun main ()
-  (init-manard)
+  (init-manardb)
   (let* ((args (argv))
 	 (verb (nth 1 args))
 	 (workers (nth 2 args))
