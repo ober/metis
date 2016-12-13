@@ -120,4 +120,5 @@ is replaced with replacement."
 	 (length (list-length split))
 	 (dir1 (nth (- length 2) split))
 	 (dir2 (nth (- length 3) split)))
-    (format nil "~A/~A/~A" dir2 dir1 (file-namestring x))))
+	 (dir3 (nth (- length 4) split)))
+    (format nil "~A/~A/~A/~A" dir3 dir2 dir1 (file-namestring x))))
