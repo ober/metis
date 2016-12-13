@@ -113,9 +113,6 @@
 
 (defun manardb-have-we-seen-this-file (file)
   (let ((name (get-filename-hash file)))
-    (multiple-value-bind (val before)
-	(gethash name *manard-files*)
-	(format t "seen:~A ?:~A:~A~%" name val before))
     (multiple-value-bind (id seen)
 	(gethash name *manard-files*)
       seen)))
