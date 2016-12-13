@@ -126,7 +126,7 @@
    (manardb:retrieve-all-instances 'metis::files)))
 
 (defun manardb-mark-file-processed (file)
-  (let ((name (get-filenamre-hash file)))
+  (let ((name (get-filename-hash file)))
     (setf (gethash name *manard-files*) t)
     (make-instance 'files :file name)))
 
