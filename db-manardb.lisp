@@ -112,7 +112,7 @@
     obj))
 
 (defun manardb-have-we-seen-this-file (file)
-  (let ((name (get-full-filename file)))
+  (let ((name (get-filename-hash file)))
     (multiple-value-bind (val before)
 	(gethash name *manard-files*)
 	(format t "seen:~A ?:~A:~A~%" name val before))
@@ -122,11 +122,11 @@
 
 (defun manardb-get-files (file)
   (remove-if-not
-   (lambda (x) (string-equal (get-full-filename file) (slot-value x 'file)))
+   (lambda (x) (string-equal (get-filename-hash file) (slot-value x 'file)))
    (manardb:retrieve-all-instances 'metis::files)))
 
 (defun manardb-mark-file-processed (file)
-  (let ((name (get-full-filename file)))
+  (let ((name (get-filenamre-hash file)))
     (setf (gethash name *manard-files*) t)
     (make-instance 'files :file name)))
 
