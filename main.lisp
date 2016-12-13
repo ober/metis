@@ -61,10 +61,7 @@
       ((equal "lec" verb)(time (get-errorcode-list)))
       ((equal "r" verb)(time (run-bench)))
       (t (progn
-	   (format t "Usage: <~A> <function> <args>~%" (nth 0 args))
-	   (format t "Function is (s) for single threaded, and (a) for multithreaded~%")
-	   (format t "ex: ~A a 10 ~~/CT/ # Would run 10 works on ~~/CT/~%" (nth 0 args))
-	   (format t "ex: ~A s ~~CT/ # Would run 10 works on ~~/CT/~%" (nth 0 args)))))
+	   (usage))))
   (manardb:close-all-mmaps)))
 
 
