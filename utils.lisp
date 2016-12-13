@@ -114,3 +114,10 @@ is replaced with replacement."
 			:end (or pos (length string)))
        when pos do (write-string replacement out)
        while pos)))
+
+(defun get-full-filename (x)
+  (let* ((split (split-sequence:split-sequence #\/ (directory-namestring x)))
+	 (length (list-length split))
+	 (dir1 (nth (- length 2) split))
+	 (dir2 (nth (- length 3) split)))
+    (format nil "~A/~A/~A" dir2 dir1 (file-namestring x))))
