@@ -32,6 +32,11 @@
   "Return the value at the end of the indicators list"
   (reduce #'getf indicators :initial-value plist))
 
+(defun get-filename-hash (file)
+  (car (cl-ppcre:split #\.
+		       (nth 4 (cl-ppcre:split "_" (file-namestring file))))))
+
+
 (defun parse-ct-contents (x)
   "process the json output"
   (let* ((records (second (read-json-gzip-file x)))
