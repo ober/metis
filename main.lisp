@@ -67,7 +67,7 @@
 
 #+allegro
 (defun main (&rest args)
-  (metis::init-manard)
+  (metis::init-manardb)
 
   (let ((verb (or (nth 1 args) nil))
 	(a (or (nth 2 args) nil))
