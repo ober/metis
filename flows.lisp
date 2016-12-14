@@ -1,6 +1,7 @@
 (in-package :metis)
 ;;(declaim (optimize (debug 3)))
 (declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
+(defvar *manard-flow-files* (make-hash-table :test 'equalp))
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
 
@@ -103,7 +104,7 @@
 (defparameter flow-tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow-files :ips :ports))
 
 (defun bench-vpc-flows-report-sync ()
-  (let ((path "~/vpctiny"))
+  (let ((path (or dir "~/vpctiny")))
     ;;(defvar benching t)
     (let ((btime (get-internal-real-time))
 	  (benching t))
@@ -130,6 +131,7 @@
 	(format t "~%delta~A rows:~A files:~A convs:~A" delta (caar rows) (caar files) convs)))))
 
 (defun vpc-flows-report-async (workers path)
+  (allocate-vpc-file-hash)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (walk-ct path #'async-vf-file)
@@ -157,6 +159,7 @@
 	      protocol))))
 
 (defun vpc-flows-report-sync (path)
+  (allocate-vpc-file-hash)
   (force-output)
   (unless (null path)
     (walk-ct path #'sync-vf-file)))
@@ -274,18 +277,17 @@
 
 
 (defun allocate-vpc-file-hash ()
-  (print "allocate-file-hash")
-  (defvar *manard-flow-files* (make-hash-table :test 'equalp))
-  (init-manardb)
-  (mapc
-   #'(lambda (x)
-       (setf (gethash (slot-value x 'file) *manard-flow-files*) t))
-   (manardb:retrieve-all-instances 'metis::flow-files)))
+  (if (eql (hash-table-count *manard-flow-files*) 0)
+      (init-manardb)
+      (mapc
+       #'(lambda (x)
+	   (setf (gethash (slot-value x 'file) *manard-flow-files*) t))
+       (manardb:retrieve-all-instances 'metis::flow-files))))
 
 (defun flows-have-we-seen-this-file (file)
+
   (let ((name (get-full-filename file)))
-    (unless (boundp '*manard-flow-files*)
-      (allocate-vpc-file-hash))
+
     (multiple-value-bind (id seen)
 	(gethash name *manard-flow-files*)
       seen)))

@@ -1,5 +1,5 @@
 (in-package :metis)
-;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
+(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
 (defvar *manard-files* (make-hash-table :test 'equalp))
 (defvar *metis-fields* (make-hash-table :test 'equalp))
 (defvar *metis-need-files* nil)
