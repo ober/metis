@@ -7,14 +7,13 @@
 (defvar *mytasks* (list))
 
 (manardb:defmmclass conversation ()
-  (
-   (interface-id :initarg :interface-id :reader interface-id)
+   ((interface-id :initarg :interface-id :reader interface-id)
    (srcaddr :initarg :srcaddr :reader srcaddr)
    (srcport :initarg :srcport :reader srcport)
    (dstaddr :initarg :dstaddr :reader dstaddr)
    (dstport :initarg :dstport :reader dstport)
    (protocol :initarg :protocol :reader protocol)
-   )
+   ))
   )
 
 (fare-memoization:define-memo-function get-obj-conversation (interface-id srcaddr srcport dstaddr dstport protocol)
@@ -138,6 +137,19 @@
 	;;(let ((rps (/ (float rows) (float delta))))
 	;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
 	(format t "~%delta~A rows:~A files:~A convs:~A" delta (caar rows) (caar files) convs)))))
+
+(defun bench-list-source-ports ()
+  #+sbcl (progn
+	   (sb-sprof:with-profiling (:report :flat) (get-vpc-srcport-list)))
+  #+lispworks (progn
+		(hcl:set-up-profiler :package '(metis))
+		(hcl:profile (get-vpc-srcport-list)))
+  #+allegro (progn
+	      (prof:start-profiler :type :time :count t)
+	      (time (get-vpc-srcport-list))
+	      (prof::show-flat-profile))
+  #+(or clozure abcl ecl)
+  (time (get-vprc-srcport-list)))
 
 (defun vpc-flows-report-async (workers path)
   (allocate-vpc-file-hash)
