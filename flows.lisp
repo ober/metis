@@ -36,11 +36,12 @@
 
 (fare-memoization:define-memo-function get-obj-conversation (interface-id srcaddr srcport dstaddr dstport protocol)
   "Return the object for a given value of klassAA"
-  (let ((obj nil)
 
+  (let ((obj nil)
 	(key-name (format nil "~A-~A-~A-~A-~A-~A" interface-id srcaddr srcport dstaddr dstport protocol)))
     (unless (or (null interface-id) (null srcaddr) (null srcport) (null dstaddr) (null dstport) (null protocol))
       (progn
+	(create-klass-hash 'conversation)
 	(multiple-value-bind (id seen)
 	    (gethash key-name (gethash 'conversation *metis-fields*))
 	  (if seen
