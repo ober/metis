@@ -196,11 +196,9 @@
 
 (defun get-unique-values (klass)
   "Return uniqure list of klass objects"
-  (let ((values nil))
-    (manardb:doclass (x klass :fresh-instances nil)
-      (with-slots (value) x
-	(push value values)))
-    (format t "~{~A~^~%~}" (delete-duplicates (sort values #'string-lessp) :test 'string-equal))))
+  (manardb:doclass (x klass :fresh-instances nil)
+    (with-slots (value) x
+      (format t "~%~A" value))))
 
 ;; lists
 
