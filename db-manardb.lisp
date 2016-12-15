@@ -95,7 +95,7 @@
 (defun create-klass-hash (klass)
   (multiple-value-bind (id seen)
       (gethash klass *metis-fields*)
-    (unless seen1
+    (unless seen
       (setf (gethash klass *metis-fields*)
 	    (thread-safe-hash-table)))))
 
@@ -111,8 +111,8 @@
 	      (setf obj id)
 	      (progn
 		(setf obj (make-instance klass :value new-value))
-		(setf (gethash new-value (gethash klass *metis-fields*)) obj)))
-	  (format t "get-obj: klass:~A new-value:~A obj:~A seen:~A id:~A~%" klass new-value obj seen id))))
+		(setf (gethash new-value (gethash klass *metis-fields*)) obj))))))
+	  ;;(format t "get-obj: klass:~A new-value:~A obj:~A seen:~A id:~A~%" klass new-value obj seen id))))
     obj))
 
 (defun manardb-have-we-seen-this-file (file)

@@ -50,29 +50,21 @@
     ;;(format t "get-obj: klass:~A new-value:~A obj:~A~%" klass new-value obj)
     obj))
 
-
-
 (defvar vpc-fields '(
-		     :action
-		     :bytez
-		     :date
-		     :dstaddr
-		     :dstport
-		     :endf
-		     :interface-id
-		     :packets
-		     :protocol
-		     :srcaddr
-		     :srcport
-		     :start
-		     :status
+		     metis::bytez
+		     metis::date
+		     metis::dstaddr
+		     metis::dstport
+		     metis::endf
+		     metis::interface-id
+		     metis::packets
+		     metis::protocol
+		     metis::srcaddr
+		     metis::srcport
+		     metis::start
+		     metis::status
 		     ))
 
-(defun init-vpc-hashes ()
-  (mapc
-   #'(lambda (x)
-       (time (allocate-klass-hash (x))))
-   vpc-fields))
 
 (manardb:defmmclass date ()
   ((file :initarg :name :reader file)))
@@ -129,10 +121,15 @@
 (manardb:defmmclass flow-files ()
   ((file :initarg :file :accessor file)))
 
+(defun init-vpc-hashes ()
+  (mapc
+   #'(lambda (x)
+       (time (allocate-klass-hash x)))
+   vpc-fields))
+
 ;; (defmethod print-object ((flow flow) stream)
 ;;   (format stream "#<date:~s srcaddr:~s dstaddr:~s srcport:~s dstport:~s>" (date flow) (srcaddr flow) (dstaddr flow) (srcport flow) (dstport flow)))
 
-(defparameter flow-tables '(:dates :versions :account_ids :interface-ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow-files :ips :ports))
 
 (defun bench-vpc-flows-report-sync (dir)
   (init-vpc-hashes)
