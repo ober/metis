@@ -14,7 +14,6 @@
    (dstport :initarg :dstport :reader dstport)
    (protocol :initarg :protocol :reader protocol)
    ))
-  )
 
 (fare-memoization:define-memo-function get-obj-conversation (interface-id srcaddr srcport dstaddr dstport protocol)
   "Return the object for a given value of klass"
