@@ -199,7 +199,6 @@
   (manardb:doclass (x klass :fresh-instances nil)
     (with-slots (value) x
       (format t "~%~A" value))))
-
 ;; lists
 
 (defun get-event-list ()
