@@ -221,7 +221,7 @@
 	      (get-val protocol)))))
 
 (defun get-by-ip (val)
-  (manardb:doclass (x 'metis::flows :fresh-instances nil)
+  (manardb:doclass (x 'metis::flow :fresh-instances nil)
     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
       (let ((srcaddr-i (get-val srcaddr))
 	    (dstaddr-i (get-val dstaddr)))
