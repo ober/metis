@@ -15,17 +15,32 @@
    (protocol :initarg :protocol :reader protocol)
    ))
 
+
+(defun allocate-conversation-hash ()
+  (format t "allocate-conversation-hash")
+  (create-klass-hash 'conversation)
+  (manardb:doclass (x 'metis::conversation :fresh-instances nil)
+    (with-slots (interface-id srcaddr srcport dstaddr dstport protocol) x
+      (let* (
+	    (interface-id-i (get-val interface-id))
+	    (srcaddr-i (get-val srcaddr))
+	    (srcport-i (get-val srcport))
+	    (dstaddr-i (get-val dstaddr))
+	    (dstport-i (get-val dstport))
+	    (protocol-i (get-val protocol))
+	    (key-name (format nil "~A-~A-~A-~A-~A-~A" interface-id-i srcaddr-i srcport-i dstaddr-i dstport-i protocol-i))
+	    )
+	(setf (gethash key-name (gethash 'conversation *metis-fields*)) x))))
+  (format t "Done with allocate"))
+
+
 (fare-memoization:define-memo-function get-obj-conversation (interface-id srcaddr srcport dstaddr dstport protocol)
-  "Return the object for a given value of klass"
+  "Return the object for a given value of klassAA"
   (let ((obj nil)
+
 	(key-name (format nil "~A-~A-~A-~A-~A-~A" interface-id srcaddr srcport dstaddr dstport protocol)))
     (unless (or (null interface-id) (null srcaddr) (null srcport) (null dstaddr) (null dstport) (null protocol))
       (progn
-	(multiple-value-bind (id1 seen1)
-	    (gethash 'conversation *metis-fields*)
-	  (unless seen1
-	    (setf (gethash 'conversation *metis-fields*)
-		  (thread-safe-hash-table))))
 	(multiple-value-bind (id seen)
 	    (gethash key-name (gethash 'conversation *metis-fields*))
 	  (if seen
@@ -49,6 +64,7 @@
 		(setf (gethash key-name (gethash 'conversation *metis-fields*)) obj))))))
     ;;(format t "get-obj: klass:~A new-value:~A obj:~A~%" klass new-value obj)
     obj))
+
 
 (defvar vpc-fields '(
 		     metis::bytez
@@ -124,8 +140,9 @@
 (defun init-vpc-hashes ()
   (mapc
    #'(lambda (x)
-       (time (allocate-klass-hash x)))
+       (allocate-klass-hash x))
    vpc-fields))
+  ;;(time (allocate-conversation-hash)))
 
 ;; (defmethod print-object ((flow flow) stream)
 ;;   (format stream "#<date:~s srcaddr:~s dstaddr:~s srcport:~s dstport:~s>" (date flow) (srcaddr flow) (dstaddr flow) (srcport flow) (dstport flow)))
@@ -337,7 +354,7 @@
 
 (defun get-vpc-protocols-list ()
   "Return uniqure list of events"
-  (get-unique-values 'metis::protocols))
+  (get-unique-values 'metis::protocol))
 
 (defun get-vpc-action-list ()
   "Return uniqure list of events"
