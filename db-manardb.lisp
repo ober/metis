@@ -1,7 +1,7 @@
 (in-package :metis)
 ;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
-(defvar *manard-files* (make-hash-table :test 'equalp))
-(defvar *metis-fields* (make-hash-table :test 'equalp))
+(defvar *manard-files* (thread-safe-hash-table))
+(defvar *metis-fields* (thread-safe-hash-table))
 (defvar *metis-need-files* nil)
 
 (defun init-manardb()
@@ -101,7 +101,7 @@
 	    (gethash klass *metis-fields*)
 	  (unless seen1
 	    (setf (gethash klass *metis-fields*)
-		  (make-hash-table :test 'equalp))))
+		  (thread-safe-hash-table))))
 	(multiple-value-bind (id seen)
 	    (gethash new-value (gethash klass *metis-fields*))
 	  (if seen

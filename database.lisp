@@ -1,7 +1,7 @@
 (in-package :metis)
 
 ;;(defparameter *q* (make-instance 'queue))
-(defvar *h* (make-hash-table :test 'equalp))
+(defvar *h* (thread-safe-hash-table))
 (defvar *db* nil)
 (defvar *pcallers* 5)
 (defvar *files* nil)

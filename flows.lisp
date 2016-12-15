@@ -1,6 +1,6 @@
 (in-package :metis)
 ;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
-(defvar *manard-flow-files* (make-hash-table :test 'equalp))
+(defvar *manard-flow-files* (thread-safe-hash-table))
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
 
@@ -25,7 +25,7 @@
 	    (gethash 'conversation *metis-fields*)
 	  (unless seen1
 	    (setf (gethash 'conversation *metis-fields*)
-		  (make-hash-table :test 'equalp))))
+		  (thread-safe-hash-table))))
 	(multiple-value-bind (id seen)
 	    (gethash key-name (gethash 'conversation *metis-fields*))
 	  (if seen
