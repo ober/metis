@@ -51,6 +51,30 @@
     ;;(format t "get-obj: klass:~A new-value:~A obj:~A~%" klass new-value obj)
     obj))
 
+
+
+(defvar vpc-fields '(
+		     :action
+		     :bytez
+		     :date
+		     :dstaddr
+		     :dstport
+		     :endf
+		     :interface-id
+		     :packets
+		     :protocol
+		     :srcaddr
+		     :srcport
+		     :start
+		     :status
+		     ))
+
+(defun init-vpc-hashes ()
+  (mapc
+   #'(lambda (x)
+       (time (allocate-klass-hash (x))))
+   vpc-fields))
+
 (manardb:defmmclass date ()
   ((file :initarg :name :reader file)))
 
@@ -112,6 +136,7 @@
 (defparameter flow-tables '(:dates :versions :account_ids :interface-ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow-files :ips :ports))
 
 (defun bench-vpc-flows-report-sync (dir)
+  (init-vpc-hashes)
   (let ((path (or dir "~/vpctiny")))
     ;;(defvar benching t)
     (let ((btime (get-internal-real-time))
@@ -153,6 +178,7 @@
 
 (defun vpc-flows-report-async (workers path)
   (allocate-vpc-file-hash)
+  (init-vpc-hashes)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
     (walk-ct path #'async-vf-file)
@@ -196,6 +222,7 @@
 			))))))
 
 (defun vpc-flows-report-sync (path)
+  (init-vpc-hashes)
   (allocate-vpc-file-hash)
   (force-output)
   (unless (null path)
@@ -207,20 +234,6 @@
 
 (defun sync-vf-file (x)
   (process-vf-file x))
-
-;; (defun read-gzip-file (file)
-;;   (uiop:run-program
-;;    (format nil "zcat ~A" file)
-;;    :output :string))
-
-
-;; (defmacro find-by-field (class field value)
-;;   `(let ((myclass (intern (string-upcase class)))
-;; 	 (myfield (intern field)))
-;;      (mapcar #'(lambda (x)
-;; 		 (format t "xxx: ~A ~%" x))
-;; 	     (retrieve-from-index 'metis::flow (quote ,field) "53" :all t))))
-
 
 (defun find-by-srcaddr (value)
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
@@ -283,32 +296,6 @@
 	      action
 	      status))))
 
-;; #+allegro
-;; (defun find-by-dstaddr (value)
-;;   (mapcar #'(lambda (x)
-;; 	      (format t "xxx: ~A ~%" x))
-;; 	  (retrieve-from-index 'metis::flow 'dstaddr value :all t)))
-
-;; #+allegro
-;; (defun find-by-srcport (value)
-;;   (mapcar #'(lambda (x)
-;; 	      (format t "xxx: ~A ~%" x))
-;; 	  (retrieve-from-index 'metis::flow 'srcport value :all t)))
-
-
-;; #+allegro
-;; (defun find-by-dstport (value)
-;;   (mapcar #'(lambda (x)
-;; 	      (format t "xxx: ~A ~%" x))
-;; 	  (retrieve-from-index 'metis::flow 'date value :all t)))
-
-;; #+allegro
-;; (defun find-by-dstport (value)
-;;   (mapcar #'(lambda (x)
-;; 	      (format t "xxx: ~A ~%" x))
-;; 	  (retrieve-from-index 'metis::flow 'dstport value :all t)))
-
-
 (defun allocate-vpc-file-hash ()
   (if (eql (hash-table-count *manard-flow-files*) 0)
       (init-manardb)
@@ -364,34 +351,6 @@
   "Return uniqure list of events"
   (get-unique-values 'metis::status))
 
-;; (defun flows-get-hash (hash file)
-;;   (let ((fullname (get-full-filename file))
-;; 	(them (load-file-flow-values)))
-;;     (if (gethash fullname them)
-;; 	t
-;; 	nil)))
-
-;; (defun flow-mark-file-processed (x)
-;;   #+allegro (progn
-;; 	      (format t "mark-file: ~A" x)
-;; 	      (make-instance 'flow_files :name (format nil "~A" (get-full-filename x)))
-;; 	      )
-;;   #-allegro (progn
-;; 	      (let ((fullname (get-full-filename x)))
-;; 		(psql-do-query
-;; 		 (format nil "insert into flow_files(value) values ('~A')" fullname))
-;; 		(setf (gethash (file-namestring x) *h*) t))))
-
-;; (defun process-vf-file (file)
-;;   (when (equal (pathname-type file) "gz")
-;;     (unless (flows-have-we-seen-this-file file)
-;;       (format t "+")
-;;       (flow-mark-file-processed file)
-;;       (mapcar #'process-vf-line
-;; 	      (split-sequence:split-sequence
-;; 	       #\linefeed
-;; 	       (uiop:run-program (format nil "zcat ~A" file) :output :string))))))
-
 (defun process-vf-file (file)
   (when (equal (pathname-type file) "gz")
     (unless (flows-have-we-seen-this-file file)
@@ -424,16 +383,9 @@
 (defun to-epoch (date)
   (local-time:timestamp-to-unix (local-time:universal-to-timestamp (cl-date-time-parser:parse-date-time date))))
 
-
 (defun insert-flows( date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let (
 	(date2 (to-epoch date))
-	;;(interface-id-i (get-obj 'metis::interface-id interface-id))
-	;;(srcaddr-i (get-obj 'metis::srcaddr srcaddr))
-	;;(dstaddr-i (get-obj 'metis::dstaddr dstaddr))
-	;;(srcport-i (get-obj 'metis::srcport srcport))
-	;;(dstport-i (get-obj 'metis::dstport dstport))
-	;;(protocol-i (get-obj 'metis::protocol protocol))
 	(conversation-i (get-obj-conversation interface-id srcaddr srcport dstaddr dstport protocol))
 	(packets-i (get-obj 'metis::packets packets))
 	(bytez-i (get-obj 'metis::bytez bytez))
@@ -443,16 +395,9 @@
 	(status-i (get-obj 'metis::status status))
 	)
 
-
     (make-instance 'flow
 		   :date date2
 		   :conversation conversation-i
-		   ;;:interface-id interface-id-i
-		   ;;:srcaddr srcaddr-i
-		   ;;:dstaddr dstaddr-i
-		   ;;:srcport srcport-i
-		   ;;:dstport dstport-i
-		   ;;:protocol protocol-i
 		   :packets packets-i
 		   :bytez bytez-i
 		   :start start-i
@@ -461,43 +406,3 @@
 		   :status status-i
 		   )
     ))
-
-;; (fare-memoization:define-memo-function create-conversation(srcaddr dstaddr srcport dstport)
-;;   "Create or return the id of the conversation of the passed arguments"
-;;   (let ((srcaddr-id (get-id-or-insert-psql "ips" srcaddr))
-;; 	(dstaddr-id (get-id-or-insert-psql "ips" dstaddr))
-;; 	(sport-id (get-id-or-insert-psql "ports" sport))
-;; 	(dport-id (get-id-or-insert-psql "ports" dstport)))
-
-;;     ;;(psql-do-query (format nil "insert into ~A(value)  select '~A' where not exists (select * from ~A where value = '~A')" table value table value))
-;;     (psql-do-query (format nil "insert into conversations(srcaddr_id, dstaddr_id, sport_id, dport_id) select '~A' where not exists (select * from conversations where srcaddr_id = '~A' and dstaddr_id = '~A' and sport_id = '~A' and dport_id = '~A')" table value table value))
-;;     (let ((id
-;; 	   (flatten
-;; 	    (car
-;; 	     (car
-;; 	      (psql-do-query
-;; 	       (format nil "select id from ~A where value = '~A'" table value)))))))
-;;     ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
-;;       (if (listp id)
-;; 	  (car id)
-;; 	  id)))
-;;   )
-
-;; (defun recreate-flow-tables(&optional db)
-;;   (let ((database (or db "metis")))
-;;     (mapcar
-;;      #'(lambda (x)
-;; 	 (psql-drop-table x database)) flow_tables)
-;;     (psql-do-query "drop table if exists raw cascade" database)
-;;     (psql-do-query "drop table if exists endpoints cascade" database)
-;;     (create-flow-tables)))
-
-;; (defun create-flow-tables (&optional db)
-;;   (let ((database (or db "metis")))
-;;     (mapcar
-;;      #'(lambda (x)
-;; 	 (psql-create-table x db)) flow_tables)
-;;     (psql-do-query "create table endpoints(id serial unique, host int references ips(id),  port int references ports(id))")
-;;     (psql-do-query "create unique index endpoints_idx on endpoints(host,port)")
-;;     (psql-do-query "create table if not exists raw(id serial, date integer, interface-id integer, srcaddr integer, dstaddr integer, srcport integer, dstport integer, protocol integer, packets integer, bytez integer, start integer, endf integer, action integer, status integer)" database)
-;;     (psql-do-query "create or replace view flows as select dates.value as date, interface-ids.value as interface-id, srcaddrs.value as srcaddr, dstaddrs.value as dstaddr, srcports.value as srcport, dstports.value as dstport, protocols.value as protocol, packetss.value as packets, bytezs.value as bytez, starts.value as start, endfs.value as endf, actions.value as action, statuss.value as status from raw, dates, interface-ids, srcaddrs, dstaddrs, srcports, dstports, protocols, packetss, bytezs, starts, endfs, actions, statuss where dates.id = raw.date and interface-ids.id = raw.interface-id and srcaddrs.id = raw.srcaddr and dstaddrs.id = raw.dstaddr and protocols.id = raw.protocol and packetss.id = raw.packets and bytezs.id = raw.bytez and starts.id = raw.start and endfs.id = raw.endf and actions.id = raw.action and statuss.id = raw.status" database)))
