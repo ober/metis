@@ -221,7 +221,7 @@
 	      (get-val protocol)))))
 
 (defun get-by-ip (val)
-  (manardb:doclass (x 'metis::conversation :fresh-instances nil)
+  (manardb:doclass (x 'metis::flows :fresh-instances nil)
     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
       (let ((srcaddr-i (get-val srcaddr))
 	    (dstaddr-i (get-val dstaddr)))
@@ -400,7 +400,13 @@
 (defun insert-flows( date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let (
 	(date2 (to-epoch date))
-	(conversation-i (get-obj-conversation interface-id srcaddr srcport dstaddr dstport protocol))
+	;;(conversation-i (get-obj-conversation interface-id srcaddr srcport dstaddr dstport protocol))
+	(interface-id-i (get-obj 'metis::interface-id interface-id))
+	(srcaddr-i (get-obj 'metis::srcaddr srcaddr))
+	(srcport-i (get-obj 'metis::srcport srcport))
+	(dstaddr-i (get-obj 'metis::dstaddr dstaddr))
+	(dstport-i (get-obj 'metis::dstport dstport))
+	(protocol-i (get-obj 'metis::protocol protocol))
 	(packets-i (get-obj 'metis::packets packets))
 	(bytez-i (get-obj 'metis::bytez bytez))
 	(start-i (get-obj 'metis::start start))
@@ -411,7 +417,13 @@
 
     (make-instance 'flow
 		   :date date2
-		   :conversation conversation-i
+		   ;;:conversation conversation-i
+		   :interface-id interface-id-i
+		   :srcaddr srcaddr-i
+		   :srcport srcport-i
+		   :dstaddr dstaddr-i
+		   :dstport dstport-i
+		   :dprotocol protocol-i
 		   :packets packets-i
 		   :bytez bytez-i
 		   :start start-i
