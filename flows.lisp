@@ -1,6 +1,5 @@
 (in-package :metis)
-;;(declaim (optimize (debug 3)))
-(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
+;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
 (defvar *manard-flow-files* (make-hash-table :test 'equalp))
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
@@ -31,14 +30,22 @@
 	    (gethash key-name (gethash 'conversation *metis-fields*))
 	  (if seen
 	      (setf obj id)
-	      (progn
+	      (let (
+		    (interface-id-i (get-obj 'metis::interface-id interface-id))
+		    (srcaddr-i (get-obj 'metis::srcaddr srcaddr))
+		    (srcport-i (get-obj 'metis::srcport srcport))
+		    (dstaddr-i (get-obj 'metis::dstaddr dstaddr))
+		    (dstport-i (get-obj 'metis::dstport dstport))
+		    (protocol-i (get-obj 'metis::protocol protocol))
+		    )
 		(setf obj (make-instance 'conversation
-					 :interface-id interface-id
-					 :srcaddr srcaddr
-					 :srcport srcport
-					 :dstaddr dstaddr
-					 :dstport dstport
-					 :protocol protocol))
+					 :interface-id interface-id-i
+					 :srcaddr srcaddr-i
+					 :srcport srcport-i
+					 :dstaddr dstaddr-i
+					 :dstport dstport-i
+					 :protocol protocol-i
+					 ))
 		(setf (gethash key-name (gethash 'conversation *metis-fields*)) obj))))))
     ;;(format t "get-obj: klass:~A new-value:~A obj:~A~%" klass new-value obj)
     obj))
@@ -46,23 +53,23 @@
 (manardb:defmmclass date ()
   ((file :initarg :name :reader file)))
 
-;;(manardb:defmmclass interface_id ()
-;;   ((value :initarg :value :accessor value)))
+(manardb:defmmclass interface-id ()
+  ((value :initarg :value :accessor value)))
 
-;; (manardb:defmmclass srcaddr ()
-;;   ((value :initarg :value :accessor value)))
+(manardb:defmmclass srcaddr ()
+   ((value :initarg :value :accessor value)))
 
-;; (manardb:defmmclass dstaddr ()
-;;   ((value :initarg :value :accessor value)))
+(manardb:defmmclass dstaddr ()
+   ((value :initarg :value :accessor value)))
 
-;; (manardb:defmmclass srcport ()
-;;   ((value :initarg :value :accessor value)))
+(manardb:defmmclass srcport ()
+   ((value :initarg :value :accessor value)))
 
-;; (manardb:defmmclass dstport ()
-;;   ((value :initarg :value :accessor value)))
+(manardb:defmmclass dstport ()
+   ((value :initarg :value :accessor value)))
 
-;; (manardb:defmmclass protocol ()
-;;   ((value :initarg :value :accessor value)))
+(manardb:defmmclass protocol ()
+   ((value :initarg :value :accessor value)))
 
 (manardb:defmmclass packets ()
   ((value :initarg :value :accessor value)))
@@ -101,9 +108,9 @@
 ;; (defmethod print-object ((flow flow) stream)
 ;;   (format stream "#<date:~s srcaddr:~s dstaddr:~s srcport:~s dstport:~s>" (date flow) (srcaddr flow) (dstaddr flow) (srcport flow) (dstport flow)))
 
-(defparameter flow-tables '(:dates :versions :account_ids :interface_ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow-files :ips :ports))
+(defparameter flow-tables '(:dates :versions :account_ids :interface-ids :srcaddrs :dstaddrs :srcports :dstports :protocols :packetss :bytezs :starts :endfs :actions :statuss :flow-files :ips :ports))
 
-(defun bench-vpc-flows-report-sync ()
+(defun bench-vpc-flows-report-sync (dir)
   (let ((path (or dir "~/vpctiny")))
     ;;(defvar benching t)
     (let ((btime (get-internal-real-time))
@@ -146,17 +153,33 @@
      *mytasks*))
   )
 
+
 (defun get-unique-conversation ()
   "Return uniqure list of klass objects"
   (manardb:doclass (x 'metis::conversation :fresh-instances nil)
     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
       (format t "int:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"
-	      interface-id
-	      srcaddr
-	      dstaddr
-	      srcport
-	      dstport
-	      protocol))))
+	      (get-val interface-id)
+	      (get-val srcaddr)
+	      (get-val dstaddr)
+	      (get-val srcport)
+	      (get-val dstport)
+	      (get-val protocol)))))
+
+(defun get-by-ip (val)
+  (manardb:doclass (x 'metis::conversation :fresh-instances nil)
+    (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
+      (let ((srcaddr-i (get-val srcaddr))
+	    (dstaddr-i (get-val dstaddr)))
+	(if (or (string-equal val srcaddr-i) (string-equal val dstaddr-i))
+		(format t "|~A|~A|~A|~A|~A|~A|~%"
+			(get-val interface-id)
+			srcaddr-i
+			dstaddr-i
+			(get-val srcport)
+			(get-val dstport)
+			(get-val protocol)
+			))))))
 
 (defun vpc-flows-report-sync (path)
   (allocate-vpc-file-hash)
@@ -185,14 +208,10 @@
 ;; 	     (retrieve-from-index 'metis::flow (quote ,field) "53" :all t))))
 
 
-(defun get-srcaddr-list ()
-  "Return uniqure list of srcaddr"
-  (get-unique-values 'metis::srcaddr))
-
 (defun find-by-srcaddr (value)
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
     (with-slots (
-		 interface_id
+		 interface-id
 		 srcaddr
 		 dstaddr
 		 srcport
@@ -207,7 +226,7 @@
 		 ) x
       (if (cl-ppcre:all-matches value srcaddr)
 	  (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
-		  interface_id
+		  interface-id
 		  srcaddr
 		  dstaddr
 		  srcport
@@ -223,7 +242,7 @@
 (defun list-all-vpc ()
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
     (with-slots (
-		 interface_id
+		 interface-id
 		 srcaddr
 		 dstaddr
 		 srcport
@@ -237,7 +256,7 @@
 		 status
 		 ) x
       (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
-	      interface_id
+	      interface-id
 	      srcaddr
 	      dstaddr
 	      srcport
@@ -285,9 +304,7 @@
        (manardb:retrieve-all-instances 'metis::flow-files))))
 
 (defun flows-have-we-seen-this-file (file)
-
   (let ((name (get-full-filename file)))
-
     (multiple-value-bind (id seen)
 	(gethash name *manard-flow-files*)
       seen)))
@@ -301,9 +318,9 @@
   "Return uniqure list of events"
   (get-unique-values 'metis::date))
 
-(defun get-vpc-interface_id-list ()
+(defun get-vpc-interface-id-list ()
   "Return uniqure list of events"
-  (get-unique-values 'metis::interface_id))
+  (get-unique-values 'metis::interface-id))
 
 (defun get-vpc-srcaddr-list ()
   "Return uniqure list of events"
@@ -386,24 +403,24 @@
   (let* ((tokens (split-sequence:split-sequence #\Space line))
 	 (length (list-length tokens)))
     (if (= 15 length)
-	(destructuring-bind (date version account_id interface_id srcaddr dstaddr srcport dstport protocol packets bytez start end action status)
+	(destructuring-bind (date version account_id interface-id srcaddr dstaddr srcport dstport protocol packets bytez start end action status)
 	    tokens
-	  (insert-flows date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start end action status)))))
+	  (insert-flows date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start end action status)))))
 
 (defun to-epoch (date)
   (local-time:timestamp-to-unix (local-time:universal-to-timestamp (cl-date-time-parser:parse-date-time date))))
 
 
-(defun insert-flows( date interface_id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
+(defun insert-flows( date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let (
 	(date2 (to-epoch date))
-	;;(interface_id-i (get-obj 'metis::interface_id interface_id))
+	;;(interface-id-i (get-obj 'metis::interface-id interface-id))
 	;;(srcaddr-i (get-obj 'metis::srcaddr srcaddr))
 	;;(dstaddr-i (get-obj 'metis::dstaddr dstaddr))
 	;;(srcport-i (get-obj 'metis::srcport srcport))
 	;;(dstport-i (get-obj 'metis::dstport dstport))
 	;;(protocol-i (get-obj 'metis::protocol protocol))
-	(conversation-i (get-obj-conversation interface_id srcaddr srcport dstaddr dstport protocol))
+	(conversation-i (get-obj-conversation interface-id srcaddr srcport dstaddr dstport protocol))
 	(packets-i (get-obj 'metis::packets packets))
 	(bytez-i (get-obj 'metis::bytez bytez))
 	(start-i (get-obj 'metis::start start))
@@ -416,7 +433,7 @@
     (make-instance 'flow
 		   :date date2
 		   :conversation conversation-i
-		   ;;:interface_id interface_id-i
+		   ;;:interface-id interface-id-i
 		   ;;:srcaddr srcaddr-i
 		   ;;:dstaddr dstaddr-i
 		   ;;:srcport srcport-i
@@ -468,5 +485,5 @@
 ;; 	 (psql-create-table x db)) flow_tables)
 ;;     (psql-do-query "create table endpoints(id serial unique, host int references ips(id),  port int references ports(id))")
 ;;     (psql-do-query "create unique index endpoints_idx on endpoints(host,port)")
-;;     (psql-do-query "create table if not exists raw(id serial, date integer, interface_id integer, srcaddr integer, dstaddr integer, srcport integer, dstport integer, protocol integer, packets integer, bytez integer, start integer, endf integer, action integer, status integer)" database)
-;;     (psql-do-query "create or replace view flows as select dates.value as date, interface_ids.value as interface_id, srcaddrs.value as srcaddr, dstaddrs.value as dstaddr, srcports.value as srcport, dstports.value as dstport, protocols.value as protocol, packetss.value as packets, bytezs.value as bytez, starts.value as start, endfs.value as endf, actions.value as action, statuss.value as status from raw, dates, interface_ids, srcaddrs, dstaddrs, srcports, dstports, protocols, packetss, bytezs, starts, endfs, actions, statuss where dates.id = raw.date and interface_ids.id = raw.interface_id and srcaddrs.id = raw.srcaddr and dstaddrs.id = raw.dstaddr and protocols.id = raw.protocol and packetss.id = raw.packets and bytezs.id = raw.bytez and starts.id = raw.start and endfs.id = raw.endf and actions.id = raw.action and statuss.id = raw.status" database)))
+;;     (psql-do-query "create table if not exists raw(id serial, date integer, interface-id integer, srcaddr integer, dstaddr integer, srcport integer, dstport integer, protocol integer, packets integer, bytez integer, start integer, endf integer, action integer, status integer)" database)
+;;     (psql-do-query "create or replace view flows as select dates.value as date, interface-ids.value as interface-id, srcaddrs.value as srcaddr, dstaddrs.value as dstaddr, srcports.value as srcport, dstports.value as dstport, protocols.value as protocol, packetss.value as packets, bytezs.value as bytez, starts.value as start, endfs.value as endf, actions.value as action, statuss.value as status from raw, dates, interface-ids, srcaddrs, dstaddrs, srcports, dstports, protocols, packetss, bytezs, starts, endfs, actions, statuss where dates.id = raw.date and interface-ids.id = raw.interface-id and srcaddrs.id = raw.srcaddr and dstaddrs.id = raw.dstaddr and protocols.id = raw.protocol and packetss.id = raw.packets and bytezs.id = raw.bytez and starts.id = raw.start and endfs.id = raw.endf and actions.id = raw.action and statuss.id = raw.status" database)))

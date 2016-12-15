@@ -1,5 +1,5 @@
 (in-package :metis)
-(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
+;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
 (defvar *manard-files* (make-hash-table :test 'equalp))
 (defvar *metis-fields* (make-hash-table :test 'equalp))
 (defvar *metis-need-files* nil)
@@ -145,13 +145,18 @@
 		   (setf (gethash (slot-value x 'file) *manard-files*) t)))
 
 (defun get-stats ()
-  (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A convs:~A~%"
+  (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A convs:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"
 	  (manardb:count-all-instances 'metis::ct)
 	  (manardb:count-all-instances 'metis::files)
 	  (manardb:count-all-instances 'metis::flow)
 	  (manardb:count-all-instances 'metis::flow-files)
 	  (manardb:count-all-instances 'metis::errorCode)
 	  (manardb:count-all-instances 'metis::conversation)
+	  (manardb:count-all-instances 'metis::srcaddr)
+	  (manardb:count-all-instances 'metis::dstaddr)
+	  (manardb:count-all-instances 'metis::srcport)
+	  (manardb:count-all-instances 'metis::dstport)
+	  (manardb:count-all-instances 'metis::protocol)
 	  ))
 
 (fare-memoization:define-memo-function  find-username (userIdentity)
@@ -240,7 +245,7 @@
 (defun get-by-event (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
 		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (let ((val2 (slot-value eventname 'value)))
+		     (let ((val2 (get-val eventName)))
 		       (if (string-equal val val2)
 			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
 				   (get-val eventTime)
@@ -255,7 +260,7 @@
 (defun get-by-errorcode (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
 		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (let ((val2 (slot-value errorcode 'value)))
+		     (let ((val2 (get-val errorCode)))
 		       (if (string-equal val val2)
 			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
 				   (get-val eventTime)
@@ -263,9 +268,11 @@
 				   (get-val eventSource)
 				   (get-val sourceIPAddress)
 				   (get-val userAgent)
+
 				   (get-val errorMessage)
-				   (get-val errorCode))
-			   )))))
+				   val2
+				   ;;(get-val errorCode)
+			   ))))))
 
 (defun get-by-date (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
