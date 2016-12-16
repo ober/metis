@@ -426,7 +426,7 @@
 		   :srcport srcport-i
 		   :dstaddr dstaddr-i
 		   :dstport dstport-i
-		   :dprotocol protocol-i
+		   :protocol protocol-i
 		   :packets packets-i
 		   :bytez bytez-i
 		   :start start-i
