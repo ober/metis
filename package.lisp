@@ -12,6 +12,7 @@
 			    ;;:s-sql
 			    ;;:sqlite
 			    :uiop
+			    :usocket
 			    )))
 
 
