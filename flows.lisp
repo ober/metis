@@ -224,19 +224,34 @@
 	      (get-val protocol)))))
 
 (defun get-by-ip (val)
-  (manardb:doclass (x 'metis::flow :fresh-instances nil)
-    (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
-      (let ((srcaddr-i (get-val srcaddr))
-	    (dstaddr-i (get-val dstaddr)))
-	(if (or (usocket:ip= val srcaddr-i) (usocket:ip= val dstaddr-i))
-		(format t "|~A|~A|~A|~A|~A|~A|~%"
-			(get-val interface-id)
-			srcaddr-i
-			dstaddr-i
-			(get-val srcport)
-			(get-val dstport)
-			(get-val protocol)
-			))))))
+  (let ((i 0)
+	(gc-limit 1000000))
+    (manardb:doclass (x 'metis::flow :fresh-instances nil)
+		     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
+		       (let* ((srcaddr-i (get-val srcaddr))
+			      (dstaddr-i (get-val dstaddr))
+			      (smatch (usocket:ip= val srcaddr-i))
+			      (dmatch (usocket:ip= val dstaddr-i))
+			      (i 0)
+			      )
+			 ;;	(format t "gip: val:~A smatch:~A dmatch:~A srcaddr:~A dstaddr:~A" val smatch dmatch srcaddr dstaddr)
+
+			 (if (or smatch dmatch)
+			     (format t "|~A|~A|~A|~A|~A|~A|~%"
+				     (get-val interface-id)
+				     srcaddr-i
+				     dstaddr-i
+				     (get-val srcport)
+				     (get-val dstport)
+				     (get-val protocol)
+				     ))))
+		     (incf i)
+		     (if (>= i gc-limit)
+			   #+sbcl (progn
+				    (sb-ext:gc :full t)
+				    (setf i 0))
+			   )
+		     )))
 
 (defun vpc-flows-report-sync (path)
   (init-vpc-hashes)
