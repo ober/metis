@@ -7,6 +7,7 @@
 		;;:s-sql
 		:pcall
 		:uiop
+		:usocket
 		:cl-date-time-parser
 		;;:postmodern
 		))

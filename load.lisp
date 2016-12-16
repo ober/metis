@@ -7,6 +7,7 @@
 		:pcall
 		;;:postmodern
 		:manardb
+		:usocket
 		))
 
 (princ "pkgdcl")

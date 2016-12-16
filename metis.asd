@@ -21,6 +21,7 @@
 	       :manardb
 	       :quicklisp
 	       :split-sequence
+	       :usocket
 	       ;;:sqlite
 	       )
   :components (

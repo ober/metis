@@ -228,7 +228,7 @@
     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
       (let ((srcaddr-i (get-val srcaddr))
 	    (dstaddr-i (get-val dstaddr)))
-	(if (or (string-equal val srcaddr-i) (string-equal val dstaddr-i))
+	(if (or (usocket:ip= val srcaddr-i) (usocket:ip= val dstaddr-i))
 		(format t "|~A|~A|~A|~A|~A|~A|~%"
 			(get-val interface-id)
 			srcaddr-i
@@ -435,3 +435,12 @@
 		   :status status-i
 		   )
     ))
+
+;; (handler-bind
+;;     ((error #'(lambda (condition)
+;;                 (error 'load-system-definition-error
+;;                        :name name :pathname pathname
+;;                        :condition condition))))
+;;   (asdf-message (compatfmt "~&~@<; ~@;Loading system definition~@[ for ~A~] from ~A~@:>~%")
+;;                 name pathname)
+;;   (load* pathname :external-format external-format))))))

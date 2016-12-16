@@ -11,6 +11,7 @@
 		;;:postmodern
 		;;:sqlite
 		:uiop
+		:usocket
 		))
 
 (load "package.lisp")
