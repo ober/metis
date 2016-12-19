@@ -10,9 +10,6 @@
 	    (setq excl:*record-source-file-info* nil)
 	    (setq excl:*record-xref-info* nil)
 	    ;;(setq excl:*tenured-bytes-limit* 5242880000)
-	    ;;(setf excl:*global-gc-behavior* :auto)
-	    ;;(setq *GLOBAL-GC-BEHAVIOR* nil)
-	    ;;(setq excl:*global-gc-behavior* nil)
 	    (eval-when (:compile-toplevel :load-toplevel :execute)
 	      (require :acldns)))
 #+clozure (progn
@@ -32,5 +29,7 @@
 	      (setq sys:*stack-overflow-behaviour* nil)
 	      (hcl:toggle-source-debugging nil))
 #+sbcl (progn
+	 (define-alien-variable gencgc-oldest-gen-to-gc int)
+	 (setf gencgc-oldest-gen-to-gc 1)
 	 (eval-when (:compile-toplevel :load-toplevel :execute)
 	   (require :sb-sprof)))
