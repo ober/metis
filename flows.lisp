@@ -7,32 +7,27 @@
 (defvar *mytasks* (list))
 
 (manardb:defmmclass conversation ()
-   ((interface-id :initarg :interface-id :reader interface-id)
+  ((interface-id :initarg :interface-id :reader interface-id)
    (srcaddr :initarg :srcaddr :reader srcaddr)
    (srcport :initarg :srcport :reader srcport)
    (dstaddr :initarg :dstaddr :reader dstaddr)
    (dstport :initarg :dstport :reader dstport)
-   (protocol :initarg :protocol :reader protocol)
-   ))
+   (protocol :initarg :protocol :reader protocol)))
 
-
-(defun allocate-conversation-hash ()
-  (format t "allocate-conversation-hash")
-  (create-klass-hash 'conversation)
-  (manardb:doclass (x 'metis::conversation :fresh-instances nil)
-    (with-slots (interface-id srcaddr srcport dstaddr dstport protocol) x
-      (let* (
-	    (interface-id-i (get-val interface-id))
-	    (srcaddr-i (get-val srcaddr))
-	    (srcport-i (get-val srcport))
-	    (dstaddr-i (get-val dstaddr))
-	    (dstport-i (get-val dstport))
-	    (protocol-i (get-val protocol))
-	    (key-name (format nil "~A-~A-~A-~A-~A-~A" interface-id-i srcaddr-i srcport-i dstaddr-i dstport-i protocol-i))
-	    )
-	(setf (gethash key-name (gethash 'conversation *metis-fields*)) x))))
-  (format t "Done with allocate"))
-
+;; (defun allocate-conversation-hash ()
+;;   (format t "allocate-conversation-hash")
+;;   (create-klass-hash 'conversation)
+;;   (manardb:doclass (x 'metis::conversation :fresh-instances nil)
+;;     (with-slots (interface-id srcaddr srcport dstaddr dstport protocol) x
+;;       (let* ((interface-id-i (get-val interface-id))
+;; 	     (srcaddr-i (get-val srcaddr))
+;; 	     (srcport-i (get-val srcport))
+;; 	     (dstaddr-i (get-val dstaddr))
+;; 	     (dstport-i (get-val dstport))
+;; 	     (protocol-i (get-val protocol))
+;; 	      (key-name (format nil "~A-~A-~A-~A-~A-~A" interface-id-i srcaddr-i srcport-i dstaddr-i dstport-i protocol-i)))
+;; 	     (setf (gethash key-name (gethash 'conversation *metis-fields*)) x)))))
+;;   (format t "Done with allocate"))
 
 (fare-memoization:define-memo-function get-obj-conversation (interface-id srcaddr srcport dstaddr dstport protocol)
   "Return the object for a given value of klassAA"
@@ -90,19 +85,19 @@
   ((value :initarg :value :accessor value)))
 
 (manardb:defmmclass srcaddr ()
-   ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)))
 
 (manardb:defmmclass dstaddr ()
-   ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)))
 
 (manardb:defmmclass srcport ()
-   ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)))
 
 (manardb:defmmclass dstport ()
-   ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)))
 
 (manardb:defmmclass protocol ()
-   ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)))
 
 (manardb:defmmclass packets ()
   ((value :initarg :value :accessor value)))
@@ -146,7 +141,7 @@
    #'(lambda (x)
        (allocate-klass-hash x))
    vpc-fields))
-  ;;(time (allocate-conversation-hash)))
+;;(time (allocate-conversation-hash)))
 
 ;; (defmethod print-object ((flow flow) stream)
 ;;   (format stream "#<date:~s srcaddr:~s dstaddr:~s srcport:~s dstport:~s>" (date flow) (srcaddr flow) (dstaddr flow) (srcport flow) (dstport flow)))
@@ -223,35 +218,55 @@
 	      (get-val dstport)
 	      (get-val protocol)))))
 
-(defun get-by-ip (val)
-  (let ((i 0)
-	(gc-limit 1000000))
-    (manardb:doclass (x 'metis::flow :fresh-instances nil)
-		     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
-		       (let* ((srcaddr-i (get-val srcaddr))
-			      (dstaddr-i (get-val dstaddr))
-			      (smatch (usocket:ip= val srcaddr-i))
-			      (dmatch (usocket:ip= val dstaddr-i))
-			      (i 0)
-			      )
-			 ;;	(format t "gip: val:~A smatch:~A dmatch:~A srcaddr:~A dstaddr:~A" val smatch dmatch srcaddr dstaddr)
+(defun get-by-srcaddr (srcaddr)
+  (manardb:doclass (x 'metis::flow :fresh-instances nil)
+    (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
+      (let ((srcaddr2 (get-val userName)))
+	(if (string-equal val val2)
+	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+		    (get-val eventTime)
+		    val2
+		    (get-val eventSource)
+		    (get-val sourceIPAddress)
+		    (get-val userAgent)
+		    (get-val errorMessage)
+		    (get-val errorCode))
+	    )))))
 
-			 (if (or smatch dmatch)
-			     (format t "|~A|~A|~A|~A|~A|~A|~%"
-				     (get-val interface-id)
-				     srcaddr-i
-				     dstaddr-i
-				     (get-val srcport)
-				     (get-val dstport)
-				     (get-val protocol)
-				     ))))
-		     (incf i)
-		     (if (>= i gc-limit)
-			   #+sbcl (progn
-				    (sb-ext:gc :full t)
-				    (setf i 0))
-			   )
-		     )))
+(defun get-by-ip (val)
+  #+sbcl(sb-sprof:start-profiling :mode :alloc)
+  (let ((i 0)
+	(gc-limit 10000000))
+    (manardb:doclass (x 'metis::flow :fresh-instances nil)
+      (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
+	(let* ((srcaddr-i (get-val srcaddr))
+	       (dstaddr-i (get-val dstaddr))
+	       (smatch (usocket:ip= val srcaddr-i))
+	       (dmatch (usocket:ip= val dstaddr-i))
+	       (i 0)
+	       )
+	  ;;	(format t "gip: val:~A smatch:~A dmatch:~A srcaddr:~A dstaddr:~A" val smatch dmatch srcaddr dstaddr)
+	  ;;(print (room t))
+	  (if (or smatch dmatch)
+	      (format t "|~A|~A|~A|~A|~A|~A|~%"
+		      (get-val interface-id)
+		      srcaddr-i
+		      dstaddr-i
+		      (get-val srcport)
+		      (get-val dstport)
+		      (get-val protocol)
+		      ))))
+      (incf i)
+      (if (>= i gc-limit)
+	  (progn
+	    #+sbcl(progn (sb-sprof:stop-profiling) (with-open-file (f "/tmp/prof.out" :direction :output :if-exists :supersede) (sb-sprof:report :stream f)))
+	    ;;#+sbcl (progn (sb-ext:gc :full t))
+	    (print (room t))
+	    (force-output)
+	    (format t "done~%")
+	    (setf i 0)))
+      )))
+
 
 (defun vpc-flows-report-sync (path)
   (init-vpc-hashes)

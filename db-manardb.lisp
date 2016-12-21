@@ -217,7 +217,8 @@
   "Return uniqure list of events"
   (get-unique-values 'metis::sourceIPAddress))
 
-(fare-memoization:define-memo-function get-val (obj)
+;;(fare-memoization:define-memo-function get-val (obj)
+(defun get-val (obj)
   (if (null obj)
       obj
       (slot-value obj 'value)))

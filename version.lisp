@@ -29,7 +29,5 @@
 	      (setq sys:*stack-overflow-behaviour* nil)
 	      (hcl:toggle-source-debugging nil))
 #+sbcl (progn
-	 (define-alien-variable gencgc-oldest-gen-to-gc int)
-	 (setf gencgc-oldest-gen-to-gc 1)
 	 (eval-when (:compile-toplevel :load-toplevel :execute)
 	   (require :sb-sprof)))
