@@ -53,11 +53,9 @@
   (print "vs - vpc-flows-report-sync arg")
 )
 
-
-
 (defun process-args (args)
   ;;(in-package :cl-user)
-  ;;(define-alien-variable "gencgc-oldest-gen-to-gc" (unsigned 8))
+  ;;(define-alien-variable "gencgc-oldest-gen-to-gc" (unsigned 8))(setf gencgc-oldest-gen-to-gc 1)
   ;;(setf gencgc-oldest-gen-to-gc 1)
   ;;(in-package :metis)
   (init-manardb)

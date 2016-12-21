@@ -196,15 +196,10 @@
     (walk-ct path #'async-vf-file)
     (mapc
      #'(lambda (x)
-	 (if (typep x 'pcall::task)
-	     (progn
-	       ;;(format t "~%here:~A" (type-of x))
-	       (pcall:join x))
-	     (format t "~%not ~A" (type-of x))
-	     ))
-     *mytasks*))
-  )
-
+	 (handler-case
+	     (pcall:join x)
+	   (t (e) (format t "~%~%Error:~A on join of ~A" e x))))
+     *mytasks*)))
 
 (defun get-unique-conversation ()
   "Return uniqure list of klass objects"
@@ -218,20 +213,20 @@
 	      (get-val dstport)
 	      (get-val protocol)))))
 
-(defun get-by-srcaddr (srcaddr)
-  (manardb:doclass (x 'metis::flow :fresh-instances nil)
-    (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
-      (let ((srcaddr2 (get-val userName)))
-	(if (string-equal val val2)
-	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-		    (get-val eventTime)
-		    val2
-		    (get-val eventSource)
-		    (get-val sourceIPAddress)
-		    (get-val userAgent)
-		    (get-val errorMessage)
-		    (get-val errorCode))
-	    )))))
+;; (defun get-by-srcaddr (srcaddr)
+;;   (manardb:doclass (x 'metis::flow :fresh-instances nil)
+;;     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
+;;       (let ((srcaddr2 (get-val userName)))
+;; 	(if (string-equal val val2)
+;; 	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+;; 		    (get-val eventTime)
+;; 		    val2
+;; 		    (get-val eventSource)
+;; 		    (get-val sourceIPAddress)
+;; 		    (get-val userAgent)
+;; 		    (get-val errorMessage)
+;; 		    (get-val errorCode))
+;; 	    )))))
 
 (defun get-by-ip (val)
   #+sbcl(sb-sprof:start-profiling :mode :alloc)
@@ -398,27 +393,34 @@
   "Return uniqure list of events"
   (get-unique-values 'metis::status))
 
+
 (defun process-vf-file (file)
   (when (equal (pathname-type file) "gz")
+    (room t)
     (unless (flows-have-we-seen-this-file file)
-      (progn
-	(format t "+")
-	(flow-mark-file-processed file)
-	(gzip-stream:with-open-gzip-file (in file)
-	  (let ((i 0)
-		(btime (get-internal-real-time)))
-	    (loop
-	       for line = (read-line in nil nil)
-	       while line
-	       collect (progn
-			 (incf i)
-			 (process-vf-line line)))
-	    (let* ((etime (get-internal-real-time))
-		   (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
-		   (rps (/ (float i) (float delta))))
-	      (format t "~%rps:~A rows:~A delta:~A" rps i delta)))))
+      (handler-case
+       (progn
+	 (format t "+")
+	 (flow-mark-file-processed file)
+	 (gzip-stream:with-open-gzip-file (in file)
+	   (let ((i 0)
+		 (btime (get-internal-real-time)))
+	     (loop
+		for line = (read-line in nil nil)
+		while line
+		collect (progn
+			  (incf i)
+			  (process-vf-line line)))
+	     (let* ((etime (get-internal-real-time))
+		    (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
+		    (rps (/ (float i) (float delta))))
+	       (format t "~%rps:~A rows:~A delta:~A" rps i delta))
+	     #+sbcl (sb-ext:gc :full t) ;;ard
+	     )))
+       (t (e) (format t "~%SHIT~%SHIT~%Error:~A~%SHIT~%SHIT~%" e)))
       (format t "-"))))
 
+(declaim (inline process-vf-line))
 (defun process-vf-line (line)
   (let* ((tokens (split-sequence:split-sequence #\Space line))
 	 (length (list-length tokens)))
