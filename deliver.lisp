@@ -23,7 +23,8 @@
 (ql:quickload "trivial-dump-core")
 
 #+sbcl
-(sb-ext:save-lisp-and-die "dist/sbcl/metis" :compression 5 :executable t :toplevel 'metis:main :save-runtime-options t)
+(sb-ext:save-lisp-and-die "dist/sbcl/metis" :executable t :toplevel 'metis:main :save-runtime-options t)
+;;(sb-ext:save-lisp-and-die "dist/sbcl/metis" :compression 5 :executable t :toplevel 'metis:main :save-runtime-options t)
 
 #+(or ccl ccl64 )
 (trivial-dump-core:save-executable "dist/ccl/metis" #'metis:main)

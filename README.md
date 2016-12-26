@@ -3,3 +3,16 @@
 
 
 ### To Build see `Makefile`
+
+
+
+### Flows layout
+
+*** Hosts object
+- name
+- ip
+- sport
+- dport
+- partners
+
+*** Partners
