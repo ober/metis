@@ -129,3 +129,16 @@ is replaced with replacement."
 	 (dir2 (nth (- length 3) split))
 	 (dir3 (nth (- length 4) split)))
     (format nil "~A/~A/~A/~A" dir3 dir2 dir1 (file-namestring x))))
+
+(defun thread-safe-hash-table ()
+  "Return a thread safe hash table"
+  (let ((size 100000)
+	(rehash-size 2.0)
+	(rehash-threshold 0.7))
+  #+sbcl
+  (make-hash-table :synchronized t :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
+  #+ccl
+  (make-hash-table :shared :lock-free :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
+  #+(or allegro lispworks)
+  (make-hash-table :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
+  ))
