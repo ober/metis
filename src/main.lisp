@@ -80,6 +80,7 @@
       ((equal "lvdp" verb)(get-vpc-srcport-list))
       ((equal "lvi" verb)(get-vpc-interface-id-list))
       ((equal "lvip" verb)(get-by-ip alpha))
+      ((equal "lvip2" verb)(get-by-ip2 alpha))
       ((equal "lvp" verb)(get-vpc-protocols-list))
       ((equal "lvpc" verb)(time (list-all-vpc)))
       ((equal "lvs" verb)(get-vpc-status-list))

@@ -132,7 +132,7 @@ is replaced with replacement."
 
 (defun thread-safe-hash-table ()
   "Return a thread safe hash table"
-  (let ((size 100000)
+  (let ((size 1000000)
 	(rehash-size 2.0)
 	(rehash-threshold 0.7))
   #+sbcl

@@ -7,8 +7,7 @@
   :license "MIT"
   :class :package-inferred-system
   :defsystem-depends-on (:asdf-package-system)
-  :depends-on (
-	       :cl-date-time-parser
+  :depends-on (:cl-date-time-parser
 	       :cl-fad
 	       :cl-json
 	       :fare-memoization
@@ -24,17 +23,18 @@
 	       :usocket
 	       ;;:sqlite
 	       )
-  :components (
-	       (:file "package")
-	       (:file "ctcl" :depends-on ("package" "utils" "database"))
-	       (:file "utils" :depends-on ("package" "database"))
-	       (:file "version" :depends-on ("package"))
-	       (:file "bench" :depends-on ("package" "ctcl"))
-	       (:file "database" :depends-on ("package"))
-;;	       (:file "db-postgres" :depends-on ("package" "database"))
-;;	       (:file "db-sqlite" :depends-on ("package" "database"))
-	       (:file "db-manardb" :depends-on ("package" "database"))
-	       (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))
-	       (:file "main" :depends-on ("package" "ctcl" "utils" "database" "flows"))
-	       (:file "pkgdcl" :depends-on ("package" "ctcl" "utils" "database"))
-	       ))
+  :components ((:module src :serial t
+			:components (
+				     (:file "package")
+				     (:file "ctcl")
+				     (:file "utils")
+				     (:file "version" :depends-on ("package"))
+				     (:file "bench" :depends-on ("package" "ctcl"))
+				     (:file "database" :depends-on ("package"))
+				     ;;	       (:file "db-postgres" :depends-on ("package" "database"))
+				     ;;	       (:file "db-sqlite" :depends-on ("package" "database"))
+				     (:file "db-manardb" :depends-on ("package" "database"))
+				     (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))
+				     (:file "main" :depends-on ("package" "ctcl" "utils" "database" "flows"))
+				     (:file "pkgdcl" :depends-on ("package" "ctcl" "utils" "database"))
+				     ))))

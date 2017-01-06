@@ -6,7 +6,7 @@ usage:
 
 lispworks:
 	@ mkdir -p dist/lispworks
-	@ ~/lw-console -build deliver.lisp
+	@ cd src && lispworks -build deliver.lisp
 
 ecl:
 	@ mkdir -p dist/ecl
@@ -14,10 +14,10 @@ ecl:
 
 sbcl:
 	@ mkdir -p dist/sbcl
-	@ cat deliver.lisp|sbcl  --dynamic-space-size 20480 #--disable-debugger
+	@ cat src/deliver.lisp|sbcl  --dynamic-space-size 20480 #--disable-debugger
 ccl:
 	@ mkdir -p dist/ccl || true
-	@ cat deliver.lisp|ccl64
+	@ cd src && cat deliver.lisp|ccl64
 
 clisp:
 	@ mkdir -p dist/clisp || true
@@ -26,9 +26,9 @@ clisp:
 allegro:
 	@ rm -rf dist/allegro metis
 	@ mkdir -p dist/allegro
-	@ cat deliver.lisp|allegro
-	@ mv metis/* dist/allegro
-	@ rm -rf metis
+	@ cd src && cat deliver.lisp|allegro
+	@ mv src/metis/* dist/allegro
+	@ rm -rf src/metis
 
 abcl:
 	@ mkdir -p dist/abcl || true

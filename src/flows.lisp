@@ -229,31 +229,6 @@
 
 
 
-(manardb:defmmclass srcaddr ()
-  ((value :initarg :value :accessor srcaddr-value)))
-
-(manardb:defmmclass dstaddr ()
-  ((value :initarg :value :accessor value)))
-
-
-(manardb:defmmclass flow ()
-  ((date :initarg :date :accessor date)
-   ;;(conversation :initarg :conversation :accessor conversation)
-   (interface-id :initarg :interface-id :reader interface-id)
-   (srcaddr :initarg :srcaddr :reader srcaddr)
-   (srcport :initarg :srcport :reader srcport)
-   (dstaddr :initarg :dstaddr :reader dstaddr)
-   (dstport :initarg :dstport :reader dstport)
-   (protocol :initarg :protocol :reader protocol)
-   (packets :initarg :packets :accessor packets)
-   (bytez :initarg :bytez :accessor bytez)
-   (start :initarg :start :accessor start)
-   (endf :initarg :endf :accessor endf)
-   (action :initarg :action :accessor action)
-   (status :initarg :status :accessor status)))
-
-
-
 (defun get-by-ip (val)
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
