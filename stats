@@ -1,0 +1,1 @@
+echo "(ql:quickload :metis)(metis::init-manards) (format t "ct:~A files~A~%" (manardb:count-all-instances 'metis::ct) (manardb:count-all-instances 'metis::files))" |sbcly

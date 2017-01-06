@@ -1,0 +1,2 @@
+(ql:quickload :metis)
+(time (metis::cloudtrail-report-async "100" "~/month"))

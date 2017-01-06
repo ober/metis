@@ -1,0 +1,4 @@
+(ql:quickload :metis)
+(ql:quickload :closer-mop)
+(metis::init-manard)
+(metis::cloudtrail-report-async "5" "~/dec")

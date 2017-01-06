@@ -1,0 +1,8 @@
+(ql:quickload :metis)
+(prof:start-profiler :type :time :count t)
+(metis::vpc-flows-report-sync "~/vpctiny/")
+;;(manardb:close-all-mmaps)
+(prof:show-flat-profile)
+(prof:show-call-graph)
+(prof:show-call-counts)
+(prof:disassemble-profile #'metis::vpc-flows-report-sync)

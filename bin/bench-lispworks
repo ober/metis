@@ -1,0 +1,3 @@
+(ql:quickload :metis)
+(hcl:set-up-profiler :package '(metis))
+(hcl:profile (metis::vpc-flows-report-sync "~/vpctiny"))

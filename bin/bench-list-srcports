@@ -1,0 +1,12 @@
+(ql:quickload :metis)
+(metis::init-manardb)
+#+sbcl (sb-sprof:with-profiling (:report :flat) (metis::get-vpc-srcport-list))
+#+lispworks (progn
+	      (hcl:set-up-profiler :package '(metis))
+	      (hcl:profile (metis::get-vpc-srcport-list)))
+#+allegro (progn
+	    (prof:start-profiler :type :time :count t)
+	    (time (metis::get-vpc-srcport-list))
+	    (prof::show-flat-profile))
+#+(or clozure abcl ecl)
+(time (metis::get-vpc-srcport-list))

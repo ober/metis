@@ -1,0 +1,2 @@
+(ql:quickload :metis)
+(sb-sprof:with-profiling (:report :flat) (metis::vpc-flows-report-sync "~/vpctiny"))
