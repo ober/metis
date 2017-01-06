@@ -146,7 +146,6 @@
 ;; (defmethod print-object ((flow flow) stream)
 ;;   (format stream "#<date:~s srcaddr:~s dstaddr:~s srcport:~s dstport:~s>" (date flow) (srcaddr flow) (dstaddr flow) (srcport flow) (dstport flow)))
 
-
 (defun bench-vpc-flows-report-sync (dir)
   (init-vpc-hashes)
   (let ((path (or dir "~/vpctiny")))

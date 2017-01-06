@@ -22,20 +22,27 @@
 	    ip))))
 
 (defun read-json-gzip-file (file)
-  (let ((json (get-json-gzip-contents file)))
-    (jonathan:parse json)))
+  (handler-case
+      (progn
+	(let ((json (get-json-gzip-contents file)))
+	  (jonathan:parse json)))
+    (t (e) (error-print "read-json-gzip-file" e))))
+
+
+(defun error-print (fn error)
+  (format t "~%~A~%~A~%~A~%~A~%~A~%" fn fn error fn fn))
 
 #-(or clozure sbcl allegro)
 (defun get-json-gzip-contents (file)
   (uiop:run-program
    (format nil "zcat ~A" file)
-    :output :string))
+   :output :string))
 
 #+(or clozure sbcl allegro)
 (defun get-json-gzip-contents (file)
   (first (gzip-stream:with-open-gzip-file (in file)
-    (loop for l = (read-line in nil nil)
-       while l collect l))))
+	   (loop for l = (read-line in nil nil)
+	      while l collect l))))
 
 (defun cdr-assoc (item a-list &rest keys)
   (cdr (apply #'assoc item a-list keys)))

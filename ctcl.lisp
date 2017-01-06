@@ -36,20 +36,22 @@
   (car (cl-ppcre:split #\.
 		       (nth 4 (cl-ppcre:split "_" (file-namestring file))))))
 
-
 (defun parse-ct-contents (x)
   "process the json output"
-  (let* ((records (second (read-json-gzip-file x)))
-	 (num (length records))
-	 (btime (get-internal-real-time)))
-    (dolist (x records)
-      (normalize-insert (process-record x *fields*)))
-    (let* ((etime (get-internal-real-time))
-	   (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
-	   (rps (ignore-errors (/ (float num) (float delta)))))
-      (if (> num 100)
-	  (format t "~%rps:~A rows:~A delta:~A" rps num delta))
-      )))
+  (handler-case
+      (progn
+	(let* ((records (second (read-json-gzip-file x)))
+	       (num (length records))
+	       (btime (get-internal-real-time)))
+	  (dolist (x records)
+	    (normalize-insert (process-record x *fields*)))
+	  (let* ((etime (get-internal-real-time))
+		 (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
+		 (rps (ignore-errors (/ (float num) (float delta)))))
+	    (if (> num 100)
+		(format t "~%rps:~A rows:~A delta:~A" rps num delta))
+	    )))
+    (t (e) (error-print "read-json-gzip-file" e))))
 
 (defun cloudtrail-report-sync (path)
   (setf *metis-need-files* t)
