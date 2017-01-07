@@ -311,20 +311,20 @@
 		    (get-val errorCode))
 	    )))))
 
-(defun get-by-ip (val)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (let ((val2 (slot-value eventSource 'value)))
-	(if (string-equal val val2)
-	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-		    (get-val eventTime)
-		    (get-val userName)
-		    (get-val eventSource)
-		    (get-val sourceIPAddress)
-		    (get-val userAgent)
-		    (get-val errorMessage)
-		    (get-val errorCode))
-	    )))))
+;; (defun get-by-ip (val)
+;;   (manardb:doclass (x 'metis::ct :fresh-instances nil)
+;;     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+;;       (let ((val2 (slot-value eventSource 'value)))
+;; 	(if (string-equal val val2)
+;; 	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+;; 		    (get-val eventTime)
+;; 		    (get-val userName)
+;; 		    (get-val eventSource)
+;; 		    (get-val sourceIPAddress)
+;; 		    (get-val userAgent)
+;; 		    (get-val errorMessage)
+;; 		    (get-val errorCode))
+;; 	    )))))
 
 ;; (let ((obj-list (get-obj-by-val 'username name)))
 ;;   (manardb:doclass (x 'metis::ct :fresh-instances nil)
