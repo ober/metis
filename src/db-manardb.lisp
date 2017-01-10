@@ -154,13 +154,12 @@
       (setf (gethash value (gethash klass *metis-fields*)) x))))
 
 (defun get-stats ()
-  (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A convs:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"
+  (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"
 	  (manardb:count-all-instances 'metis::ct)
 	  (manardb:count-all-instances 'metis::files)
 	  (manardb:count-all-instances 'metis::flow)
 	  (manardb:count-all-instances 'metis::flow-files)
 	  (manardb:count-all-instances 'metis::errorCode)
-	  (manardb:count-all-instances 'metis::conversation)
 	  (manardb:count-all-instances 'metis::srcaddr)
 	  (manardb:count-all-instances 'metis::dstaddr)
 	  (manardb:count-all-instances 'metis::srcport)

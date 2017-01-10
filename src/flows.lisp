@@ -6,62 +6,6 @@
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
 
-(manardb:defmmclass conversation ()
-  ((interface-id :initarg :interface-id :reader interface-id)
-   (srcaddr :initarg :srcaddr :reader srcaddr)
-   (srcport :initarg :srcport :reader srcport)
-   (dstaddr :initarg :dstaddr :reader dstaddr)
-   (dstport :initarg :dstport :reader dstport)
-   (protocol :initarg :protocol :reader protocol)))
-
-;; (defun allocate-conversation-hash ()
-;;   (format t "allocate-conversation-hash")
-;;   (create-klass-hash 'conversation)
-;;   (manardb:doclass (x 'metis::conversation :fresh-instances nil)
-;;     (with-slots (interface-id srcaddr srcport dstaddr dstport protocol) x
-;;       (let* ((interface-id-i (get-val interface-id))
-;; 	     (srcaddr-i (get-val srcaddr))
-;; 	     (srcport-i (get-val srcport))
-;; 	     (dstaddr-i (get-val dstaddr))
-;; 	     (dstport-i (get-val dstport))
-;; 	     (protocol-i (get-val protocol))
-;; 	      (key-name (format nil "~A-~A-~A-~A-~A-~A" interface-id-i srcaddr-i srcport-i dstaddr-i dstport-i protocol-i)))
-;; 	     (setf (gethash key-name (gethash 'conversation *metis-fields*)) x)))))
-;;   (format t "Done with allocate"))
-
-(fare-memoization:define-memo-function get-obj-conversation (interface-id srcaddr srcport dstaddr dstport protocol)
-  "Return the object for a given value of klassAA"
-
-  (let ((obj nil)
-	(key-name (format nil "~A-~A-~A-~A-~A-~A" interface-id srcaddr srcport dstaddr dstport protocol)))
-    (unless (or (null interface-id) (null srcaddr) (null srcport) (null dstaddr) (null dstport) (null protocol))
-      (progn
-	(create-klass-hash 'conversation)
-	(multiple-value-bind (id seen)
-	    (gethash key-name (gethash 'conversation *metis-fields*))
-	  (if seen
-	      (setf obj id)
-	      (let (
-		    (interface-id-i (get-obj 'metis::interface-id interface-id))
-		    (srcaddr-i (get-obj 'metis::srcaddr srcaddr))
-		    (srcport-i (get-obj 'metis::srcport srcport))
-		    (dstaddr-i (get-obj 'metis::dstaddr dstaddr))
-		    (dstport-i (get-obj 'metis::dstport dstport))
-		    (protocol-i (get-obj 'metis::protocol protocol))
-		    )
-		(setf obj (make-instance 'conversation
-					 :interface-id interface-id-i
-					 :srcaddr srcaddr-i
-					 :srcport srcport-i
-					 :dstaddr dstaddr-i
-					 :dstport dstport-i
-					 :protocol protocol-i
-					 ))
-		(setf (gethash key-name (gethash 'conversation *metis-fields*)) obj))))))
-    ;;(format t "get-obj: klass:~A new-value:~A obj:~A~%" klass new-value obj)
-    obj))
-
-
 (defvar vpc-fields '(
 		     metis::bytez
 		     metis::date
@@ -77,45 +21,71 @@
 		     metis::status
 		     ))
 
+;;date version account_id interface-id srcaddr dstaddr srcport dstport protocol packets bytez start end action status
+;;2016-08-01T00:28:14.000Z 2 224108527019 eni-0016955d 10.16.3.11 10.16.11.123 53 53573 17 2 186 1470011294 1470011354 ACCEPT OK
 
 (manardb:defmmclass date ()
   ((file :initarg :name :reader file)))
 
 (manardb:defmmclass interface-id ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id)
+   (idx :initarg idx :accessor idx)))
 
 (manardb:defmmclass srcaddr ()
-  ((value :initarg :value :accessor srcaddr-value)))
+  ((value :initarg :value :accessor srcaddr-value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor srcaddr-idx)))
 
 (manardb:defmmclass dstaddr ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass srcport ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass dstport ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass protocol ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass packets ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass bytez ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass start ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass endf ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass action ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass status ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (max-id :initarg :max-id :accessor max-id :allocation :class)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass flow ()
   ((date :initarg :date :accessor date)
@@ -227,8 +197,6 @@
 ;; 		    (get-val errorCode))
 ;; 	    )))))
 
-
-
 (defun get-by-ip (val)
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
@@ -236,49 +204,17 @@
 	     (dstaddr-i (get-val dstaddr))
 	     (smatch (usocket:ip= val srcaddr-i))
 	     (dmatch (usocket:ip= val dstaddr-i)))
-	  (if (or smatch dmatch)
-	      (format t "|~A|~A|~A|~A|~A|~A|~%"
-		      (get-val interface-id)
-		      srcaddr-i
-		      dstaddr-i
-		      (get-val srcport)
-		      (get-val dstport)
-		      (get-val protocol)
-		      ))))))
+	;;(format t "smatch:~A val:~A srcaddr-i:~A~%" smatch val srcaddr-i)
+	(if (or smatch dmatch)
+	    (format t "|~A|~A|~A|~A|~A|~A|~%"
+		    (get-val interface-id)
+		    srcaddr-i
+		    dstaddr-i
+		    (get-val srcport)
+		    (get-val dstport)
+		    (get-val protocol)
+		    ))))))
 
-
-(defun get-by-ip2 (val)
-  (let ((srcaddr-entry nil)
-	(dstaddr-entry nil))
-
-    (time (manardb:doclass (x 'metis::srcaddr :fresh-instances nil)
-	    (with-slots (value) x
-	      (if (usocket:ip= value val)
-		  (progn
-		    (format t "~%Srcaddr Match: val:~A value:~A x:~A~%" val value x)
-		    (setf srcaddr-entry (format nil "~A" x)))))))
-
-    (time (manardb:doclass (x 'metis::dstaddr :fresh-instances nil)
-    	    (with-slots (value) x
-    	      (if (usocket:ip= value val)
-    		  (progn
-    		    (format t "~%Dstaddr Match: val:~A value:~A x:~A~%" val value x)
-    		    (setf dstaddr-entry (format nil "~A" x)))))))
-
-    (if (or srcaddr-entry dstaddr-entry)
-	(time (manardb:doclass (x 'metis::flow :fresh-instances t)
-		(with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
-		  (if (or
-		       (string-equal srcaddr-entry (format nil "~A" srcaddr))
-		       (string-equal dstaddr-entry (format nil "~A" dstaddr)))
-		      (format t "|~A|~A|~A|~A|~A|~A|~%"
-			      (get-val interface-id)
-			      (get-val srcaddr)
-			      (get-val dstaddr)
-			      (get-val srcport)
-			      (get-val dstport)
-			      (get-val protocol)
-			      ))))))))
 
 (defun vpc-flows-report-sync (path)
   (init-vpc-hashes)
@@ -413,7 +349,7 @@
 
 (defun process-vf-file (file)
   (when (equal (pathname-type file) "gz")
-    (room t)
+    ;;(room t)
     (unless (flows-have-we-seen-this-file file)
       (handler-case
 	  (progn
@@ -449,22 +385,45 @@
 (defun to-epoch (date)
   (local-time:timestamp-to-unix (local-time:universal-to-timestamp (cl-date-time-parser:parse-date-time date))))
 
-(defun insert-flows( date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
+
+(fare-memoization:define-memo-function get-idx (klass new-value)
+  "Return the object for a given value of klass"
+  (let ((obj nil)
+	(nid nil)
+	(max-id nil))
+    (unless (or (null klass) (null new-value))
+      (progn
+	(create-klass-hash klass)
+
+	(multiple-value-bind (id seen)
+	    (gethash new-value (gethash klass *metis-fields*))
+	  (if seen
+	      (setf nid id)
+	      (progn
+		(setf obj (make-instance klass :value new-value))
+		(setf (gethash new-value (gethash klass *metis-fields*)) obj)
+		(if (null (max-id obj)) ;; first object in this class
+		    (setf max-id 0))
+		(setf (slot-value obj 'max-id) (+ 1 max-id))
+		(setf (slot-value obj 'idx) (+ 1 max-id))
+		(setf id (slot-value obj 'idx)))))
+	  nid))))
+
+(defun insert-flows (date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let (
 	(date2 (to-epoch date))
-	;;(conversation-i (get-obj-conversation interface-id srcaddr srcport dstaddr dstport protocol))
-	(interface-id-i (get-obj 'metis::interface-id interface-id))
-	(srcaddr-i (get-obj 'metis::srcaddr srcaddr))
-	(srcport-i (get-obj 'metis::srcport srcport))
-	(dstaddr-i (get-obj 'metis::dstaddr dstaddr))
-	(dstport-i (get-obj 'metis::dstport dstport))
-	(protocol-i (get-obj 'metis::protocol protocol))
-	(packets-i (get-obj 'metis::packets packets))
-	(bytez-i (get-obj 'metis::bytez bytez))
-	(start-i (get-obj 'metis::start start))
-	(endf-i (get-obj 'metis::endf endf))
-	(action-i (get-obj 'metis::action action))
-	(status-i (get-obj 'metis::status status))
+	(interface-id-i (get-idx 'metis::interface-id interface-id))
+	(srcaddr-i (get-idx 'metis::srcaddr srcaddr))
+	(srcport-i (get-idx 'metis::srcport srcport))
+	(dstaddr-i (get-idx 'metis::dstaddr dstaddr))
+	(dstport-i (get-idx 'metis::dstport dstport))
+	(protocol-i (get-idx 'metis::protocol protocol))
+	(packets-i (get-idx 'metis::packets packets))
+	(bytez-i (get-idx 'metis::bytez bytez))
+	(start-i (get-idx 'metis::start start))
+	(endf-i (get-idx 'metis::endf endf))
+	(action-i (get-idx 'metis::action action))
+	(status-i (get-idx 'metis::status status))
 	)
 
     (make-instance 'flow
@@ -481,9 +440,9 @@
 		   :start start-i
 		   :endf endf-i
 		   :action action-i
-		   :status status-i
-		   )
-    ))
+		   :status status-i)))
+
+
 
 ;; (handler-bind
 ;;     ((error #'(lambda (condition)
