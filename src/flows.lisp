@@ -182,21 +182,6 @@
 	      (get-val dstport)
 	      (get-val protocol)))))
 
-;; (defun get-by-srcaddr (srcaddr)
-;;   (manardb:doclass (x 'metis::flow :fresh-instances nil)
-;;     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
-;;       (let ((srcaddr2 (get-val userName)))
-;; 	(if (string-equal val val2)
-;; 	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-;; 		    (get-val eventTime)
-;; 		    val2
-;; 		    (get-val eventSource)
-;; 		    (get-val sourceIPAddress)
-;; 		    (get-val userAgent)
-;; 		    (get-val errorMessage)
-;; 		    (get-val errorCode))
-;; 	    )))))
-
 (defun get-by-ip (val)
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
@@ -388,26 +373,27 @@
 
 (fare-memoization:define-memo-function get-idx (klass new-value)
   "Return the object for a given value of klass"
-  (let ((obj nil)
-	(nid nil)
-	(max-id nil))
-    (unless (or (null klass) (null new-value))
-      (progn
-	(create-klass-hash klass)
+  (if (and klass new-value)
+      (let ((klass-hash (gethash klass *metis-fields*))
+	    (nid nil))
+	(progn
+	  (multiple-value-bind (id seen)
+	      (gethash new-value klass-hash)
+	    (if seen
+		(setf nid id)
+		(progn
+		  (setf obj (make-instance klass :value new-value))
+		  (format t "klass length ~A~%" (length (alexandria:hash-table-values klass-hash)))
 
-	(multiple-value-bind (id seen)
-	    (gethash new-value (gethash klass *metis-fields*))
-	  (if seen
-	      (setf nid id)
-	      (progn
-		(setf obj (make-instance klass :value new-value))
-		(setf (gethash new-value (gethash klass *metis-fields*)) obj)
-		(if (null (max-id obj)) ;; first object in this class
-		    (setf max-id 0))
-		(setf (slot-value obj 'max-id) (+ 1 max-id))
-		(setf (slot-value obj 'idx) (+ 1 max-id))
-		(setf id (slot-value obj 'idx)))))
-	  nid))))
+		  1)))))))
+		;; 	  (if (null
+	  ;; 	(setf (gethash new-value klass-hash) obj)
+	  ;; 	(setf
+	  ;; 	 (+ 1
+	  ;; 	(setf (slot-value obj 'max-id) (+ 1 max-id))
+	  ;; 	(setf (slot-value obj 'idx) (+ 1 max-id))
+	  ;; 	(setf nid (slot-value obj 'idx)))))
+	  ;; nid))))
 
 (defun insert-flows (date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let (
@@ -426,6 +412,8 @@
 	(status-i (get-idx 'metis::status status))
 	)
 
+    (format t "~{~A, ~}~%" (list date2 interface-id-i srcaddr-i dstaddr-i srcport-i dstport-i protocol-i packets-i bytez-i start-i endf-i action-i status-i))
+
     (make-instance 'flow
 		   :date date2
 		   ;;:conversation conversation-i
@@ -441,14 +429,3 @@
 		   :endf endf-i
 		   :action action-i
 		   :status status-i)))
-
-
-
-;; (handler-bind
-;;     ((error #'(lambda (condition)
-;;                 (error 'load-system-definition-error
-;;                        :name name :pathname pathname
-;;                        :condition condition))))
-;;   (asdf-message (compatfmt "~&~@<; ~@;Loading system definition~@[ for ~A~] from ~A~@:>~%")
-;;                 name pathname)
-;;   (load* pathname :external-format external-format))))))

@@ -148,10 +148,12 @@
     (setf (gethash (slot-value x 'file) *manard-files*) t)))
 
 (defun allocate-klass-hash (klass)
-  (create-klass-hash klass)
-  (manardb:doclass (x klass :fresh-instances nil)
-    (with-slots (value) x
-      (setf (gethash value (gethash klass *metis-fields*)) x))))
+  (format t "allocating class:~A~%" klass)
+  (time (progn
+	  (create-klass-hash klass)
+	  (manardb:doclass (x klass :fresh-instances nil)
+	    (with-slots (value idx) x
+	      (setf (gethash value (gethash klass *metis-fields*)) idx))))))
 
 (defun get-stats ()
   (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"
@@ -196,8 +198,8 @@
 (defun get-unique-values (klass)
   "Return uniqure list of klass objects"
   (manardb:doclass (x klass :fresh-instances nil)
-    (with-slots (value) x
-      (format t "~%~A" value))))
+    (with-slots (value idx) x
+      (format t "~%~A: ~A" idx value))))
 ;; lists
 
 (defun get-event-list ()

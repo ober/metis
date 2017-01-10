@@ -71,7 +71,7 @@
 ;;     (with-slots (list tail) queue
 ;;       (cond ((cddddr list)
 ;; 	     ;; at least five elements, so print ellipsis
-;; 	     (format stream "(~{~S ~}... ~S)"
+;; 	     (format stream "(~{T~S ~}... ~S)"
 ;; 		     (subseq list 0 3) (first tail)))
 ;; 	    ;; otherwise print whole list
 ;; 	    (t (format stream "~:S" list))))))
