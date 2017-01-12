@@ -379,10 +379,9 @@
 
 
 (defun get-next-idx (klass-hash)
-  (if (hash-table-p klass-hash)
-      (let ((next (max (alexandria:hash-table-values klass-hash))))
-	(format t "gnix: klass:~A next:~A~%" klass-hash (+ (parse-integer next) 1))
-	(+ (parse-integer next) 1))))
+  (let ((next (parse-integer (max (alexandria:hash-table-values klass-hash)))))
+    (format t "gnix: klass:~A next:~A~%" klass-hash next)
+    next))
     ;;     (setf (gethash new-value klass-hash) obj)
 ;;        (setf
 ;; 	(+ 1
@@ -398,7 +397,8 @@
   "Return the object for a given value of klass"
   (if (and klass new-value)
       (let ((klass-hash (gethash klass *metis-fields*))
-	    (nid nil))
+	    (nid nil)
+	    (obj nil))
 	(unless (hash-table-p klass-hash)
 	  (format t "XXX: no valid hash table for klass:~A in get-idx~%" klass))
 	(multiple-value-bind (id seen)
