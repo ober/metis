@@ -19,6 +19,7 @@
 		     metis::srcport
 		     metis::start
 		     metis::status
+		     metis::action
 		     ))
 
 ;;date version account_id interface-id srcaddr dstaddr srcport dstport protocol packets bytez start end action status
@@ -382,7 +383,7 @@
       (let ((next 0))
 	(format t "gnix: klass:~A length:~A~%" klass-hash (length (alexandria:hash-table-keys klass-hash)))
 	1)
-      (format "got klass-hash:~A~% which is NOT a hash. wtf?~%" klass-hash)))
+      (format t "got klass-hash:~A~% which is NOT a hash. wtf?~%" klass-hash)))
 
 
     ;;     (setf (gethash new-value klass-hash) obj)
@@ -401,6 +402,8 @@
   (if (and klass new-value)
       (let ((klass-hash (gethash klass *metis-fields*))
 	    (nid nil))
+	(unless (hash-table-p klass-hash)
+	  (format t "XXX: no valid hash table for klass:~A in get-idx~%" klass))
 	(multiple-value-bind (id seen)
 	    (gethash new-value klass-hash)
 	  (if seen
