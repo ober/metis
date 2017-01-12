@@ -371,6 +371,23 @@
   (local-time:timestamp-to-unix (local-time:universal-to-timestamp (cl-date-time-parser:parse-date-time date))))
 
 
+(defun all-objects-have-idx (klass)
+
+
+
+  )
+
+
+
+(defun get-next-idx (klass)
+
+
+
+  )
+
+
+
+
 (fare-memoization:define-memo-function get-idx (klass new-value)
   "Return the object for a given value of klass"
   (if (and klass new-value)
@@ -381,19 +398,18 @@
 	      (gethash new-value klass-hash)
 	    (if seen
 		(setf nid id)
-		(progn
-		  (setf obj (make-instance klass :value new-value))
-		  (format t "klass length ~A~%" (length (alexandria:hash-table-values klass-hash)))
+		(progn ;; new item
+		  (setf obj (make-instance klass :value new-value :idx (get-next-idx klass)))
 
-		  1)))))))
-		;; 	  (if (null
-	  ;; 	(setf (gethash new-value klass-hash) obj)
-	  ;; 	(setf
-	  ;; 	 (+ 1
-	  ;; 	(setf (slot-value obj 'max-id) (+ 1 max-id))
-	  ;; 	(setf (slot-value obj 'idx) (+ 1 max-id))
-	  ;; 	(setf nid (slot-value obj 'idx)))))
-	  ;; nid))))
+		  (format t "klass length ~A~%" (length (alexandria:hash-table-values klass-hash)))
+		  (if (null
+		       (setf (gethash new-value klass-hash) obj)
+		       (setf
+			(+ 1
+			   (setf (slot-value obj 'max-id) (+ 1 max-id))
+			   (setf (slot-value obj 'idx) (+ 1 max-id))
+			   (setf nid (slot-value obj 'idx)))))
+		      nid))))
 
 (defun insert-flows (date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let (
