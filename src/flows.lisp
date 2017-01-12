@@ -374,20 +374,20 @@
 (defun all-objects-have-idx (klass)
 
 
-
   )
 
 
-
 (defun get-next-idx (klass)
-  (if (null
-       (setf (gethash new-value klass-hash) obj)
-       (setf
-	(+ 1
-	   (setf (slot-value obj 'max-id) (+ 1 max-id))
-	   (setf (slot-value obj 'idx) (+ 1 max-id))
-	   (setf nid (slot-value obj 'idx)))))
-)
+  (let ((next 0))
+    (format t "gnix: klass:~A length:~A~%" klass (length klass))
+    1))
+    ;;     (setf (gethash new-value klass-hash) obj)
+;;        (setf
+;; 	(+ 1
+;; 	   (setf (slot-value obj 'max-id) (+ 1 max-id))
+;; 	   (setf (slot-value obj 'idx) (+ 1 max-id))
+;; 	   (setf nid (slot-value obj 'idx)))))
+;; )
 
 
 
@@ -402,8 +402,9 @@
 	  (if seen
 	      (setf nid id)
 	      (progn ;; new item
-		(setf obj (make-instance klass :value new-value :idx (get-next-idx klass)))
-		(setf nid (idx obj)))))
+		(setf nid (get-next-idx klass))
+		(setf obj (make-instance klass :value new-value :idx nid))
+		(setf (gethash new-value klass-hash) nid))))
 	nid)))
 
 (defun insert-flows (date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
