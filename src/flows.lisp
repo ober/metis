@@ -380,10 +380,14 @@
 
 
 (defun get-next-idx (klass)
-
-
-
-  )
+  (if (null
+       (setf (gethash new-value klass-hash) obj)
+       (setf
+	(+ 1
+	   (setf (slot-value obj 'max-id) (+ 1 max-id))
+	   (setf (slot-value obj 'idx) (+ 1 max-id))
+	   (setf nid (slot-value obj 'idx)))))
+)
 
 
 
@@ -393,23 +397,14 @@
   (if (and klass new-value)
       (let ((klass-hash (gethash klass *metis-fields*))
 	    (nid nil))
-	(progn
-	  (multiple-value-bind (id seen)
-	      (gethash new-value klass-hash)
-	    (if seen
-		(setf nid id)
-		(progn ;; new item
-		  (setf obj (make-instance klass :value new-value :idx (get-next-idx klass)))
-
-		  (format t "klass length ~A~%" (length (alexandria:hash-table-values klass-hash)))
-		  (if (null
-		       (setf (gethash new-value klass-hash) obj)
-		       (setf
-			(+ 1
-			   (setf (slot-value obj 'max-id) (+ 1 max-id))
-			   (setf (slot-value obj 'idx) (+ 1 max-id))
-			   (setf nid (slot-value obj 'idx)))))
-		      nid))))
+	(multiple-value-bind (id seen)
+	    (gethash new-value klass-hash)
+	  (if seen
+	      (setf nid id)
+	      (progn ;; new item
+		(setf obj (make-instance klass :value new-value :idx (get-next-idx klass)))
+		(setf nid (idx obj)))))
+	nid)))
 
 (defun insert-flows (date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
   (let (
