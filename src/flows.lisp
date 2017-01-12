@@ -380,12 +380,9 @@
 
 (defun get-next-idx (klass-hash)
   (if (hash-table-p klass-hash)
-      (let ((next 0))
-	(format t "gnix: klass:~A length:~A~%" klass-hash (length (alexandria:hash-table-keys klass-hash)))
-	1)
-      (format t "got klass-hash:~A~% which is NOT a hash. wtf?~%" klass-hash)))
-
-
+      (let ((next (max (alexandria:hash-table-values klass-hash))))
+	(format t "gnix: klass:~A next:~A~%" klass-hash (+ (parse-integer next) 1))
+	(+ next 1))))
     ;;     (setf (gethash new-value klass-hash) obj)
 ;;        (setf
 ;; 	(+ 1
