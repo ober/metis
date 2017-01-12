@@ -378,9 +378,13 @@
 
 
 (defun get-next-idx (klass-hash)
-  (let ((next 0))
-    (format t "gnix: klass:~A length:~A~%" klass-hash (length (alexandria:hash-table-keys klass-hash)))
-    1))
+  (if (hash-table-p klass-hash)
+      (let ((next 0))
+	(format t "gnix: klass:~A length:~A~%" klass-hash (length (alexandria:hash-table-keys klass-hash)))
+	1)
+      (format "got klass-hash:~A~% which is NOT a hash. wtf?~%" klass-hash)))
+
+
     ;;     (setf (gethash new-value klass-hash) obj)
 ;;        (setf
 ;; 	(+ 1
