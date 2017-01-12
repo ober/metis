@@ -382,7 +382,7 @@
   (if (hash-table-p klass-hash)
       (let ((next (max (alexandria:hash-table-values klass-hash))))
 	(format t "gnix: klass:~A next:~A~%" klass-hash (+ (parse-integer next) 1))
-	(+ next 1))))
+	(+ (parse-integer next) 1))))
     ;;     (setf (gethash new-value klass-hash) obj)
 ;;        (setf
 ;; 	(+ 1
