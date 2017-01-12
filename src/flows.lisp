@@ -374,7 +374,7 @@
 		(progn
 		  ;;(format t "gnix: klass:~A length:~A~%" klass-hash (hash-table-size klass-hash))
 		  ;;(setf max-id (+ 1 (apply #'max (mapcar #'(lambda (x) (if (stringp x) (parse-integer x) x)) idxs))))))
-		  (setf max-id (+ 1 (hash-table-size klass-hash)))))met
+		  (setf max-id (+ 1 (hash-table-size klass-hash)))))
 	   max-id))))
 
 (fare-memoization:define-memo-function get-idx (klass new-value)
