@@ -30,67 +30,54 @@
 
 (manardb:defmmclass interface-id ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass srcaddr ()
   ((value :initarg :value :accessor srcaddr-value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor srcaddr-idx)))
 
 (manardb:defmmclass dstaddr ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass srcport ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass dstport ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass protocol ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass packets ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass bytez ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass start ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass endf ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass action ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass status ()
   ((value :initarg :value :accessor value)
-   (max-id :initarg :max-id :accessor max-id :allocation :class)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass flow ()
   ((date :initarg :date :accessor date)
-   ;;(conversation :initarg :conversation :accessor conversation)
    (interface-id :initarg :interface-id :reader interface-id)
    (srcaddr :initarg :srcaddr :reader srcaddr)
    (srcport :initarg :srcport :reader srcport)
@@ -385,10 +372,9 @@
 		(max-id 0))
 	   (and idxs
 		(progn
-		  (format t "gnix: klass:~A length:~A~%" klass-hash (hash-table-size klass-hash))
-		  (setf max-id (+ 1 (apply #'max (mapcar #'(lambda (x)
-							     (if (stringp x) (parse-integer x)
-								 x)) idxs))))))
+		  ;;(format t "gnix: klass:~A length:~A~%" klass-hash (hash-table-size klass-hash))
+		  ;;(setf max-id (+ 1 (apply #'max (mapcar #'(lambda (x) (if (stringp x) (parse-integer x) x)) idxs))))))
+		  (setf max-id (+ 1 (hash-table-size klass-hash)))))met
 	   max-id))))
 
 (fare-memoization:define-memo-function get-idx (klass new-value)
@@ -426,7 +412,7 @@
 	(status-i (get-idx 'metis::status status))
 	)
 
-    (format t "~{~A, ~}~%" (list date2 interface-id-i srcaddr-i dstaddr-i srcport-i dstport-i protocol-i packets-i bytez-i start-i endf-i action-i status-i))
+    ;;(format t "~{~A, ~}~%" (list date2 interface-id-i srcaddr-i dstaddr-i srcport-i dstport-i protocol-i packets-i bytez-i start-i endf-i action-i status-i))
 
     (make-instance 'flow
 		   :date date2
