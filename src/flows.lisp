@@ -30,7 +30,7 @@
 (manardb:defmmclass interface-id ()
   ((value :initarg :value :accessor value)
    (max-id :initarg :max-id :accessor max-id)
-   (idx :initarg idx :accessor idx)))
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass srcaddr ()
   ((value :initarg :value :accessor srcaddr-value)
@@ -377,9 +377,9 @@
   )
 
 
-(defun get-next-idx (klass)
+(defun get-next-idx (klass-hash)
   (let ((next 0))
-    (format t "gnix: klass:~A length:~A~%" klass (length klass))
+    (format t "gnix: klass:~A length:~A~%" klass-hash (length (alexandria:hash-table-keys klass-hash)))
     1))
     ;;     (setf (gethash new-value klass-hash) obj)
 ;;        (setf
@@ -402,7 +402,7 @@
 	  (if seen
 	      (setf nid id)
 	      (progn ;; new item
-		(setf nid (get-next-idx klass))
+		(setf nid (get-next-idx klass-hash))
 		(setf obj (make-instance klass :value new-value :idx nid))
 		(setf (gethash new-value klass-hash) nid))))
 	nid)))
