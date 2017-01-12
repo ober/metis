@@ -379,24 +379,17 @@
 
 
 (defun get-next-idx (klass-hash)
-
-  (let ((next (parse-integer (max (alexandria:hash-table-values klass-hash)))))
-    (format t "gnix: klass:~A next:~A~%" klass-hash next)
-
-
-
-    next))
-
-    ;;     (setf (gethash new-value klass-hash) obj)
-;;        (setf
-;; 	(+ 1
-;; 	   (setf (slot-value obj 'max-id) (+ 1 max-id))
-;; 	   (setf (slot-value obj 'idx) (+ 1 max-id))
-;; 	   (setf nid (slot-value obj 'idx)))))
-;; )
-
-
-
+  (and (hash-table-p klass-hash)
+       (progn
+	 (let* ((idxs (alexandria:hash-table-values klass-hash))
+		(max-id 0))
+	   (and idxs
+		(progn
+		  (format t "gnix: klass:~A length:~A~%" klass-hash (hash-table-size klass-hash))
+		  (setf max-id (+ 1 (apply #'max (mapcar #'(lambda (x)
+							     (if (stringp x) (parse-integer x)
+								 x)) idxs))))))
+	   max-id))))
 
 (fare-memoization:define-memo-function get-idx (klass new-value)
   "Return the object for a given value of klass"
