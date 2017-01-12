@@ -379,9 +379,14 @@
 
 
 (defun get-next-idx (klass-hash)
+
   (let ((next (parse-integer (max (alexandria:hash-table-values klass-hash)))))
     (format t "gnix: klass:~A next:~A~%" klass-hash next)
+
+
+
     next))
+
     ;;     (setf (gethash new-value klass-hash) obj)
 ;;        (setf
 ;; 	(+ 1
