@@ -235,11 +235,12 @@
 		  status)))))
 
 (fare-memoization:define-memo-function get-val-by-idx (klass idx)
-  (let ((klass-hash (gethash klass *metis-fields*))
-	(val nil))
+  (let* ((klass-hash (gethash klass *metis-fields*))
+	   (rev-hash (reverse-hash-kv klass-hash))
+	   (val nil))
     (if (hash-table-p klass-hash)
-	(setf val (gethash idx klass-hash))
-	(format t "get-val-by-idx: klass:~A has no hash:~A....~%" klass (type-of klass-hash)))
+	(setf val (gethash idx rev-hash))
+	(format t "get-val-by-idx: klass:~A has no hash:~A....~%" klass (type-of rev-hash)))
   val))
 
 (defun list-all-vpc ()
@@ -329,7 +330,6 @@
   "Return uniqure list of events"
   (get-unique-values 'metis::status))
 
-
 (defun process-vf-file (file)
   (when (equal (pathname-type file) "gz")
     ;;(room t)
@@ -374,7 +374,6 @@
 
   )
 
-
 (defun get-next-idx (klass-hash)
   (and (hash-table-p klass-hash)
        (progn
@@ -406,8 +405,7 @@
 	nid)))
 
 (defun insert-flows (date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
-  (let (
-	(date2 (to-epoch date))
+  (let ((date2 (to-epoch date))
 	(interface-id-i (get-idx 'metis::interface-id interface-id))
 	(srcaddr-i (get-idx 'metis::srcaddr srcaddr))
 	(srcport-i (get-idx 'metis::srcport srcport))
@@ -419,8 +417,7 @@
 	(start-i (get-idx 'metis::start start))
 	(endf-i (get-idx 'metis::endf endf))
 	(action-i (get-idx 'metis::action action))
-	(status-i (get-idx 'metis::status status))
-	)
+	(status-i (get-idx 'metis::status status)))
 
     ;;(format t "~{~A, ~}~%" (list date2 interface-id-i srcaddr-i dstaddr-i srcport-i dstport-i protocol-i packets-i bytez-i start-i endf-i action-i status-i))
 
