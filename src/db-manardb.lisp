@@ -112,7 +112,7 @@
 	      (progn
 		(setf obj (make-instance klass :value new-value))
 		(setf (gethash new-value (gethash klass *metis-fields*)) obj))))))
-	  ;;(format t "get-obj: klass:~A new-value:~A obj:~A seen:~A id:~A~%" klass new-value obj seen id))))
+    ;;(format t "get-obj: klass:~A new-value:~A obj:~A seen:~A id:~A~%" klass new-value obj seen id))))
     obj))
 
 (defun manardb-have-we-seen-this-file (file)
@@ -154,6 +154,7 @@
 	  (manardb:doclass (x klass :fresh-instances nil)
 	    (with-slots (value idx) x
 	      (setf (gethash value (gethash klass *metis-fields*)) idx))))))
+
 
 (defun get-stats ()
   (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"

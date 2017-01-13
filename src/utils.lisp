@@ -142,3 +142,7 @@ is replaced with replacement."
   #+(or allegro lispworks)
   (make-hash-table :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
   ))
+
+(fare-memoization:define-memo-function reverse-hash-kv (old)
+  (let ((new (make-hash-table)))
+    (maphash #'(lambda (k v) (setf (gethash v new) k)) old) new))
