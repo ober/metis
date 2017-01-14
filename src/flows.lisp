@@ -99,51 +99,6 @@
    #'(lambda (x)
        (allocate-klass-hash x))
    vpc-fields))
-;;(time (allocate-conversation-hash)))
-
-;; (defmethod print-object ((flow flow) stream)
-;;   (format stream "#<date:~s srcaddr:~s dstaddr:~s srcport:~s dstport:~s>" (date flow) (srcaddr flow) (dstaddr flow) (srcport flow) (dstport flow)))
-
-(defun bench-vpc-flows-report-sync (dir)
-  (init-vpc-hashes)
-  (let ((path (or dir "~/vpctiny")))
-    ;;(defvar benching t)
-    (let ((btime (get-internal-real-time))
-	  (benching t))
-      #+sbcl
-      (progn
-	(sb-sprof:with-profiling (:report :flat) (vpc-flows-report-sync path)))
-      #+lispworks
-      (progn
-	(hcl:set-up-profiler :package '(metis))
-	(hcl:profile (vpc-flows-report-sync path)))
-      #+allegro (progn
-		  (prof:start-profiler :type :time :count t)
-		  (time (vpc-flows-report-sync path))
-		  (prof::show-flat-profile))
-      #+(or clozure abcl ecl) (time (vpc-flows-report-sync path))
-      (let* ((etime (get-internal-real-time))
-	     (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
-	     (rows (manardb:count-all-instances 'metis::flow))
-	     (convs (manardb:count-all-instances 'metis::conversation))
-	     (files (manardb:count-all-instances 'metis::flow-files)))
-	;;      (if (and delta rows)
-	;;(let ((rps (/ (float rows) (float delta))))
-	;;(format t "~%rps:~A delta~A rows:~A files:~A" (/ (float rows) (float delta)) delta (caar rows) (caar files)))))
-	(format t "~%delta~A rows:~A files:~A convs:~A" delta (caar rows) (caar files) convs)))))
-
-(defun bench-list-source-ports ()
-  #+sbcl (progn
-	   (sb-sprof:with-profiling (:report :flat) (get-vpc-srcport-list)))
-  #+lispworks (progn
-		(hcl:set-up-profiler :package '(metis))
-		(hcl:profile (get-vpc-srcport-list)))
-  #+allegro (progn
-	      (prof:start-profiler :type :time :count t)
-	      (time (get-vpc-srcport-list))
-	      (prof::show-flat-profile))
-  #+(or clozure abcl ecl)
-  (time (get-vprc-srcport-list)))
 
 (defun vpc-flows-report-async (workers path)
   (allocate-vpc-file-hash)
