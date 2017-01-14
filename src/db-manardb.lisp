@@ -149,11 +149,11 @@
 
 (defun allocate-klass-hash (klass)
   (format t "allocating class:~A~%" klass)
-  (time (progn
-	  (create-klass-hash klass)
-	  (manardb:doclass (x klass :fresh-instances nil)
-	    (with-slots (value idx) x
-	      (setf (gethash value (gethash klass *metis-fields*)) idx))))))
+  (progn
+    (create-klass-hash klass)
+    (manardb:doclass (x klass :fresh-instances nil)
+      (with-slots (value idx) x
+	(setf (gethash value (gethash klass *metis-fields*)) idx)))))
 
 
 (defun get-stats ()
