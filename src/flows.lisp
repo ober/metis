@@ -188,7 +188,6 @@
 		    (get-val protocol)
 		    ))))))
 
-
 (defun vpc-flows-report-sync (path)
   (init-vpc-hashes)
   (allocate-vpc-file-hash)
@@ -236,43 +235,43 @@
 
 (fare-memoization:define-memo-function get-val-by-idx (klass idx)
   (let* ((klass-hash (gethash klass *metis-fields*))
-	   (rev-hash (reverse-hash-kv klass-hash))
-	   (val nil))
+	 (rev-hash (reverse-hash-kv klass-hash))
+	 (val nil))
     (if (hash-table-p klass-hash)
 	(setf val (gethash idx rev-hash))
 	(format t "get-val-by-idx: klass:~A has no hash:~A....~%" klass (type-of rev-hash)))
-  val))
+    val))
 
 (defun list-all-vpc ()
   (init-vpc-hashes)
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
     (with-slots (
-	      interface-id
-	      srcaddr
-	      dstaddr
-	      srcport
-	      dstport
-	      protocol
-	      packets
-	      bytez
-	      start
-	      endf
-	      action
-	      status
+		 interface-id
+		 srcaddr
+		 dstaddr
+		 srcport
+		 dstport
+		 protocol
+		 packets
+		 bytez
+		 start
+		 endf
+		 action
+		 status
 		 ) x
       (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
-		 (get-val-by-idx 'metis::interface-id interface-id)
-		 (get-val-by-idx 'metis::srcaddr srcaddr)
-		 (get-val-by-idx 'metis::dstaddr dstaddr)
-		 (get-val-by-idx 'metis::srcport srcport)
-		 (get-val-by-idx 'metis::dstport dstport)
-		 (get-val-by-idx 'metis::protocol protocol)
-		 (get-val-by-idx 'metis::packets packets)
-		 (get-val-by-idx 'metis::bytez bytez)
-		 (get-val-by-idx 'metis::start start)
-		 (get-val-by-idx 'metis::endf endf)
-		 (get-val-by-idx 'metis::action action)
-		 (get-val-by-idx 'metis::status status)))))
+	      (get-val-by-idx 'metis::interface-id interface-id)
+	      (get-val-by-idx 'metis::srcaddr srcaddr)
+	      (get-val-by-idx 'metis::dstaddr dstaddr)
+	      (get-val-by-idx 'metis::srcport srcport)
+	      (get-val-by-idx 'metis::dstport dstport)
+	      (get-val-by-idx 'metis::protocol protocol)
+	      (get-val-by-idx 'metis::packets packets)
+	      (get-val-by-idx 'metis::bytez bytez)
+	      (get-val-by-idx 'metis::start start)
+	      (get-val-by-idx 'metis::endf endf)
+	      (get-val-by-idx 'metis::action action)
+	      (get-val-by-idx 'metis::status status)))))
 
 
 (defun allocate-vpc-file-hash ()
@@ -330,6 +329,7 @@
   "Return uniqure list of events"
   (get-unique-values 'metis::status))
 
+
 (defun process-vf-file (file)
   (when (equal (pathname-type file) "gz")
     ;;(room t)
@@ -368,11 +368,140 @@
 (defun to-epoch (date)
   (local-time:timestamp-to-unix (local-time:universal-to-timestamp (cl-date-time-parser:parse-date-time date))))
 
+(defun vpc-search-by-srcport (port)
+  (init-vpc-hashes)
+  (let* ((klass 'metis::srcport)
+	 (klass-hash (gethash klass *metis-fields*)))
+    (multiple-value-bind (id seen)
+	(gethash port klass-hash)
+      (if seen
+	  (progn
+	    (manardb:doclass (x 'metis::flow :fresh-instances nil)
+	      (with-slots (interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status) x
+		(and (= srcport id)
+		     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
+			     (get-val-by-idx 'metis::interface-id interface-id)
+			     (get-val-by-idx 'metis::srcaddr srcaddr)
+			     (get-val-by-idx 'metis::dstaddr dstaddr)
+			     (get-val-by-idx 'metis::srcport srcport)
+			     (get-val-by-idx 'metis::dstport dstport)
+			     (get-val-by-idx 'metis::protocol protocol)
+			     (get-val-by-idx 'metis::packets packets)
+			     (get-val-by-idx 'metis::bytez bytez)
+			     (get-val-by-idx 'metis::start start)
+			     (get-val-by-idx 'metis::endf endf)
+			     (get-val-by-idx 'metis::action action)
+			     (get-val-by-idx 'metis::status status))))))
+	    (format t "Error: have not seen source port ~A~%" port)))))
 
-(defun all-objects-have-idx (klass)
+(defun vpc-search-by-dstport (value)
+  (init-vpc-hashes)
+  (let* ((klass 'metis::dstport)
+	 (klass-hash (gethash klass *metis-fields*)))
+    (multiple-value-bind (id seen)
+	(gethash value klass-hash)
+      (if seen
+	  (progn
+	    (manardb:doclass (x 'metis::flow :fresh-instances nil)
+	      (with-slots (interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status) x
+		(and (= dstport id)
+		     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
+			     (get-val-by-idx 'metis::interface-id interface-id)
+			     (get-val-by-idx 'metis::srcaddr srcaddr)
+			     (get-val-by-idx 'metis::dstaddr dstaddr)
+			     (get-val-by-idx 'metis::srcport srcport)
+			     (get-val-by-idx 'metis::dstport dstport)
+			     (get-val-by-idx 'metis::protocol protocol)
+			     (get-val-by-idx 'metis::packets packets)
+			     (get-val-by-idx 'metis::bytez bytez)
+			     (get-val-by-idx 'metis::start start)
+			     (get-val-by-idx 'metis::endf endf)
+			     (get-val-by-idx 'metis::action action)
+			     (get-val-by-idx 'metis::status status))))))
+	    (format t "Error: have not seen dest port ~A~%" value)))))
 
+(defun vpc-search-by-srcaddr (value)
+  (init-vpc-hashes)
+  (let* ((klass 'metis::srcaddr)
+	 (klass-hash (gethash klass *metis-fields*)))
+    (multiple-value-bind (id seen)
+	(gethash value klass-hash)
+      (if seen
+	  (progn
+	    (manardb:doclass (x 'metis::flow :fresh-instances nil)
+	      (with-slots (interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status) x
+		(and (= srcaddr id)
+		     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
+			     (get-val-by-idx 'metis::interface-id interface-id)
+			     (get-val-by-idx 'metis::srcaddr srcaddr)
+			     (get-val-by-idx 'metis::dstaddr dstaddr)
+			     (get-val-by-idx 'metis::srcport srcport)
+			     (get-val-by-idx 'metis::dstport dstport)
+			     (get-val-by-idx 'metis::protocol protocol)
+			     (get-val-by-idx 'metis::packets packets)
+			     (get-val-by-idx 'metis::bytez bytez)
+			     (get-val-by-idx 'metis::start start)
+			     (get-val-by-idx 'metis::endf endf)
+			     (get-val-by-idx 'metis::action action)
+			     (get-val-by-idx 'metis::status status))))))
+	    (format t "Error: have not seen srcaddr ~A~%" value)))))
 
-  )
+(defun vpc-search-by-dstaddr (value)
+  (init-vpc-hashes)
+  (let* ((klass 'metis::dstaddr)
+	 (klass-hash (gethash klass *metis-fields*)))
+    (multiple-value-bind (id seen)
+	(gethash value klass-hash)
+      (if seen
+	  (progn
+	    (manardb:doclass (x 'metis::flow :fresh-instances nil)
+	      (with-slots (interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status) x
+		(and (= dstaddr id)
+		     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
+			     (get-val-by-idx 'metis::interface-id interface-id)
+			     (get-val-by-idx 'metis::srcaddr srcaddr)
+			     (get-val-by-idx 'metis::dstaddr dstaddr)
+			     (get-val-by-idx 'metis::srcport srcport)
+			     (get-val-by-idx 'metis::dstport dstport)
+			     (get-val-by-idx 'metis::protocol protocol)
+			     (get-val-by-idx 'metis::packets packets)
+			     (get-val-by-idx 'metis::bytez bytez)
+			     (get-val-by-idx 'metis::start start)
+			     (get-val-by-idx 'metis::endf endf)
+			     (get-val-by-idx 'metis::action action)
+			     (get-val-by-idx 'metis::status status))))))
+	    (format t "Error: have not seen dstaddr ~A~%" value)))))
+
+;; (defun vpc-search-by (klass value field)
+;;   (init-vpc-hashes)
+;;   (let* ((klass-hash (gethash klass *metis-fields*)))
+;;     (multiple-value-bind (id seen)
+;; 	(gethash value klass-hash)
+;;       (if seen
+;; 	  (progn
+;; 	    (manardb:doclass (x 'metis::flow :fresh-instances nil)
+;; 	      (with-slots (interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status) x
+;; 		(and (= field id)
+;; 		     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
+;; 			     (get-val-by-idx 'metis::interface-id interface-id)
+;; 			     (get-val-by-idx 'metis::srcaddr srcaddr)
+;; 			     (get-val-by-idx 'metis::dstaddr dstaddr)
+;; 			     (get-val-by-idx 'metis::srcport srcport)
+;; 			     (get-val-by-idx 'metis::dstport dstport)
+;; 			     (get-val-by-idx 'metis::protocol protocol)
+;; 			     (get-val-by-idx 'metis::packets packets)
+;; 			     (get-val-by-idx 'metis::bytez bytez)
+;; 			     (get-val-by-idx 'metis::start start)
+;; 			     (get-val-by-idx 'metis::endf endf)
+;; 			     (get-val-by-idx 'metis::action action)
+;; 			     (get-val-by-idx 'metis::status status))))))
+;; 	  (format t "Error: have not seen value:~A for class:~A~%" value klass)))))
+
+;; (defun vpc-search-by-srcport (value)
+;;   (vpc-search-by 'metis::srcport value 'srcport))
+
+;; (defun vpc-search-by-srcip (value)
+;;   (vpc-search-by 'metis::srcip value 'srcip))
 
 (defun get-next-idx (klass-hash)
   (and (hash-table-p klass-hash)
@@ -383,7 +512,7 @@
 		(progn
 		  ;;(format t "gnix: klass:~A length:~A~%" klass-hash (hash-table-size klass-hash))
 		  ;;(setf max-id (+ 1 (apply #'max (mapcar #'(lambda (x) (if (stringp x) (parse-integer x) x)) idxs))))))
-		  (setf max-id (+ 1 (hash-table-size klass-hash)))))
+		  (setf max-id (+ 1 (hash-table-count klass-hash)))))
 	   max-id))))
 
 (fare-memoization:define-memo-function get-idx (klass new-value)

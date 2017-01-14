@@ -51,6 +51,10 @@
   (print "st - get-stats")
   (print "va - vpc-flows-report-async arg beta")
   (print "vs - vpc-flows-report-sync arg")
+  (print "vsp - vpc-search-by-srcport port")
+  (print "vdp - vpc-search-by-dstport port")
+  (print "vsi - vpc-search-by-srcip port")
+  (print "vdi - vpc-search-by-dstip port")
 )
 
 (defun process-args (args)
@@ -68,6 +72,10 @@
     ;;(format t "main:~A verb:~A alpha:~A beta:~A" (nth 0 args) verb alpha beta)
     (cond
       ((equal "a" verb)(time (cloudtrail-report-async alpha beta)))
+      ((equal "vsp" verb)(time (vpc-search-by-srcport alpha)))
+      ((equal "vdp" verb)(time (vpc-search-by-dstport alpha)))
+      ((equal "vsa" verb)(time (vpc-search-by-srcaddr alpha)))
+      ((equal "vda" verb)(time (vpc-search-by-dstaddr alpha)))
       ((equal "b" verb)(time (bench-vpc-flows-report-sync alpha)))
       ((equal "lc" verb)(time (get-unique-conversation)))
       ((equal "lec" verb)(time (get-errorcode-list)))
