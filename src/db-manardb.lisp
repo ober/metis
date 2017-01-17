@@ -4,6 +4,30 @@
 (defvar *metis-fields* (thread-safe-hash-table))
 (defvar *metis-need-files* nil)
 
+
+(defvar ct-fields '(
+		    metis::additionalEventData
+		    metis::awsRegion
+		    metis::errorCode
+		    metis::errorMessage
+		    metis::eventID
+		    metis::eventName
+		    metis::eventSource
+		    metis::eventTime
+		    metis::eventType
+		    metis::eventVersion
+		    metis::recipientAccountId
+		    metis::requestID
+		    metis::requestParameters
+		    metis::resources
+		    metis::responseElements
+		    metis::sourceIPAddress
+		    metis::userAgent
+		    metis::userIdentity
+		    metis::userName
+		    ))
+
+
 (defun init-manardb()
   (unless (boundp 'manardb:use-mmap-dir)
     (manardb:use-mmap-dir "~/ct-manardb/"))
@@ -14,61 +38,81 @@
   ((file :type STRING :initarg :file :accessor file)))
 
 (manardb:defmmclass additionalEventData ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass awsRegion ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass errorCode ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass errorMessage ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass eventID ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass eventName ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass eventSource ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass eventTime ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass eventType ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass eventVersion ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass recipientAccountId ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass requestID ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass requestParameters ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass resources ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass responseElements ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass sourceIPAddress ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass userAgent ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
+
 
 (manardb:defmmclass userIdentity ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass userName ()
-  ((value :initarg :value :accessor value)))
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass ct ()
   ((addionalEventData :initarg :additionalEventData :accessor additionalEventData)
@@ -145,16 +189,22 @@
 
 (defun allocate-file-hash ()
   (manardb:doclass (x 'metis::files :fresh-instances nil)
-    (setf (gethash (slot-value x 'file) *manard-files*) t)))
+		   (setf (gethash (slot-value x 'file) *manard-files*) t)))
+
 
 (defun allocate-klass-hash (klass)
   (format t "allocating class:~A~%" klass)
   (progn
     (create-klass-hash klass)
     (manardb:doclass (x klass :fresh-instances nil)
-      (with-slots (value idx) x
-	(setf (gethash value (gethash klass *metis-fields*)) idx)))))
+		     (with-slots (value idx) x
+		       (setf (gethash value (gethash klass *metis-fields*)) idx)))))
 
+(defun init-ct-hashes ()
+  (mapc
+   #'(lambda (x)
+       (allocate-klass-hash x))
+   ct-fields))
 
 (defun get-stats ()
   (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"
@@ -181,26 +231,26 @@
 
 (defun get-all-errorcodes ()
   (manardb:doclass
-      (x 'metis::ct :fresh-instances nil)
-    (unless (string-equal "NIL" (get-val (slot-value x 'errorCode)))
-      (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-	(format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
-		(get-val eventTime)
-		(get-val errorCode)
-		(get-val userName)
-		(get-val eventName)
-		(get-val eventSource)
-		(get-val sourceIPAddress)
-		(get-val userAgent)
-		(get-val errorMessage))))))
+   (x 'metis::ct :fresh-instances nil)
+   (unless (string-equal "NIL" (get-val (slot-value x 'errorCode)))
+     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+       (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+	       (get-val eventTime)
+	       (get-val errorCode)
+	       (get-val userName)
+	       (get-val eventName)
+	       (get-val eventSource)
+	       (get-val sourceIPAddress)
+	       (get-val userAgent)
+	       (get-val errorMessage))))))
 
 ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
 (defun get-unique-values (klass)
   "Return uniqure list of klass objects"
   (manardb:doclass (x klass :fresh-instances nil)
-    (with-slots (value idx) x
-      (format t "~%~A: ~A" idx value))))
+		   (with-slots (value idx) x
+		     (format t "~%~A: ~A" idx value))))
 ;; lists
 
 (defun get-event-list ()
@@ -229,89 +279,89 @@
   (let ((obj-list nil))
     ;;(let ((obj nil))
     (manardb:doclass (x klass :fresh-instances nil)
-      (with-slots (value) x
-	(if (string-equal val value)
-	    ;;(setf obj x))))
-	    (push x obj-list))))
+		     (with-slots (value) x
+		       (if (string-equal val value)
+			   ;;(setf obj x))))
+			   (push x obj-list))))
     ;;obj))
     obj-list))
 
 (defun get-by-name (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (let ((val2 (get-val userName)))
-	(if (string-equal val val2)
-	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-		    (get-val eventTime)
-		    val2
-		    (get-val eventSource)
-		    (get-val sourceIPAddress)
-		    (get-val userAgent)
-		    (get-val errorMessage)
-		    (get-val errorCode))
-	    )))))
+		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+		     (let ((val2 (get-val userName)))
+		       (if (string-equal val val2)
+			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+				   (get-val eventTime)
+				   val2
+				   (get-val eventSource)
+				   (get-val sourceIPAddress)
+				   (get-val userAgent)
+				   (get-val errorMessage)
+				   (get-val errorCode))
+			   )))))
 
 (defun get-by-event (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (let ((val2 (get-val eventName)))
-	(if (string-equal val val2)
-	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-		    (get-val eventTime)
-		    (get-val userName)
-		    (get-val eventSource)
-		    (get-val sourceIPAddress)
-		    (get-val userAgent)
-		    (get-val errorMessage)
-		    (get-val errorCode))
-	    )))))
+		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+		     (let ((val2 (get-val eventName)))
+		       (if (string-equal val val2)
+			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+				   (get-val eventTime)
+				   (get-val userName)
+				   (get-val eventSource)
+				   (get-val sourceIPAddress)
+				   (get-val userAgent)
+				   (get-val errorMessage)
+				   (get-val errorCode))
+			   )))))
 
 (defun get-by-errorcode (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (let ((val2 (get-val errorCode)))
-	(if (string-equal val val2)
-	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-		    (get-val eventTime)
-		    (get-val userName)
-		    (get-val eventSource)
-		    (get-val sourceIPAddress)
-		    (get-val userAgent)
+		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+		     (let ((val2 (get-val errorCode)))
+		       (if (string-equal val val2)
+			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+				   (get-val eventTime)
+				   (get-val userName)
+				   (get-val eventSource)
+				   (get-val sourceIPAddress)
+				   (get-val userAgent)
 
-		    (get-val errorMessage)
-		    val2
-		    ;;(get-val errorCode)
-		    ))))))
+				   (get-val errorMessage)
+				   val2
+				   ;;(get-val errorCode)
+				   ))))))
 
 (defun get-by-date (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (let ((val2 (get-val eventTime)))
-	(if (cl-ppcre:all-matches val val2)
-	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-		    val2
-		    (get-val userName)
-		    (get-val eventSource)
-		    (get-val sourceIPAddress)
-		    (get-val userAgent)
-		    (get-val errorMessage)
-		    (get-val errorCode))
-	    )))))
+		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+		     (let ((val2 (get-val eventTime)))
+		       (if (cl-ppcre:all-matches val val2)
+			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+				   val2
+				   (get-val userName)
+				   (get-val eventSource)
+				   (get-val sourceIPAddress)
+				   (get-val userAgent)
+				   (get-val errorMessage)
+				   (get-val errorCode))
+			   )))))
 
 (defun get-by-sourceip (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (let ((val2 (slot-value sourceipaddress 'value)))
-	(if (string-equal val val2)
-	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-		    (get-val eventTime)
-		    (get-val userName)
-		    (get-val eventSource)
-		    (get-val sourceIPAddress)
-		    (get-val userAgent)
-		    (get-val errorMessage)
-		    (get-val errorCode))
-	    )))))
+		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+		     (let ((val2 (slot-value sourceipaddress 'value)))
+		       (if (string-equal val val2)
+			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+				   (get-val eventTime)
+				   (get-val userName)
+				   (get-val eventSource)
+				   (get-val sourceIPAddress)
+				   (get-val userAgent)
+				   (get-val errorMessage)
+				   (get-val errorCode))
+			   )))))
 
 ;; (defun get-by-ip (val)
 ;;   (manardb:doclass (x 'metis::ct :fresh-instances nil)
@@ -346,17 +396,17 @@
 (defun get-useridentity-by-name (name)
   "Return any entries with username in useridentity"
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-    (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-      (if (cl-ppcre:all-matches name userIdentity)
-	  (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
-		  eventTime
-		  errorCode
-		  userName
-		  eventName
-		  eventSource
-		  sourceIPAddress
-		  userAgent
-		  errorMessage)))))
+		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+		     (if (cl-ppcre:all-matches name userIdentity)
+			 (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+				 eventTime
+				 errorCode
+				 userName
+				 eventName
+				 eventSource
+				 sourceIPAddress
+				 userAgent
+				 errorMessage)))))
 
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))
@@ -432,27 +482,25 @@
 		       userName
 		       )
       record
-    (let (
-	  (additionalEventData-i (get-obj 'metis::additionalEventData additionalEventData))
-	  (awsRegion-i (get-obj 'metis::awsRegion awsRegion))
-	  (errorCode-i (get-obj 'metis::errorCode errorCode))
-	  (errorMessage-i (get-obj 'metis::errorMessage errorMessage))
-	  (eventID-i (get-obj 'metis::eventID eventID))
-	  (eventName-i (get-obj 'metis::eventName eventName))
-	  (eventSource-i (get-obj 'metis::eventSource eventSource))
-	  (eventTime-i (get-obj 'metis::eventTime eventTime))
-	  (eventType-i (get-obj 'metis::eventType eventType))
-	  (eventVersion-i (get-obj 'metis::eventVersion eventVersion))
-	  (recipientAccountId-i (get-obj 'metis::recipientAccountId recipientAccountId))
-	  (requestID-i (get-obj 'metis::requestID requestID))
-	  (requestParameters-i (get-obj 'metis::requestParameters requestParameters))
-	  (resources-i (get-obj 'metis::resources resources))
-	  (responseElements-i (get-obj 'metis::responseElements responseElements))
-	  (sourceIPAddress-i (get-obj 'metis::sourceIPAddress sourceIPAddress))
-	  (userAgent-i (get-obj 'metis::userAgent userAgent))
-	  (userIdentity-i (get-obj 'metis::userIdentity userIdentity))
-	  (userName-i (get-obj 'metis::userName (or userName (find-username userIdentity)))))
-
+    (let ((additionalEventData-i (get-idx 'metis::additionalEventData additionalEventData))
+	  (awsRegion-i (get-idx 'metis::awsRegion awsRegion))
+	  (errorCode-i (get-idx 'metis::errorCode errorCode))
+	  (errorMessage-i (get-idx 'metis::errorMessage errorMessage))
+	  (eventID-i (get-idx 'metis::eventID eventID))
+	  (eventName-i (get-idx 'metis::eventName eventName))
+	  (eventSource-i (get-idx 'metis::eventSource eventSource))
+	  (eventTime-i (get-idx 'metis::eventTime eventTime))
+	  (eventType-i (get-idx 'metis::eventType eventType))
+	  (eventVersion-i (get-idx 'metis::eventVersion eventVersion))
+	  (recipientAccountId-i (get-idx 'metis::recipientAccountId recipientAccountId))
+	  (requestID-i (get-idx 'metis::requestID requestID))
+	  (requestParameters-i (get-idx 'metis::requestParameters requestParameters))
+	  (resources-i (get-idx 'metis::resources resources))
+	  (responseElements-i (get-idx 'metis::responseElements responseElements))
+	  (sourceIPAddress-i (get-idx 'metis::sourceIPAddress sourceIPAddress))
+	  (userAgent-i (get-idx 'metis::userAgent userAgent))
+	  (userIdentity-i (get-idx 'metis::userIdentity userIdentity))
+	  (userName-i (get-idx 'metis::userName (or userName (find-username userIdentity)))))
       (make-instance 'ct
 		     :additionalEventData additionalEventData-i
 		     :awsRegion awsRegion-i
@@ -474,7 +522,6 @@
 		     :userIdentity userIdentity-i
 		     :userName userName-i
 		     ))))
-
 
 (defun cleanse (var)
   (typecase var

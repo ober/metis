@@ -434,7 +434,7 @@
 ;; 	(gethash value klass-hash)
 ;;       (if seen
 ;; 	  (progn
-;; 	    (manardb:doclass (x 'metis::flow :fresh-instances nil)
+;; 	    (manardb:doclass (x 'metis::flow :fresh-instances nil)XS
 ;; 	      (with-slots (interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status) x
 ;; 		(and (= field id)
 ;; 		     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"

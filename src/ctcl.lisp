@@ -56,6 +56,7 @@
 (defun cloudtrail-report-sync (path)
   (setf *metis-need-files* t)
   (init-manardb)
+  (init-ct-hashes)
   (force-output)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
@@ -64,6 +65,7 @@
 (defun cloudtrail-report-async (workers path)
   (setf *metis-need-files* t)
   (init-manardb)
+  (init-ct-hashes)
   (force-output)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
