@@ -27,7 +27,6 @@
 		    metis::userName
 		    ))
 
-
 (defun init-manardb()
   (unless (boundp 'manardb:use-mmap-dir)
     (manardb:use-mmap-dir "~/ct-manardb/"))
@@ -286,20 +285,29 @@
     ;;obj))
     obj-list))
 
-(defun get-by-name (val)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (let ((val2 (get-val userName)))
-		       (if (string-equal val val2)
-			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-				   (get-val eventTime)
-				   val2
-				   (get-val eventSource)
-				   (get-val sourceIPAddress)
-				   (get-val userAgent)
-				   (get-val errorMessage)
-				   (get-val errorCode))
-			   )))))
+
+
+(defun ct-get-by-name (value)
+  (init-ct-hashes)
+  (let* ((klass 'metis::userName)
+	 (klass-hash (gethash klass *metis-fields*)))
+    (multiple-value-bind (id seen)
+	(gethash value klass-hash)
+      (if seen
+	  (progn
+	    (manardb:doclass (x 'metis::ct :fresh-instances nil)
+			     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+			       (and (= userName id)
+				    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
+					    (get-val-by-idx eventTime)
+					    val2
+					    (get-val-by-idx 'metis::eventSource eventSource)
+					    (get-val-by-idx 'metis::sourceIPAddress sourceIPAddress)
+					    (get-val-by-idx 'metis::userAgent userAgent)
+					    (get-val-by-idx 'metis::errorMessage errorMessage)
+					    (get-val-by-idx 'metis::errorCode errorCode))))))
+	  (format t "Error: have not seen source port ~A~%" value)))))
+
 
 (defun get-by-event (val)
   (manardb:doclass (x 'metis::ct :fresh-instances nil)
