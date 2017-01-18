@@ -189,13 +189,16 @@
 		  status)))))
 
 (fare-memoization:define-memo-function get-val-by-idx (klass idx)
-  (let* ((klass-hash (gethash klass *metis-fields*))
-	 (rev-hash (reverse-hash-kv klass-hash))
+  (let (
+    (or (hash-table-p klass-hash) (allocate-klass-hash klass))
+    (let*
+	((klass-hash2 (gethash klass *metis-fields*))
+	 (rev-hash (reverse-hash-kv klass-hash2))
 	 (val nil))
-    (if (hash-table-p klass-hash)
-	(setf val (gethash idx rev-hash))
-	(format t "get-val-by-idx: klass:~A has no hash:~A....~%" klass (type-of rev-hash)))
-    val))
+      (if (hash-table-p klass-hash)
+	  (setf val (gethash idx rev-hash))
+	  (format t "get-val-by-idx: klass:~A has no hash:~A....~%" klass (type-of rev-hash)))
+      val)))
 
 (defun list-all-vpc ()
   (init-vpc-hashes)

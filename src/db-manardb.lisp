@@ -174,30 +174,18 @@
     (setf (gethash name *manard-files*) t)
     (make-instance 'files :file name)))
 
-(defun print-record-a (x)
-  (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-	  (slot-value x 'eventTime)
-	  (slot-value x 'eventName)
-	  (slot-value x 'eventSource)
-	  (slot-value x 'sourceIPAddress)
-	  (slot-value x 'userAgent)
-	  (slot-value x 'errorMessage)
-	  (slot-value x 'errorCode)
-	  ;;(slot-value x 'userIdentity)
-	  ))
-
 (defun allocate-file-hash ()
   (manardb:doclass (x 'metis::files :fresh-instances nil)
 		   (setf (gethash (slot-value x 'file) *manard-files*) t)))
 
-
 (defun allocate-klass-hash (klass)
-  (format t "allocating class:~A~%" klass)
-  (progn
-    (create-klass-hash klass)
-    (manardb:doclass (x klass :fresh-instances nil)
-		     (with-slots (value idx) x
-		       (setf (gethash value (gethash klass *metis-fields*)) idx)))))
+  (or (hash-table-p (gethash klass *metis-fields*))
+      (progn
+	(format t "allocating class:~A~%" klass)
+	(create-klass-hash klass)
+	(manardb:doclass (x klass :fresh-instances nil)
+			 (with-slots (value idx) x
+			   (setf (gethash value (gethash klass *metis-fields*)) idx))))))
 
 (defun init-ct-hashes ()
   (mapc
@@ -228,20 +216,6 @@
     ;;(format t "a: ~A b:~A c:~A d:~A len:~A username:~A" a b c d len username)
     (or a b c d)))
 
-(defun get-all-errorcodes ()
-  (manardb:doclass
-   (x 'metis::ct :fresh-instances nil)
-   (unless (string-equal "NIL" (get-val (slot-value x 'errorCode)))
-     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-       (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
-	       (get-val eventTime)
-	       (get-val errorCode)
-	       (get-val userName)
-	       (get-val eventName)
-	       (get-val eventSource)
-	       (get-val sourceIPAddress)
-	       (get-val userAgent)
-	       (get-val errorMessage))))))
 
 ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
@@ -268,7 +242,6 @@
   "Return uniqure list of events"
   (get-unique-values 'metis::sourceIPAddress))
 
-;;(fare-memoization:define-memo-function get-val (obj)
 (defun get-val (obj)
   (if (null obj)
       obj
@@ -286,135 +259,53 @@
     obj-list))
 
 
-
-(defun ct-get-by-name (value)
-  (init-ct-hashes)
-  (let* ((klass 'metis::userName)
-	 (klass-hash (gethash klass *metis-fields*)))
+(defun ct-get-by-klass-value (klass value)
+  (allocate-klass-hash klass)
+  (let* ((klass-hash (gethash klass *metis-fields*))
+	 (slotv nil))
     (multiple-value-bind (id seen)
 	(gethash value klass-hash)
       (if seen
 	  (progn
 	    (manardb:doclass (x 'metis::ct :fresh-instances nil)
 			     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-			       (and (= userName id)
-				    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-					    (get-val-by-idx eventTime)
-					    val2
+			       (cond
+				 ((equal (find-class klass) (find-class 'metis::userName)) (setf slotv userName))
+				 ((equal (find-class klass) (find-class 'metis::eventName)) (setf slotv eventName))
+				 ((equal (find-class klass) (find-class 'metis::eventSource)) (setf slotv eventSource))
+				 ((equal (find-class klass) (find-class 'metis::sourceIPAddress)) (setf slotv sourceIPAddress))
+				 ((equal (find-class klass) (find-class 'metis::errorMessage)) (setf slotv errorMessage))
+				 ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode)))
+			       (and (= slotv id)
+				    (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+					    (get-val-by-idx 'metis::eventTime eventTime)
+					    (get-val-by-idx 'metis::eventName eventName)
+					    (get-val-by-idx 'metis::userName userName)
 					    (get-val-by-idx 'metis::eventSource eventSource)
 					    (get-val-by-idx 'metis::sourceIPAddress sourceIPAddress)
 					    (get-val-by-idx 'metis::userAgent userAgent)
 					    (get-val-by-idx 'metis::errorMessage errorMessage)
 					    (get-val-by-idx 'metis::errorCode errorCode))))))
-	  (format t "Error: have not seen source port ~A~%" value)))))
+	  (format t "Error: have not seen class: ~A value:~A~%" klass value)))))
 
 
-(defun get-by-event (val)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (let ((val2 (get-val eventName)))
-		       (if (string-equal val val2)
-			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-				   (get-val eventTime)
-				   (get-val userName)
-				   (get-val eventSource)
-				   (get-val sourceIPAddress)
-				   (get-val userAgent)
-				   (get-val errorMessage)
-				   (get-val errorCode))
-			   )))))
+(defun ct-get-by-name (name)
+  (ct-get-by-klass-value 'metis::userName name))
 
-(defun get-by-errorcode (val)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (let ((val2 (get-val errorCode)))
-		       (if (string-equal val val2)
-			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-				   (get-val eventTime)
-				   (get-val userName)
-				   (get-val eventSource)
-				   (get-val sourceIPAddress)
-				   (get-val userAgent)
+(defun ct-get-by-errorcode (name)
+  (ct-get-by-klass-value 'metis::errorCode name))
 
-				   (get-val errorMessage)
-				   val2
-				   ;;(get-val errorCode)
-				   ))))))
+(defun ct-get-by-errorMessage (name)
+  (ct-get-by-klass-value 'metis::errorMessage name))
 
-(defun get-by-date (val)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (let ((val2 (get-val eventTime)))
-		       (if (cl-ppcre:all-matches val val2)
-			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-				   val2
-				   (get-val userName)
-				   (get-val eventSource)
-				   (get-val sourceIPAddress)
-				   (get-val userAgent)
-				   (get-val errorMessage)
-				   (get-val errorCode))
-			   )))))
+(defun ct-get-by-eventName (name)
+  (ct-get-by-klass-value 'metis::eventName name))
 
-(defun get-by-sourceip (val)
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (let ((val2 (slot-value sourceipaddress 'value)))
-		       (if (string-equal val val2)
-			   (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-				   (get-val eventTime)
-				   (get-val userName)
-				   (get-val eventSource)
-				   (get-val sourceIPAddress)
-				   (get-val userAgent)
-				   (get-val errorMessage)
-				   (get-val errorCode))
-			   )))))
+(defun ct-get-by-eventSource (name)
+  (ct-get-by-klass-value 'metis::eventSource name))
 
-;; (defun get-by-ip (val)
-;;   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-;;     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-;;       (let ((val2 (slot-value eventSource 'value)))
-;; 	(if (string-equal val val2)
-;; 	    (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-;; 		    (get-val eventTime)
-;; 		    (get-val userName)
-;; 		    (get-val eventSource)
-;; 		    (get-val sourceIPAddress)
-;; 		    (get-val userAgent)
-;; 		    (get-val errorMessage)
-;; 		    (get-val errorCode))
-;; 	    )))))
-
-;; (let ((obj-list (get-obj-by-val 'username name)))
-;;   (manardb:doclass (x 'metis::ct :fresh-instances nil)
-;;     (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-;; 	(let ((name2 (slot-value userName 'value)))
-;; 	  (if (string-equal name2 name)
-;; 	      (format t "|~A|~A|~A|~A|~A|~A|~A|~%"
-;; 		      (get-val eventTime)
-;; 		      name2
-;; 		      (get-val eventSource)
-;; 		      (get-val sourceIPAddress)
-;; 		      (get-val userAgent)
-;; 		      (get-val errorMessage)
-;; 		      (get-val errorCode))
-;; 	      ))))))
-
-(defun get-useridentity-by-name (name)
-  "Return any entries with username in useridentity"
-  (manardb:doclass (x 'metis::ct :fresh-instances nil)
-		   (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
-		     (if (cl-ppcre:all-matches name userIdentity)
-			 (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
-				 eventTime
-				 errorCode
-				 userName
-				 eventName
-				 eventSource
-				 sourceIPAddress
-				 userAgent
-				 errorMessage)))))
+(defun ct-get-by-sourceIPAddress (name)
+  (ct-get-by-klass-value 'metis::sourceIPAddress name))
 
 (defun manardb-recreate-tables ()
   (format t "manardb-recreate-tables~%"))
