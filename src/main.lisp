@@ -110,6 +110,7 @@
       ((equal "vs" verb)(time (vpc-flows-report-sync alpha)))
       ((equal "vsa" verb)(time (vpc-search-by-srcaddr alpha)))
       ((equal "vsp" verb)(time (vpc-search-by-srcport alpha)))
+      ((equal "ctf" verb)(time (get-ct-files)))
       (t (progn
 	   (usage))))
   (manardb:close-all-mmaps)))
