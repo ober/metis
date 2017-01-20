@@ -196,6 +196,7 @@
 	 (val nil))
       (if (hash-table-p klass-hash)
 	  (setf val (gethash idx rev-hash))
+
 	  (format t "get-val-by-idx: klass:~A has no hash:~A....~%" klass (type-of rev-hash)))
       val))
 
@@ -478,17 +479,18 @@
       (let ((klass-hash (gethash klass *metis-fields*))
 	    (nid nil)
 	    (obj nil))
-	(unless (hash-table-p klass-hash)
-	  (format t "XXX: no valid hash table for klass:~A in get-idx~%" klass))
-	(multiple-value-bind (id seen)
-	    (gethash new-value klass-hash)
-	  (if seen
-	      (setf nid id)
-	      (progn ;; new item
-		(setf nid (get-next-idx klass-hash))
-		(setf obj (make-instance klass :value new-value :idx nid))
-		;;(setf (gethash new-value klass-hash) nid)
-		)))
+	(if (hash-table-p klass-hash)
+	    ;;(format t "XXX: no valid hash table for klass:~A in get-idx~%" klass))
+	    (multiple-value-bind (id seen)
+		(gethash new-value klass-hash)
+	      (if seen
+		  (setf nid id)
+		  (progn ;; new item
+		    (setf nid (get-next-idx klass-hash))
+		    (setf obj (make-instance klass :value new-value :idx nid))
+		    ;;(setf (gethash new-value klass-hash) nid)
+		    )))
+	    (setf nid obj))
 	nid)))
 
 (defun insert-flows (date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
