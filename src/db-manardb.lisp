@@ -190,10 +190,10 @@
 	(setf (gethash klass *metis-counters*) (get-max-id-from-hash (gethash klass *metis-fields*))))))
 
 (defun get-max-id-from-hash (hash)
-  (format t "hash: ~A~%" hash)
+  ;;(format t "hash: ~A~%" hash)
   (let* ((idxs (alexandria:hash-table-values hash))
 	 (max-id 0))
-    (format t "idxs: ~A~%" idxs)
+    ;;(format t "idxs: ~A~%" idxs)
     (and idxs
 	 (setf max-id
 	       (apply #'max
