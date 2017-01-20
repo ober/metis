@@ -490,7 +490,7 @@
 		    (setf obj (make-instance klass :value new-value :idx nid))
 		    ;;(setf (gethash new-value klass-hash) nid)
 		    )))
-	    (setf nid obj))
+	    (setf nid new-value))
 	nid)))
 
 (defun insert-flows (date interface-id srcaddr dstaddr srcport dstport protocol packets bytez start endf action status)
