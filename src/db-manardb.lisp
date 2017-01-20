@@ -2,6 +2,7 @@
 ;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
 (defvar *manard-files* (thread-safe-hash-table))
 (defvar *metis-fields* (thread-safe-hash-table))
+(defvar *metis-counters* (thread-safe-hash-table))
 (defvar *metis-need-files* nil)
 
 
@@ -185,7 +186,20 @@
 	(create-klass-hash klass)
 	(manardb:doclass (x klass :fresh-instances nil)
 	  (with-slots (value idx) x
-	    (setf (gethash value (gethash klass *metis-fields*)) idx))))))
+	    (setf (gethash value (gethash klass *metis-fields*)) idx)))
+	(setf (gethash klass *metis-counters*) (get-max-id-from-hash (gethash klass *metis-fields*))))))
+
+(defun get-max-id-from-hash (hash)
+  (format t "hash: ~A~%" hash)
+  (let* ((idxs (alexandria:hash-table-values hash))
+	 (max-id 0))
+    (format t "idxs: ~A~%" idxs)
+    (and idxs
+	 (setf max-id
+	       (apply #'max
+		      (mapcar #'(lambda (x)
+				  (if (stringp x) (parse-integer x) x)) idxs))))
+    max-id))
 
 (defun init-ct-hashes ()
   (mapc
