@@ -473,6 +473,13 @@
 		  (setf max-id (+ 1 (hash-table-count klass-hash)))))
 	   max-id))))
 
+(defun get-next-id (klass)
+  (let ((counter (gethash klass *metis-counters*)))
+    (if counter
+	(setf (gethash klass *metis-counters*) (+ counter 1)))))
+
+
+
 (fare-memoization:define-memo-function get-idx (klass new-value)
   "Return the object for a given value of klass"
   (if (and klass new-value)
@@ -486,7 +493,8 @@
 	      (if seen
 		  (setf nid id)
 		  (progn ;; new item
-		    (setf nid (get-next-idx klass-hash))
+		    ;;(setf nid (get-next-idx klass-hash))
+		    (setf nid (incf (gethash klass *metis-counters*)))
 		    (setf obj (make-instance klass :value new-value :idx nid))
 		    ;;(setf (gethash new-value klass-hash) nid)
 		    )))
