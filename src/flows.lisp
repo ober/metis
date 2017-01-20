@@ -195,7 +195,7 @@
 	 (rev-hash (reverse-hash-kv klass-hash))
 	 (val nil))
       (if (hash-table-p klass-hash)
-	  (setf val (symbol-name (gethash idx rev-hash)))
+	  (setf val (gethash idx rev-hash))
 	  (format t "get-val-by-idx: klass:~A has no hash:~A....~%" klass (type-of rev-hash)))
       val))
 

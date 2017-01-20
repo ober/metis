@@ -186,7 +186,7 @@
 	(create-klass-hash klass)
 	(manardb:doclass (x klass :fresh-instances nil)
 	  (with-slots (value idx) x
-	    (setf (gethash (intern value) (gethash klass *metis-fields*)) idx))))))
+	    (setf (gethash value (gethash klass *metis-fields*)) idx))))))
 
 (defun init-ct-hashes ()
   (mapc

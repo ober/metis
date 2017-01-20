@@ -136,11 +136,11 @@ is replaced with replacement."
 	(rehash-size 2.0)
 	(rehash-threshold 0.7))
   #+sbcl
-  (make-hash-table :synchronized t :test 'eq :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
+  (make-hash-table :synchronized t :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
   #+ccl
-  (make-hash-table :shared :lock-free :test 'eq :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
+  (make-hash-table :shared :lock-free :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
   #+(or allegro lispworks)
-  (make-hash-table :test 'eq :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
+  (make-hash-table :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
   ))
 
 (fare-memoization:define-memo-function reverse-hash-kv (old)
