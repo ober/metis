@@ -20,10 +20,10 @@
 		    metis::requestID
 		    metis::requestParameters
 		    metis::resources
-		    metis::responseElements
+		    ;;metis::responseElements
 		    metis::sourceIPAddress
 		    metis::userAgent
-		    metis::userIdentity
+		    ;;metis::userIdentity
 		    metis::userName
 		    ))
 
@@ -104,7 +104,6 @@
 (manardb:defmmclass userAgent ()
   ((value :initarg :value :accessor value)
    (idx :initarg :idx :accessor idx)))
-
 
 (manardb:defmmclass userIdentity ()
   ((value :initarg :value :accessor value)
