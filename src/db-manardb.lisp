@@ -11,14 +11,14 @@
 		    metis::awsRegion
 		    metis::errorCode
 		    metis::errorMessage
-		    metis::eventID
+		    ;;metis::eventID
 		    metis::eventName
 		    metis::eventSource
-		    metis::eventTime
+		    ;;metis::eventTime
 		    metis::eventType
 		    metis::eventVersion
 		    metis::recipientAccountId
-		    metis::requestID
+		    ;;metis::requestID
 		    metis::requestParameters
 		    metis::resources
 		    ;;metis::responseElements
