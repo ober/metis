@@ -1,7 +1,6 @@
 (in-package :metis)
 ;;(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
 
-
 (defvar *manard-flow-files* (thread-safe-hash-table))
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
@@ -21,9 +20,6 @@
 		     metis::status
 		     metis::action
 		     ))
-
-;;date version account_id interface-id srcaddr dstaddr srcport dstport protocol packets bytez start end action status
-;;2016-08-01T00:28:14.000Z 2 224108527019 eni-0016955d 10.16.3.11 10.16.11.123 53 53573 17 2 186 1470011294 1470011354 ACCEPT OK
 
 (manardb:defmmclass date ()
   ((file :initarg :name :reader file)))
@@ -113,18 +109,6 @@
 	   (t (e) (format t "~%~%Error:~A on join of ~A" e x))))
      *mytasks*)))
 
-(defun get-unique-conversation ()
-  "Return uniqure list of klass objects"
-  (manardb:doclass (x 'metis::conversation :fresh-instances nil)
-    (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
-      (format t "int:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"
-	      (get-val interface-id)
-	      (get-val srcaddr)
-	      (get-val dstaddr)
-	      (get-val srcport)
-	      (get-val dstport)
-	      (get-val protocol)))))
-
 (defun get-by-ip (val)
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
     (with-slots (interface-id srcaddr dstaddr srcport dstport protocol) x
@@ -132,7 +116,6 @@
 	     (dstaddr-i (get-val dstaddr))
 	     (smatch (usocket:ip= val srcaddr-i))
 	     (dmatch (usocket:ip= val dstaddr-i)))
-	;;(format t "smatch:~A val:~A srcaddr-i:~A~%" smatch val srcaddr-i)
 	(if (or smatch dmatch)
 	    (format t "|~A|~A|~A|~A|~A|~A|~%"
 		    (get-val interface-id)
@@ -189,22 +172,23 @@
 		  status)))))
 
 (fare-memoization:define-memo-function get-val-by-idx (klass idx)
-    (allocate-klass-hash klass)
-    (let*
-	((klass-hash (gethash klass *metis-fields*))
-	 (rev-hash (reverse-hash-kv klass-hash))
-	 (val nil))
-      (if (hash-table-p klass-hash)
+  (allocate-klass-hash klass)
+  (let*
+      ((klass-hash (gethash klass *metis-fields*))
+       (rev-hash (reverse-hash-kv klass-hash))
+       (val nil))
+    (if (hash-table-p klass-hash)
+	(progn
 	  (setf val (gethash idx rev-hash))
-
-	  (format t "get-val-by-idx: klass:~A has no hash:~A....~%" klass (type-of rev-hash)))
-      val))
+	  (unless val
+	    (setf val idx)))
+	(format t "get-val-by-idx: klass:~A has no hash:~A....~%" klass (type-of rev-hash)))
+    val))
 
 (defun list-all-vpc ()
   (init-vpc-hashes)
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
-    (with-slots (
-		 interface-id
+    (with-slots (interface-id
 		 srcaddr
 		 dstaddr
 		 srcport
@@ -215,8 +199,7 @@
 		 start
 		 endf
 		 action
-		 status
-		 ) x
+		 status) x
       (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
 	      (get-val-by-idx 'metis::interface-id interface-id)
 	      (get-val-by-idx 'metis::srcaddr srcaddr)
@@ -230,7 +213,6 @@
 	      (get-val-by-idx 'metis::endf endf)
 	      (get-val-by-idx 'metis::action action)
 	      (get-val-by-idx 'metis::status status)))))
-
 
 (defun allocate-vpc-file-hash ()
   (if (eql (hash-table-count *manard-flow-files*) 0)
@@ -286,7 +268,6 @@
 (defun geft-vpc-status-list ()
   "Return uniqure list of events"
   (get-unique-values 'metis::status))
-
 
 (defun process-vf-file (file)
   (when (equal (pathname-type file) "gz")
@@ -350,7 +331,7 @@
 			     (get-val-by-idx 'metis::endf endf)
 			     (get-val-by-idx 'metis::action action)
 			     (get-val-by-idx 'metis::status status))))))
-	    (format t "Error: have not seen source port ~A~%" port)))))
+	  (format t "Error: have not seen source port ~A~%" port)))))
 
 (defun vpc-search-by-dstport (value)
   (init-vpc-hashes)
@@ -376,7 +357,7 @@
 			     (get-val-by-idx 'metis::endf endf)
 			     (get-val-by-idx 'metis::action action)
 			     (get-val-by-idx 'metis::status status))))))
-	    (format t "Error: have not seen dest port ~A~%" value)))))
+	  (format t "Error: have not seen dest port ~A~%" value)))))
 
 (defun vpc-search-by-srcaddr (value)
   (init-vpc-hashes)
@@ -402,7 +383,7 @@
 			     (get-val-by-idx 'metis::endf endf)
 			     (get-val-by-idx 'metis::action action)
 			     (get-val-by-idx 'metis::status status))))))
-	    (format t "Error: have not seen srcaddr ~A~%" value)))))
+	  (format t "Error: have not seen srcaddr ~A~%" value)))))
 
 (defun vpc-search-by-dstaddr (value)
   (init-vpc-hashes)
@@ -428,7 +409,7 @@
 			     (get-val-by-idx 'metis::endf endf)
 			     (get-val-by-idx 'metis::action action)
 			     (get-val-by-idx 'metis::status status))))))
-	    (format t "Error: have not seen dstaddr ~A~%" value)))))
+	  (format t "Error: have not seen dstaddr ~A~%" value)))))
 
 ;; (defun vpc-search-by (klass value field)
 ;;   (init-vpc-hashes)
@@ -479,7 +460,6 @@
 	(setf (gethash klass *metis-counters*) (+ counter 1)))))
 
 
-
 (fare-memoization:define-memo-function get-idx (klass new-value)
   "Return the object for a given value of klass"
   (if (and klass new-value)
@@ -520,7 +500,6 @@
 
     (make-instance 'flow
 		   :date date2
-		   ;;:conversation conversation-i
 		   :interface-id interface-id-i
 		   :srcaddr srcaddr-i
 		   :srcport srcport-i
