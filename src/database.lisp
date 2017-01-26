@@ -1,16 +1,5 @@
 (in-package :metis)
 
-
-(defun thread-safe-hash-table ()
-  "Return a thread safe hash table"
-  #+sbcl
-  (make-hash-table :synchronized t :test 'equalp)
-  #+ccl
-  (make-hash-table :shared :lock-free :test 'equalp)
-  #+(or allegro lispworks)
-  (make-hash-table :test 'equalp)
-  )
-
 ;;(defparameter *q* (make-instance 'queue))
 (defvar *h* (thread-safe-hash-table))
 (defvar *db* nil)
