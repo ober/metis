@@ -233,7 +233,6 @@
     ;;(format t "a: ~A b:~A c:~A d:~A len:~A username:~A" a b c d len username)
     (or a b c d)))
 
-
 ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
 (defun get-unique-values (klass)
@@ -278,7 +277,7 @@
     ;;obj))
     obj-list))
 
-(defun ct-get-by-klass-value (klass value)
+(defun ct-get-by-klass-value (klass value &optional inverse)
   (allocate-klass-hash klass)
   (let* ((klass-hash (gethash klass *metis-fields*))
 	 (slotv nil))
@@ -296,7 +295,8 @@
 		  ((equal (find-class klass) (find-class 'metis::errorMessage)) (setf slotv errorMessage))
 		  ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode)))
 		;;(format t "id:~A seen:~A slotv:~A userName:~A ~%" id seen slotv username)
-		(and slotv (= slotv id)
+		(and slotv
+		     (or (and (= slotv id) (null inverse)) (and (/= slotv id) inverse))
 		     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
 			     (get-val-by-idx 'metis::eventTime eventTime)
 			     (get-val-by-idx 'metis::eventName eventName)
@@ -307,6 +307,9 @@
 			     (get-val-by-idx 'metis::errorMessage errorMessage)
 			     (get-val-by-idx 'metis::errorCode errorCode))))))
 	  (format t "Error: have not seen class: ~A value:~A~%" klass value)))))
+
+(defun ct-get-all-errors ()
+  (ct-get-by-klass-value 'metis::errorCode nil t))
 
 (defun ct-get-by-name (name)
   (ct-get-by-klass-value 'metis::userName name))
@@ -376,6 +379,16 @@
 		   )
     ))
 
+(defun compress-str (str)
+  (when str
+    (let ((store-me nil))
+      (cond
+	((consp str) (setf store-me (format nil "~{~A ~}" str)))
+	((stringp str) (setf store-me str))
+	)
+      (if (< (length store-me) 10)
+	  (flexi-streams:octets-to-string (thnappy:compress-string store-me))
+	  store-me))))
 
 (defun manardb-normalize-insert (record)
   (destructuring-bind (
@@ -414,7 +427,7 @@
 	  (requestID-i (get-idx 'metis::requestID requestID))
 	  (requestParameters-i (get-idx 'metis::requestParameters requestParameters))
 	  (resources-i (get-idx 'metis::resources resources))
-	  (responseElements-i (get-idx 'metis::responseElements responseElements))
+	  (responseElements-i (get-idx 'metis::responseElements (compress-str responseElements)))
 	  (sourceIPAddress-i (get-idx 'metis::sourceIPAddress sourceIPAddress))
 	  (userAgent-i (get-idx 'metis::userAgent userAgent))
 	  (userIdentity-i (get-idx 'metis::userIdentity userIdentity))
