@@ -20,6 +20,7 @@
 	       :manardb
 	       :quicklisp
 	       :split-sequence
+	       :thnappy
 	       :usocket
 	       ;;:sqlite
 	       )

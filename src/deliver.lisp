@@ -10,6 +10,7 @@
 		:pcall
 		;;:postmodern
 		;;:sqlite
+		:thnappy
 		:uiop
 		:usocket
 		))
