@@ -32,13 +32,14 @@
 (defun error-print (fn error)
   (format t "~%~A~%~A~%~A~%~A~%~A~%" fn fn error fn fn))
 
-#-(or clozure sbcl allegro)
-(defun get-json-gzip-contents (file)
-  (uiop:run-program
-   (format nil "zcat ~A" file)
-   :output :string))
+;; #-(or clozure sbcl allegro)
+;; (defun get-json-gzip-contents (file)
+;;   (uiop:run-program
+;;    (format nil "zcat ~A" file)
+;;    :output :string))
 
-#+(or clozure sbcl allegro)
+;; #+(or clozure sbcl allegro)
+
 (defun get-json-gzip-contents (file)
   (first (gzip-stream:with-open-gzip-file (in file)
 	   (loop for l = (read-line in nil nil)
@@ -131,10 +132,11 @@ is replaced with replacement."
     (format nil "~A/~A/~A/~A" dir3 dir2 dir1 (file-namestring x))))
 
 (defun thread-safe-hash-table ()
-  "Return a thread safe hash table"
+  "Return A thread safe hash table"
   (let ((size 1000000)
 	(rehash-size 2.0)
 	(rehash-threshold 0.7))
+  #+abcl (make-hash-table :test 'equalp)
   #+sbcl
   (make-hash-table :synchronized t :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
   #+ccl

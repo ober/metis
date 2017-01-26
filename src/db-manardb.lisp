@@ -30,7 +30,7 @@
 
 (defun init-manardb()
   (unless (boundp 'manardb:use-mmap-dir)
-    (manardb:use-mmap-dir "~/ct-manardb/"))
+    (manardb:use-mmap-dir (or (uiop:getenv "METIS") "~/ct-manardb/")))
   (if (and (eql (hash-table-count *manard-files*) 0) *metis-need-files*)
       (allocate-file-hash)))
 
