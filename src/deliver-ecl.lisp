@@ -1,15 +1,24 @@
-(load "collector/load.lisp")
+(require 'asdf)
+(require 'cmp)
 
-(compile-file "pkgdcl.lisp" :system-p t)
-(compile-file "utils.lisp" :system-p t)
-(compile-file "ctcl.lisp" :system-p t)
-(compile-file "main.lisp" :system-p t)
+(setf *load-verbose* nil)
+(setf *compile-verbose* nil)
+(setf c::*suppress-compiler-warnings* t)
+(setf c::*suppress-compiler-notes* t)
+(setf c::*compile-in-constants* t)
+
+(push (make-pathname :name nil :type nil :version nil :defaults *load-truename*)
+      asdf:*central-registry*)
+
+(ql:quickload :metis)
+
+;;(asdf:operate 'asdf:load-op 'metis)
+
+;;(asdf:operate 'asdf:load-bundle-op 'uiop)
+;;(asdf:operate 'asdf:load-bundle-op 'metis)
 
 
-(defconstant +standalone-exe+ (compile-file-pathname "dist/ecl/metis" :type :program))
+;;(asdf:make-build :metis :type :program :epilogue-code 'metis::main :move-here "./")
 
-(c::build-program +standalone-exe+
-		  :lisp-files
-		  (list (compile-file-pathname "collector/load.lisp" :type :object))
-		  :epilogue-code
-		  'ctcl:main))
+
+(asdf:operate 'asdf:program-op :metis)

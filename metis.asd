@@ -7,6 +7,7 @@
   :license "MIT"
   :class :package-inferred-system
   :defsystem-depends-on (:asdf-package-system)
+  :entry-point "metis:main"
   :depends-on (:cl-date-time-parser
 	       :cl-fad
 	       :cl-json
@@ -16,8 +17,10 @@
 	       :local-time
 	       :pcall
 	       :pcall-queue
+	       :asdf
 	       ;;:postmodern
 	       :manardb
+	       :uiop
 	       :quicklisp
 	       :split-sequence
 	       :thnappy

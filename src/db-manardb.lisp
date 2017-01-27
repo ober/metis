@@ -35,7 +35,7 @@
       (allocate-file-hash)))
 
 (manardb:defmmclass files ()
-  ((value :type STRING :initarg :value :accessor value)
+  ((value :initarg :value :accessor value)
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass additionalEventData ()
