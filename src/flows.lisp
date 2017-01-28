@@ -171,7 +171,8 @@
 		  action
 		  status)))))
 
-(fare-memoization:define-memo-function get-val-by-idx (klass idx)
+;;(fare-memoization:define-memo-function get-val-by-idx (klass idx)
+(defun get-val-by-idx (klass idx)
   (allocate-klass-hash klass)
   (let*
       ((klass-hash (gethash klass *metis-fields*))
@@ -460,7 +461,8 @@
 	(setf (gethash klass *metis-counters*) (+ counter 1)))))
 
 
-(fare-memoization:define-memo-function get-idx (klass new-value)
+;;(fare-memoization:define-memo-function get-idx (klass new-value)
+(defun get-idx (klass new-value)
   "Return the object for a given value of klass"
   (if (and klass new-value)
       (let ((klass-hash (gethash klass *metis-fields*))

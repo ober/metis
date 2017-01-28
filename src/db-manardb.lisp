@@ -143,7 +143,8 @@
       (setf (gethash klass *metis-fields*)
 	    (thread-safe-hash-table)))))
 
-(fare-memoization:define-memo-function get-obj (klass new-value)
+;;(fare-memoization:define-memo-function get-obj (klass new-value)
+(defun get-obj (klass new-value)
   "Return the object for a given value of klass"
   (let ((obj nil))
     (unless (or (null klass) (null new-value))
