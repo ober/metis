@@ -478,7 +478,7 @@
 		    ;;(setf nid (get-next-idx klass-hash))
 		    (setf nid (incf (gethash klass *metis-counters*)))
 		    (setf obj (make-instance klass :value new-value :idx nid))
-		    ;;(setf (gethash new-value klass-hash) nid)
+		    (setf (gethash new-value klass-hash) nid)
 		    )))
 	    (setf nid new-value))
 	nid)))
