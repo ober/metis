@@ -37,19 +37,19 @@ abcl:
 cmucl:
 	@ cat deliver.lisp|/usr/cmucl/bin/lisp
 
-bench:
-	echo "****************SBCL**********************************"
-	time cat collector/run.lisp|sbcl --dynamic-space-size 2048
-	echo "**************** CCL **********************************"
-	time cat collector/run.lisp|ccl64
-	echo "**************** ALLEGRO **********************************"
-	time cat collector/run.lisp|mlisp | grep -v New
-	echo "**************** LISPWORKS **********************************"
-	time cat collector/run.lisp|lw-console
-	echo "**************** CMUCL **********************************"
-	time cat collector/run.lisp|/usr/bin/cmucl | grep -v New
-	echo "**************** ABCL **********************************"
-	time cat collector/run.lisp|abcl | grep -v New
+bench: all
+	rm -rf /tmp/m-a
+	export METIS="/tmp/m-a"
+	metis-sbcl s ~/ct-test > results/sbcl
 
+	rm -rf /tmp/m-a
+	export METIS="/tmp/m-a"
+	metis-lispworks s ~/ct-test > results/lispworks
+	rm -rf /tmp/m-a
+	export METIS="/tmp/m-a"
+	metis-allegro s ~/ct-test > results/allegro
+	rm -rf /tmp/m-a
+	export METIS="/tmp/m-a"
+	metis-ccl s ~/ct-test > results/ccl
 
 all: lispworks sbcl ccl allegro
