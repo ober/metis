@@ -11,11 +11,11 @@ allocating class:RESOURCES
 allocating class:SOURCEIPADDRESS
 allocating class:USERAGENT
 allocating class:USERNAME
-; cpu time (non-gc) 0.121075 sec user, 0.061514 sec system
-; cpu time (gc)     1.104792 sec user, 0.055181 sec system
-; cpu time (total)  1.225867 sec user, 0.116695 sec system
-; cpu time (thread) 0.120954 sec user, 0.061396 sec system
-; real time  1.346101 sec (99.74%)
+; cpu time (non-gc) 0.134961 sec user, 0.065497 sec system
+; cpu time (gc)     1.104653 sec user, 0.060237 sec system
+; cpu time (total)  1.239614 sec user, 0.125734 sec system
+; cpu time (thread) 0.135408 sec user, 0.064696 sec system
+; real time  1.369147 sec (99.72%)
 ; space allocation:
 ;  165,119 cons cells, 310,594,784 other bytes, 0 static bytes
-; Page Faults: major: 0 (gc: 69485), minor: 147202 (gc: 69485)
+; Page Faults: major: 0 (gc: 69484), minor: 147207 (gc: 69484)

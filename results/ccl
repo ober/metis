@@ -12,10 +12,10 @@ allocating class:SOURCEIPADDRESS
 allocating class:USERAGENT
 allocating class:USERNAME
 (METIS::CLOUDTRAIL-REPORT-SYNC METIS::ALPHA)
-took 3,529,237 microseconds (3.529237 seconds) to run.
-     3,338,543 microseconds (3.338543 seconds, 94.60%) of which was spent in GC.
+took 3,547,958 microseconds (3.547958 seconds) to run.
+     3,354,325 microseconds (3.354325 seconds, 94.54%) of which was spent in GC.
 During that period, and with 8 available CPU cores,
-     3,404,853 microseconds (3.404853 seconds) were spent in user mode
-       115,397 microseconds (0.115397 seconds) were spent in system mode
+     3,436,348 microseconds (3.436348 seconds) were spent in user mode
+       101,783 microseconds (0.101783 seconds) were spent in system mode
  309,744,672 bytes of memory allocated.
- 108,041 minor page faults, 0 major page faults, 0 swaps.
+ 108,040 minor page faults, 0 major page faults, 0 swaps.
