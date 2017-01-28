@@ -12,23 +12,23 @@ allocating class:SOURCEIPADDRESS
 allocating class:USERAGENT
 allocating class:USERNAME
 
-rps:592.0093 rows:215 delta:0.36317
-rps:697.59735 rows:242 delta:0.346905
-rps:17543.86 rows:143 delta:0.008151
-rps:18677.152 rows:133 delta:0.007121
-rps:17586.55 rows:159 delta:0.009041
-rps:615.79913 rows:213 delta:0.345892
-rps:578.5089 rows:220 delta:0.380288
-rps:561.96954 rows:204 delta:0.363009
-rps:673.07007 rows:255 delta:0.378861
-rps:18009.553 rows:230 delta:0.012771
-rps:626.9473 rows:231 delta:0.368452
-rps:617.7076 rows:216 delta:0.34968
+rps:621.9229 rows:215 delta:0.345702
+rps:686.83655 rows:242 delta:0.35234
+rps:17033.947 rows:143 delta:0.008395
+rps:18521.098 rows:133 delta:0.007181
+rps:17373.252 rows:159 delta:0.009152
+rps:592.7352 rows:213 delta:0.359351
+rps:623.45026 rows:220 delta:0.352875
+rps:541.9637 rows:204 delta:0.376409
+rps:17533.004 rows:255 delta:0.014544
+rps:665.05896 rows:230 delta:0.345834
+rps:611.3246 rows:231 delta:0.377868
+rps:619.26605 rows:216 delta:0.3488
 (METIS::CLOUDTRAIL-REPORT-SYNC METIS::ALPHA)
-took 31,749,843 microseconds (31.749844 seconds) to run.
-     27,812,066 microseconds (27.812065 seconds, 87.60%) of which was spent in GC.
+took 32,162,640 microseconds (32.162640 seconds) to run.
+     28,175,850 microseconds (28.175850 seconds, 87.60%) of which was spent in GC.
 During that period, and with 8 available CPU cores,
-     31,509,943 microseconds (31.509945 seconds) were spent in user mode
-        163,464 microseconds ( 0.163464 seconds) were spent in system mode
- 634,933,824 bytes of memory allocated.
- 113,420 minor page faults, 0 major page faults, 0 swaps.
+     31,906,484 microseconds (31.906485 seconds) were spent in user mode
+        169,386 microseconds ( 0.169386 seconds) were spent in system mode
+ 634,917,744 bytes of memory allocated.
+ 113,617 minor page faults, 0 major page faults, 0 swaps.

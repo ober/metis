@@ -37,7 +37,7 @@ abcl:
 cmucl:
 	@ cat deliver.lisp|/usr/cmucl/bin/lisp
 
-bench: #all
+bench: all
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
 	METIS="/tmp/m-a/" metis-sbcl s ~/ct-test > results/sbcl
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
