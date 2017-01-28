@@ -142,16 +142,22 @@ is replaced with replacement."
 
 (defun thread-safe-hash-table ()
   "Return A thread safe hash table"
-  (let ((size 1000000)
+  (let ((size 10000000)
 	(rehash-size 2.0)
 	(rehash-threshold 0.7))
   #+(or abcl ecl) (make-hash-table :test 'equalp)
   #+sbcl
-  (make-hash-table :synchronized t :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
+  (make-hash-table :synchronized t :test 'equalp
+		   ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
+		   )
   #+ccl
-  (make-hash-table :shared :lock-free :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
+  (make-hash-table :shared :lock-free :test 'equalp
+		   ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
+		   )
   #+(or allegro lispworks)
-  (make-hash-table :test 'equalp :size size :rehash-size rehash-size :rehash-threshold rehash-threshold)
+  (make-hash-table :test 'equalp
+		   ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
+		   )
   ))
 
 (fare-memoization:define-memo-function reverse-hash-kv (old)

@@ -52,7 +52,7 @@
 		(format t "~%rps:~A rows:~A delta:~A" rps num delta))
 	    )))
     (t (e) (error-print "read-json-gzip-file" e)))
-;;  #+sbcl (trivial-garbage:gc)
+  ;;#+sbcl (room) ;; (trivial-garbage:gc)
   )
 
 (defun cloudtrail-report-sync (path)
