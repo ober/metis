@@ -1,0 +1,20 @@
+Timing the evaluation of (METIS::CLOUDTRAIL-REPORT-SYNC METIS::ALPHA)
+allocating class:ADDITIONALEVENTDATA
+allocating class:AWSREGION
+allocating class:ERRORCODE
+allocating class:ERRORMESSAGE
+allocating class:EVENTNAME
+allocating class:EVENTSOURCE
+allocating class:EVENTTYPE
+allocating class:EVENTVERSION
+allocating class:RECIPIENTACCOUNTID
+allocating class:RESOURCES
+allocating class:SOURCEIPADDRESS
+allocating class:USERAGENT
+allocating class:USERNAME
+
+User time    =        0.184
+System time  =        0.074
+Elapsed time =        0.261
+Allocation   = 114081296 bytes
+0 Page faults

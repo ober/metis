@@ -13,6 +13,7 @@
 			    ;;:sqlite
 			    :uiop
 			    :thnappy
+			    :trivial-garbage
 			    :usocket
 			    )))
 

@@ -126,7 +126,7 @@
 
 (defun get-index-value (table value)
   (let ((one (ignore-errors (db-get-or-insert-id table value))))
-    (unless (typep one 'integer)
+    (unless (typepc one 'integer)
       (setf one (db-get-or-insert-id table value)))
     one))
 

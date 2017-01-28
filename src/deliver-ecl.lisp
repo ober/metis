@@ -10,15 +10,12 @@
 (push (make-pathname :name nil :type nil :version nil :defaults *load-truename*)
       asdf:*central-registry*)
 
-(ql:quickload :metis)
-
-;;(asdf:operate 'asdf:load-op 'metis)
+(asdf:operate 'asdf:load-op 'metis)
+;;(asdf:operate 'asdf:load-op 'closer-mop)
 
 ;;(asdf:operate 'asdf:load-bundle-op 'uiop)
 ;;(asdf:operate 'asdf:load-bundle-op 'metis)
+;;(ql:quickload :closer-mop)
 
-
-;;(asdf:make-build :metis :type :program :epilogue-code 'metis::main :move-here "./")
-
-
-(asdf:operate 'asdf:program-op :metis)
+(asdf:make-build :metis :type :program :monolithic t :prologue-code '(require :asdf) :epilogue-code 'metis:main :move-here "./")
+;;(asdf:make :metis :type :program :epilogue-code 'metis:main)

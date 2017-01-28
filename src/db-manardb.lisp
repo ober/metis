@@ -166,8 +166,11 @@
       seen)))
 
 (defun manardb-get-files (file)
+  (format t "manardb-get-files:~A~%" file)
   (remove-if-not
-   (lambda (x) (string-equal (get-filename-hash file) (slot-value x 'value)))
+   (lambda (x) (string-equal
+		(get-filename-hash file)
+		(slot-value x :value2)))
    (manardb:retrieve-all-instances 'metis::files)))
 
 (defun manardb-mark-file-processed (file)

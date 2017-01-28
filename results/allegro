@@ -1,0 +1,21 @@
+allocating class:ADDITIONALEVENTDATA
+allocating class:AWSREGION
+allocating class:ERRORCODE
+allocating class:ERRORMESSAGE
+allocating class:EVENTNAME
+allocating class:EVENTSOURCE
+allocating class:EVENTTYPE
+allocating class:EVENTVERSION
+allocating class:RECIPIENTACCOUNTID
+allocating class:RESOURCES
+allocating class:SOURCEIPADDRESS
+allocating class:USERAGENT
+allocating class:USERNAME
+; cpu time (non-gc) 0.121075 sec user, 0.061514 sec system
+; cpu time (gc)     1.104792 sec user, 0.055181 sec system
+; cpu time (total)  1.225867 sec user, 0.116695 sec system
+; cpu time (thread) 0.120954 sec user, 0.061396 sec system
+; real time  1.346101 sec (99.74%)
+; space allocation:
+;  165,119 cons cells, 310,594,784 other bytes, 0 static bytes
+; Page Faults: major: 0 (gc: 69485), minor: 147202 (gc: 69485)

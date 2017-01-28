@@ -6,25 +6,31 @@
   :version "0.0.1"
   :license "MIT"
   :class :package-inferred-system
+  :build-operation program-op
+  :build-pathname "metis"
   :defsystem-depends-on (:asdf-package-system)
   :entry-point "metis:main"
-  :depends-on (:cl-date-time-parser
+  :depends-on (
+	       :asdf
+	       :cffi-grovel
+	       :cl-date-time-parser
 	       :cl-fad
 	       :cl-json
 	       :fare-memoization
 	       :gzip-stream
 	       :jonathan
 	       :local-time
+	       :manardb
 	       :pcall
 	       :pcall-queue
-	       :asdf
-	       ;;:postmodern
-	       :manardb
-	       :uiop
 	       :quicklisp
 	       :split-sequence
 	       :thnappy
+	       :trivial-garbage
+	       :uiop
 	       :usocket
+	       ;;:closer-mop
+	       ;;:postmodern
 	       ;;:sqlite
 	       )
   :components ((:module src :serial t

@@ -1,0 +1,32 @@
+allocating class:ADDITIONALEVENTDATA
+allocating class:AWSREGION
+allocating class:ERRORCODE
+allocating class:ERRORMESSAGE
+allocating class:EVENTNAME
+allocating class:EVENTSOURCE
+allocating class:EVENTTYPE
+allocating class:EVENTVERSION
+allocating class:RECIPIENTACCOUNTID
+allocating class:RESOURCES
+allocating class:SOURCEIPADDRESS
+allocating class:USERAGENT
+allocating class:USERNAME
+
+rps:26874.998 rows:215 delta:0.008
+rps:30249.998 rows:242 delta:0.008
+rps:35750.0 rows:143 delta:0.004
+rps:26600.0 rows:133 delta:0.005
+rps:31800.0 rows:159 delta:0.005
+rps:26624.998 rows:213 delta:0.008
+rps:24444.445 rows:220 delta:0.009
+Evaluation took:
+  65.534 seconds of real time
+  65.329172 seconds of total run time (63.071374 user, 2.257798 system)
+  [ Run times consist of 63.663 seconds GC time, and 1.667 seconds non-GC time. ]
+  99.69% CPU
+  1 form interpreted
+  250 lambdas converted
+  184,019,551,991 processor cycles
+  1 page fault
+  888,753,376 bytes consed
+  
