@@ -11,11 +11,27 @@ allocating class:RESOURCES
 allocating class:SOURCEIPADDRESS
 allocating class:USERAGENT
 allocating class:USERNAME
-; cpu time (non-gc) 0.134961 sec user, 0.065497 sec system
-; cpu time (gc)     1.104653 sec user, 0.060237 sec system
-; cpu time (total)  1.239614 sec user, 0.125734 sec system
-; cpu time (thread) 0.135408 sec user, 0.064696 sec system
-; real time  1.369147 sec (99.72%)
+
+rps:8642.856 rows:242 delta:0.028
+69414416 bytes have been tenured, next gc will be global.
+See the documentation for variable *GLOBAL-GC-BEHAVIOR* for more information.
+
+rps:8192.308 rows:213 delta:0.026
+rps:8869.565 rows:204 delta:0.023
+rps:9444.444 rows:255 delta:0.027
+rps:9352.94 rows:159 delta:0.017
+rps:7150.0 rows:143 delta:0.02
+rps:10000.0 rows:230 delta:0.023
+rps:10230.769 rows:133 delta:0.013
+rps:7448.276 rows:216 delta:0.029
+rps:9347.826 rows:215 delta:0.023
+rps:1170.2128 rows:220 delta:0.188
+rps:10043.479 rows:231 delta:0.023
+; cpu time (non-gc) 3.872496 sec user, 0.119592 sec system
+; cpu time (gc)     2.945812 sec user, 0.075723 sec system
+; cpu time (total)  6.818308 sec user, 0.195315 sec system
+; cpu time (thread) 3.869600 sec user, 0.119564 sec system
+; real time  6.760906 sec (103.7%)
 ; space allocation:
-;  165,119 cons cells, 310,594,784 other bytes, 0 static bytes
-; Page Faults: major: 0 (gc: 69484), minor: 147207 (gc: 69484)
+;  5,680,914 cons cells, 497,077,056 other bytes, 0 static bytes
+; Page Faults: major: 0 (gc: 90982), minor: 211650 (gc: 90982)

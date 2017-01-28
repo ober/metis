@@ -37,15 +37,15 @@ abcl:
 cmucl:
 	@ cat deliver.lisp|/usr/cmucl/bin/lisp
 
-bench: all
+bench: #all
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
-	METIS="/tmp/m-a" metis-sbcl s ~/ct-test > results/sbcl
+	METIS="/tmp/m-a/" metis-sbcl s ~/ct-test > results/sbcl
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
-	METIS="/tmp/m-a" metis-lispworks s ~/ct-test > results/lispworks
+	METIS="/tmp/m-a/" metis-lispworks s ~/ct-test > results/lispworks
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
-	METIS="/tmp/m-a" metis-allegro s ~/ct-test > results/allegro
+	METIS="/tmp/m-a/" metis-allegro s ~/ct-test > results/allegro
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
-	METIS="/tmp/m-a" metis-ccl s ~/ct-test > results/ccl
+	METIS="/tmp/m-a/" metis-ccl s ~/ct-test > results/ccl
 	rm -rf /tmp/m-a
 	git add results && git commit -a -m "benchmark results" && git push
 

@@ -11,11 +11,26 @@ allocating class:RESOURCES
 allocating class:SOURCEIPADDRESS
 allocating class:USERAGENT
 allocating class:USERNAME
+
+rps:26874.998 rows:215 delta:0.008
+rps:30249.998 rows:242 delta:0.008
+rps:20428.57 rows:143 delta:0.007
+rps:19000.0 rows:133 delta:0.007
+rps:26500.0 rows:159 delta:0.006
+rps:30428.57 rows:213 delta:0.007
+rps:31428.57 rows:220 delta:0.007
+rps:25499.998 rows:204 delta:0.008
+rps:28333.334 rows:255 delta:0.009
+rps:32857.14 rows:230 delta:0.007
+rps:19250.0 rows:231 delta:0.012
+rps:16615.385 rows:216 delta:0.013
 Evaluation took:
-  0.205 seconds of real time
-  0.203462 seconds of total run time (0.088869 user, 0.114593 system)
-  99.02% CPU
-  30 lambdas converted
-  573,699,024 processor cycles
-  654,863,520 bytes consed
+  112.425 seconds of real time
+  111.663153 seconds of total run time (107.409720 user, 4.253433 system)
+  [ Run times consist of 108.882 seconds GC time, and 2.782 seconds non-GC time. ]
+  99.32% CPU
+  1 form interpreted
+  266 lambdas converted
+  315,689,234,229 processor cycles
+  1,052,315,088 bytes consed
   

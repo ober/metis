@@ -13,8 +13,20 @@ allocating class:SOURCEIPADDRESS
 allocating class:USERAGENT
 allocating class:USERNAME
 
-User time    =        0.198
-System time  =        0.067
-Elapsed time =        0.267
-Allocation   = 114081296 bytes
+rps:12736.843 rows:242 delta:0.019
+rps:13312.499 rows:213 delta:0.016
+rps:13600.0 rows:204 delta:0.015
+rps:14166.667 rows:255 delta:0.018
+rps:14454.546 rows:159 delta:0.011
+rps:14300.0 rows:143 delta:0.01
+rps:11500.0 rows:230 delta:0.02
+rps:7823.529 rows:133 delta:0.017
+rps:11368.422 rows:216 delta:0.019
+rps:13437.499 rows:215 delta:0.016
+rps:11578.947 rows:220 delta:0.019
+rps:14437.499 rows:231 delta:0.016
+User time    =        4.223
+System time  =        0.138
+Elapsed time =        4.381
+Allocation   = 335349800 bytes
 0 Page faults
