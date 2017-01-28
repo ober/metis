@@ -39,13 +39,13 @@ cmucl:
 
 bench: all
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
-	METIS="/tmp/m-a/" metis-sbcl s ~/ct-test > results/sbcl
+	METIS="/tmp/m-a/" time metis-sbcl s ~/ct-test > results/sbcl 2>&1
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
-	METIS="/tmp/m-a/" metis-lispworks s ~/ct-test > results/lispworks
+	METIS="/tmp/m-a/" time metis-lispworks s ~/ct-test > results/lispworks 2>&1
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
-	METIS="/tmp/m-a/" metis-allegro s ~/ct-test > results/allegro
+	METIS="/tmp/m-a/" time metis-allegro s ~/ct-test > results/allegro  2>&1
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
-	METIS="/tmp/m-a/" metis-ccl s ~/ct-test > results/ccl
+	METIS="/tmp/m-a/" time metis-ccl s ~/ct-test > results/ccl 2>&1
 	rm -rf /tmp/m-a
 	git add results && git commit -a -m "benchmark results" && git push
 
