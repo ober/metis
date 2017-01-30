@@ -28,6 +28,7 @@
 	       :thnappy
 	       :trivial-garbage
 	       :uiop
+	       :zs3
 	       :usocket
 	       ;;:closer-mop
 	       ;;:postmodern

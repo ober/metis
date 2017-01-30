@@ -19,7 +19,7 @@
 
 
 (defpackage :metis
-  (:use :cl
+  (:use :cl :zs3
 	#+allegro :prof
 	)
 
