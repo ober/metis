@@ -10,6 +10,7 @@
 			    ;;:postmodern
 			    :manardb
 			    ;;:s-sql
+			    :zs3
 			    ;;:sqlite
 			    :uiop
 			    :thnappy

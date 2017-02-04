@@ -16,6 +16,7 @@
 	       :cl-date-time-parser
 	       :cl-fad
 	       :cl-json
+	       :closer-mop
 	       :fare-memoization
 	       :gzip-stream
 	       :jonathan
@@ -23,14 +24,12 @@
 	       :manardb
 	       :pcall
 	       :pcall-queue
-	       :quicklisp
 	       :split-sequence
 	       :thnappy
 	       :trivial-garbage
 	       :uiop
-	       :zs3
 	       :usocket
-	       ;;:closer-mop
+	       :zs3
 	       ;;:postmodern
 	       ;;:sqlite
 	       )
