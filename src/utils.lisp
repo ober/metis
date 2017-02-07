@@ -163,3 +163,35 @@ is replaced with replacement."
 (fare-memoization:define-memo-function reverse-hash-kv (old)
   (let ((new (make-hash-table)))
     (maphash #'(lambda (k v) (setf (gethash v new) k)) old) new))
+
+
+;; from David McClain
+
+(defun %par (fn &rest fns)
+  (let* ((nfns (length fns))
+         (sem  (mp:make-semaphore :count 0)))
+    (dolist (fn fns)
+      (mp:funcall-async (lambda ()
+                          (unwind-protect
+                              (funcall fn)
+                            (mp:semaphore-release sem)))
+                        ))
+    (prog1
+        (funcall fn)
+      (mp:semaphore-acquire sem :count nfns))))
+
+(defmacro par1 (&rest clauses)
+  ;; like PROG1, but executes all clauses in parallel, synchronizing
+  ;; at the closing paren, and returning value of first clause
+  (when clauses
+    (if (rest clauses)
+        `(%par ,@(mapcar #`(lambda ()
+                             ,a1)
+                         clauses))
+      ;; else
+      (first clauses))))
+
+(defmacro par (&rest clauses)
+  ;; like PROGN, but executes all clauses in parallel, synchronizing
+  ;; at the closing paren, and returning value of last clause
+  `(par1 ,@(nreverse clauses)))
