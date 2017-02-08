@@ -40,48 +40,47 @@
 (deliver 'metis:main "../dist/lispworks/metis" 0 :keep-package-manipulation t :multiprocessing t :keep-eval t :keep-fasl-dump t :keep-editor t :keep-foreign-symbols t :keep-function-name t :keep-gc-cursor t :keep-keyword-names t :keep-lisp-reader t :keep-macros t :keep-modules t :keep-top-level t :license-info nil  :keep-walker t :KEEP-PRETTY-PRINTER t)
 
 #+allegro
-(progn
-  (let ((lfiles '(
-		  "package.lisp"
-		  "utils.lisp"
-		  "ctcl.lisp"
-		  "database.lisp"
-		  ;;"db-postgres.lisp"
-		  ;;"db-sqlite.lisp"
-		  "db-manardb.lisp"
-		  "main.lisp"
-		  "bench.lisp"
-		  "flows.lisp"
-		  )))
-    (mapcar #'compile-file lfiles)
-    (cl-user::generate-executable "../dist/allegro/metis" '(
-							 "package.fasl"
-							 "utils.fasl"
-							 "database.fasl"
-							 ;;"db-postgres.fasl"
-							 ;;"db-sqlite.fasl"
-							 "db-manardb.fasl"
-							 "ctcl.fasl"
-							 "main.fasl"
-							 "bench.fasl"
-							 "flows.fasl"
-							 )
-				  :runtime :partners
-				  :show-window :shownoactivate
-				  :system-dlls-path "system-dlls/"
-				  :temporary-directory #P"/tmp/"
-				  :verbose nil
-				  :discard-compiler nil
-				  :discard-local-name-info t
-				  :discard-source-file-info t
-				  :discard-xref-info t
-				  :ignore-command-line-arguments t
-				  :include-compiler t
-				  :include-composer nil
-				  :include-debugger t
-				  :include-devel-env nil
-				  :include-ide nil
-				  :runtime :partners
-				  :suppress-allegro-cl-banner t
-				  :newspace 16777216
-				  :oldspace 33554432)))
+(let ((lfiles '(
+		"package.lisp"
+		"utils.lisp"
+		"ctcl.lisp"
+		"database.lisp"
+		;;"db-postgres.lisp"
+		;;"db-sqlite.lisp"
+		"db-manardb.lisp"
+		"main.lisp"
+		"bench.lisp"
+		"flows.lisp"
+		)))
+  (mapcar #'compile-file lfiles)
+  (cl-user::generate-executable "../dist/allegro/metis" '(
+							  "package.fasl"
+							  "utils.fasl"
+							  "database.fasl"
+							  ;;"db-postgres.fasl"
+							  ;;"db-sqlite.fasl"
+							  "db-manardb.fasl"
+							  "ctcl.fasl"
+							  "main.fasl"
+							  "bench.fasl"
+							  "flows.fasl"
+							  )
+				:runtime :partners
+				:show-window :shownoactivate
+				:system-dlls-path "system-dlls/"
+				:temporary-directory #P"/tmp/"
+				:verbose nil
+				:discard-compiler nil
+				:discard-local-name-info t
+				:discard-source-file-info t
+				:discard-xref-info t
+				:ignore-command-line-arguments t
+				:include-compiler t
+				:include-composer nil
+				:include-debugger t
+				:include-devel-env nil
+				:include-ide nil
+				:runtime :partners
+				:suppress-allegro-cl-banner t
+				:newspace 16777216
+				:oldspace 33554432))
