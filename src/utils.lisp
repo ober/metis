@@ -167,6 +167,7 @@ is replaced with replacement."
 
 ;; from David McClain
 
+#+lispworks
 (defun %par (fn &rest fns)
   (let* ((nfns (length fns))
          (sem  (mp:make-semaphore :count 0)))
@@ -180,6 +181,7 @@ is replaced with replacement."
         (funcall fn)
       (mp:semaphore-acquire sem :count nfns))))
 
+#+lispworks
 (defmacro par1 (&rest clauses)
   ;; like PROG1, but executes all clauses in parallel, synchronizing
   ;; at the closing paren, and returning value of first clause
@@ -191,6 +193,7 @@ is replaced with replacement."
       ;; else
       (first clauses))))
 
+#+lispworks
 (defmacro par (&rest clauses)
   ;; like PROGN, but executes all clauses in parallel, synchronizing
   ;; at the closing paren, and returning value of last clause
