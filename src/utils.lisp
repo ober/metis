@@ -49,8 +49,8 @@
 (defun get-json-gzip-contents (file)
   (handler-case
       (progn (first (gzip-stream:with-open-gzip-file (in file)
-	   (loop for l = (read-line in nil nil)
-	      while l collect l))))
+		      (loop for l = (read-line in nil nil)
+			 while l collect l))))
     (t (e) (error-print "get-json-gzip-contents" e))))
 
 
@@ -145,20 +145,20 @@ is replaced with replacement."
   (let ((size 10000000)
 	(rehash-size 2.0)
 	(rehash-threshold 0.7))
-  #+(or abcl ecl) (make-hash-table :test 'equalp)
-  #+sbcl
-  (make-hash-table :synchronized t :test 'equalp
-		   ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
-		   )
-  #+ccl
-  (make-hash-table :shared :lock-free :test 'equalp
-		   ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
-		   )
-  #+(or allegro lispworks)
-  (make-hash-table :test 'equalp
-		   ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
-		   )
-  ))
+    #+(or abcl ecl) (make-hash-table :test 'equalp)
+    #+sbcl
+    (make-hash-table :synchronized t :test 'equalp
+		     ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
+		     )
+    #+ccl
+    (make-hash-table :shared :lock-free :test 'equalp
+		     ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
+		     )
+    #+(or allegro lispworks)
+    (make-hash-table :test 'equalp
+		     ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
+		     )
+    ))
 
 (fare-memoization:define-memo-function reverse-hash-kv (old)
   (let ((new (make-hash-table)))
@@ -167,34 +167,34 @@ is replaced with replacement."
 
 ;; from David McClain
 
-#+lispworks
-(defun %par (fn &rest fns)
-  (let* ((nfns (length fns))
-         (sem  (mp:make-semaphore :count 0)))
-    (dolist (fn fns)
-      (mp:funcall-async (lambda ()
-                          (unwind-protect
-                              (funcall fn)
-                            (mp:semaphore-release sem)))
-                        ))
-    (prog1
-        (funcall fn)
-      (mp:semaphore-acquire sem :count nfns))))
+;; #+lispworks
+;; (defun %par (fn &rest fns)
+;;   (let* ((nfns (length fns))
+;;          (sem  (mp:make-semaphore :count 0)))
+;;     (dolist (fn fns)
+;;       (mp:funcall-async (lambda ()
+;;                           (unwind-protect
+;; 			       (funcall fn)
+;;                             (mp:semaphore-release sem)))
+;;                         ))
+;;     (prog1
+;;         (funcall fn)
+;;       (mp:semaphore-acquire sem :count nfns))))
 
-#+lispworks
-(defmacro par1 (&rest clauses)
-  ;; like PROG1, but executes all clauses in parallel, synchronizing
-  ;; at the closing paren, and returning value of first clause
-  (when clauses
-    (if (rest clauses)
-        `(%par ,@(mapcar #`(lambda ()
-                             ,a1)
-                         clauses))
-      ;; else
-      (first clauses))))
+;; #+lispworks
+;; (defmacro par1 (&rest clauses)
+;;   ;; like PROG1, but executes all clauses in parallel, synchronizing
+;;   ;; at the closing paren, and returning value of first clause
+;;   (when clauses
+;;     (if (rest clauses)
+;;         `(%par ,@(mapcar #`(lambda ()
+;;                              ,a1)
+;;                          clauses))
+;; 	;; else
+;; 	(first clauses))))
 
-#+lispworks
-(defmacro par (&rest clauses)
-  ;; like PROGN, but executes all clauses in parallel, synchronizing
-  ;; at the closing paren, and returning value of last clause
-  `(par1 ,@(nreverse clauses)))
+;; #+lispworks
+;; (defmacro par (&rest clauses)
+;;   ;; like PROGN, but executes all clauses in parallel, synchronizing
+;;   ;; at the closing paren, and returning value of last clause
+;;   `(par1 ,@(nreverse clauses)))
