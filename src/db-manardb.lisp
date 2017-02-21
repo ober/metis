@@ -228,14 +228,15 @@
 	  (manardb:count-all-instances 'metis::protocol)
 	  ))
 
-(fare-memoization:define-memo-function  find-username (userIdentity)
+(defun find-username (userIdentity)
   (let ((a (fetch-value '(:|sessionContext| :|sessionIssuer| :|userName|) userIdentity))
 	(b (fetch-value '(:|sessionContext| :|userName|) userIdentity))
 	(c (fetch-value '(:|userName|) userIdentity))
-	(d (fetch-value '(:|type|) userIdentity))
+	(d (last (cl-ppcre:split ":" (fetch-value '(:|arn|) userIdentity))))
+	(e (fetch-value '(:|type|) userIdentity))
 	(len (length userIdentity)))
     ;;(format t "a: ~A b:~A c:~A d:~A len:~A username:~A" a b c d len username)
-    (or a b c d)))
+    (or a b c d e)))
 
 ;;(cl-ppcre:regex-replace #\newline 'userIdentity " "))))))
 
@@ -301,7 +302,7 @@
 		;;(format t "id:~A seen:~A slotv:~A userName:~A ~%" id seen slotv username)
 		(and slotv
 		     (or (and (= slotv id) (null inverse)) (and (/= slotv id) inverse))
-		     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+		     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~%"
 			     (get-val-by-idx 'metis::eventTime eventTime)
 			     (get-val-by-idx 'metis::eventName eventName)
 			     (get-val-by-idx 'metis::userName userName)
@@ -309,7 +310,8 @@
 			     (get-val-by-idx 'metis::sourceIPAddress sourceIPAddress)
 			     (get-val-by-idx 'metis::userAgent userAgent)
 			     (get-val-by-idx 'metis::errorMessage errorMessage)
-			     (get-val-by-idx 'metis::errorCode errorCode))))))
+			     (get-val-by-idx 'metis::errorCode errorCode)
+			     (find-username (get-val-by-idx 'metis::userIdentity userIdentity)))))))
 	  (format t "Error: have not seen class: ~A value:~A~%" klass value)))))
 
 (defun ct-get-all-errors ()
