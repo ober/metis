@@ -18,6 +18,11 @@
 ;; 	(b (or (nth 3 args) nil))
 ;; 	(c (or (nth 4 args) nil)))
 
+#+sbcl
+(defun sbcl-entry()
+  (handler-case (main)
+    (sb-sys:interactive-interrupt ()
+      (sb-ext:quit))))
 
 (defun usage ()
   (print "a - cloudtrail-report-async")
@@ -116,9 +121,13 @@
 	   (usage))))
   (manardb:close-all-mmaps)))
 
-
 (defun main ()
   (init-manardb)
+  #+sbcl
+  (handler-case (process-args (argv))
+    (sb-sys:interactive-interrupt ()
+      (sb-ext:quit)))
+  #-sbcl
   (process-args (argv)))
 
 #+allegro
