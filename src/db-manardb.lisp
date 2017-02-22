@@ -232,7 +232,7 @@
   (let ((a (fetch-value '(:|sessionContext| :|sessionIssuer| :|userName|) userIdentity))
 	(b (fetch-value '(:|sessionContext| :|userName|) userIdentity))
 	(c (fetch-value '(:|userName|) userIdentity))
-	(d (last (cl-ppcre:split ":" (fetch-value '(:|arn|) userIdentity))))
+	(d (car (last (cl-ppcre:split ":" (fetch-value '(:|arn|) userIdentity)))))
 	(e (fetch-value '(:|type|) userIdentity))
 	(len (length userIdentity)))
     ;;(format t "a: ~A b:~A c:~A d:~A len:~A username:~A" a b c d len username)
