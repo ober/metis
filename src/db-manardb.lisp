@@ -144,6 +144,7 @@
 	    (thread-safe-hash-table)))))
 
 ;;(fare-memoization:define-memo-function get-obj (klass new-value)
+
 (defun get-obj (klass new-value)
   "Return the object for a given value of klass"
   (let ((obj nil))
@@ -288,7 +289,7 @@
 	 (slotv nil))
     (multiple-value-bind (id seen)
 	(gethash value klass-hash)
-      (if seen
+      (or seen (and inverse (null value))
 	  (progn
 	    (manardb:doclass (x 'metis::ct :fresh-instances nil)
 	      (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
@@ -299,19 +300,17 @@
 		  ((equal (find-class klass) (find-class 'metis::sourceIPAddress)) (setf slotv sourceIPAddress))
 		  ((equal (find-class klass) (find-class 'metis::errorMessage)) (setf slotv errorMessage))
 		  ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode)))
-		;;(format t "id:~A seen:~A slotv:~A userName:~A ~%" id seen slotv username)
-		(and slotv
-		     (or (and (= slotv id) (null inverse)) (and (/= slotv id) inverse))
-		     (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~%"
-			     (get-val-by-idx 'metis::eventTime eventTime)
-			     (get-val-by-idx 'metis::eventName eventName)
-			     (get-val-by-idx 'metis::userName userName)
-			     (get-val-by-idx 'metis::eventSource eventSource)
-			     (get-val-by-idx 'metis::sourceIPAddress sourceIPAddress)
-			     (get-val-by-idx 'metis::userAgent userAgent)
-			     (get-val-by-idx 'metis::errorMessage errorMessage)
-			     (get-val-by-idx 'metis::errorCode errorCode)
-			     (find-username (get-val-by-idx 'metis::userIdentity userIdentity)))))))
+		(when slotv
+		  (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+			  (get-val-by-idx 'metis::eventTime eventTime)
+			  (get-val-by-idx 'metis::eventName eventName)
+			  (get-val-by-idx 'metis::userName userName)
+			  (get-val-by-idx 'metis::eventSource eventSource)
+			  (get-val-by-idx 'metis::sourceIPAddress sourceIPAddress)
+			  (get-val-by-idx 'metis::userAgent userAgent)
+			  (get-val-by-idx 'metis::errorMessage errorMessage)
+			  (get-val-by-idx 'metis::errorCode errorCode)
+			  (find-username (get-val-by-idx 'metis::userIdentity userIdentity)))))))
 	  (format t "Error: have not seen class: ~A value:~A~%" klass value)))))
 
 (defun ct-get-all-errors ()
