@@ -198,3 +198,15 @@ is replaced with replacement."
 ;;   ;; like PROGN, but executes all clauses in parallel, synchronizing
 ;;   ;; at the closing paren, and returning value of last clause
 ;;   `(par1 ,@(nreverse clauses)))
+
+
+(defun get-size (file)
+  (let ((stat (get-stat file)))
+    #+allegro (progn
+		(require 'osi)
+		(excl.osi:stat-size stat))
+    #+lispworks (progn
+		  (sys:file-stat-size stat))
+    #+sbcl (sb-posix:stat-size stat)
+    #+ccl (elt stat 2)
+    ))
