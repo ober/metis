@@ -1,5 +1,4 @@
 (in-package :metis)
-(declaim (optimize (speed 3) (debug 0) (safety 0) (compilation-speed 0)))
 (defvar *manard-files* (thread-safe-hash-table))
 (defvar *metis-fields* (thread-safe-hash-table))
 (defvar *metis-counters* (thread-safe-hash-table))
