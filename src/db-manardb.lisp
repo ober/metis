@@ -132,7 +132,7 @@
    (sourceIPAddress :initarg :sourceIPAddress :accessor sourceIPAddress)
    (userAgent :initarg :userAgent :accessor userAgent)
    (userIdentity :initarg :userIdentity :accessor userIdentity)
-   (userName :initarg :userName :accessor username)
+A   (userName :initarg :userName :accessor username)
    ))
 
 (defun create-klass-hash (klass)
@@ -245,6 +245,15 @@
   (manardb:doclass (x klass :fresh-instances nil)
     (with-slots (value idx) x
       (format t "~%~A: ~A" idx value))))
+
+(defun get-unique-values-list (klass)
+  "Return unique list of klass objects"
+  (let ((results '()))
+    (manardb:doclass (x klass :fresh-instances nil)
+      (with-slots (value idx) x
+	(push value results)))
+    results))
+
 ;; lists
 (defun get-ct-files ()
   "Return unique list of ct files"
