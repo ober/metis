@@ -254,6 +254,10 @@ A   (userName :initarg :userName :accessor username)
 	(push value results)))
     results))
 
+
+
+
+
 ;; lists
 (defun get-ct-files ()
   "Return unique list of ct files"
@@ -282,14 +286,12 @@ A   (userName :initarg :userName :accessor username)
 
 (defun get-obj-by-val (klass val)
   (let ((obj-list nil))
-    ;;(let ((obj nil))
     (manardb:doclass (x klass :fresh-instances nil)
       (with-slots (value) x
 	(if (string-equal val value)
-	    ;;(setf obj x))))
 	    (push x obj-list))))
-    ;;obj))
     obj-list))
+
 
 (defun ct-get-by-klass-value (klass value &optional inverse)
   (allocate-klass-hash klass)
@@ -297,7 +299,7 @@ A   (userName :initarg :userName :accessor username)
 	 (slotv nil))
     (multiple-value-bind (id seen)
 	(gethash value klass-hash)
-      (or seen (and inverse (null value))
+      (if (or seen (and inverse (null value)))
 	  (progn
 	    (manardb:doclass (x 'metis::ct :fresh-instances nil)
 	      (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
