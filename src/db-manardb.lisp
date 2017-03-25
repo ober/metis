@@ -132,7 +132,7 @@
    (sourceIPAddress :initarg :sourceIPAddress :accessor sourceIPAddress)
    (userAgent :initarg :userAgent :accessor userAgent)
    (userIdentity :initarg :userIdentity :accessor userIdentity)
-A   (userName :initarg :userName :accessor username)
+   (userName :initarg :userName :accessor username)
    ))
 
 (defun create-klass-hash (klass)
