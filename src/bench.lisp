@@ -9,7 +9,6 @@
   (defvar *db-backend* :manardb)
   (init-manardb-bench)
   (manardb:use-mmap-dir "~/ct-manardb/")
-  (declaim (optimize (safety 3) (speed 0) (debug 3)))
   (defvar *benching* t)
   ;;(cloudtrail-report-async "1" "~/nov/"))
   (cloudtrail-report-async "4" "~/jan/"))
