@@ -22,7 +22,7 @@
 
 (defun async-ct-file (x)
   (push (pcall:pexec
-	  (funcall #'process-ct-file x)) *mytasks*))
+	 (funcall #'process-ct-file x)) *mytasks*))
 
 (defun process-ct-file (x)
   "Handle the contents of the json gzip file"
