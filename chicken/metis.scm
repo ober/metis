@@ -41,15 +41,19 @@
 	 (entries (vector->list (cdr (car json)))))
     (for-each
      (lambda (x)
-       (process-ct-line x))
+       (normalize-insert (process-record x)))
      entries)))
 
-(define (process-ct-line line)
+(define (normalize-insert record)
+  (format #t "normalize-insert:~{ ~A ~}~%" record)
+  )
+
+(define (process-record line fields)
   ;;(format #t "line:~A~%" line)
   (for-each
    (lambda (x)
      (get-value x line))
-   *fields*))
+   fields))
 
 (define (ct-report-sync dir)
   (for-each

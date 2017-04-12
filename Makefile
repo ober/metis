@@ -39,9 +39,10 @@ cmucl:
 	@ cat deliver.lisp|/usr/cmucl/bin/lisp
 
 chicken:
+	@ rm -rf ./dist/chicken
 	@ mkdir -p dist/chicken
 	@ chicken-install z3 medea vector-lib posix files srfi-13
-	@ csc -deploy chicken/metis.scm -o dist/chicken/metis
+	@ csc -deploy -o dist/chicken chicken/metis.scm
 	@ chicken-install -deploy -p dist/chicken z3 medea vector-lib posix files srfi-13
 
 bench: all
