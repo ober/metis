@@ -37,6 +37,12 @@ abcl:
 cmucl:
 	@ cat deliver.lisp|/usr/cmucl/bin/lisp
 
+chicken:
+	@ mkdir -p dist/chicken
+	@ chicken-install z3 medea vector-lib posix files srfi-13
+	@ csc -deploy chicken/read-ct.scm -o dist/chicken/metis
+	@ chicken-install -deploy -p dist/chicken z3 medea vector-lib posix files srfi-13
+
 bench: all
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
 	METIS="/tmp/m-a/" time metis-sbcl s ~/ct-test > results/sbcl 2>&1
