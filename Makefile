@@ -1,4 +1,5 @@
 .DEFAULT_GOAL := usage
+.PHONY: chicken
 
 usage:
 	@ echo "make all # create distributions for all installed lisps"
