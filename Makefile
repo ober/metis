@@ -41,9 +41,9 @@ cmucl:
 chicken:
 	@ rm -rf ./dist/chicken
 	@ mkdir -p dist/chicken
-	@ chicken-install -deploy -p dist/chicken z3 medea vector-lib posix files srfi-13
-	@ chicken-install z3 medea vector-lib posix files srfi-13
-	@ csc -deploy -o dist/chicken chicken/metis.scm
+	@ /usr/local/bin/chicken-install -deploy -p dist/chicken z3 medea vector-lib posix files srfi-13 format list-bindings
+	@ /usr/local/bin/chicken-install z3 medea vector-lib posix files srfi-13 format list-bindings
+	@ /usr/local/bin/csc -deploy -o dist/chicken chicken/metis.scm
 	@ mv dist/chicken/chicken dist/chicken/metis
 
 
