@@ -1,9 +1,16 @@
 (use z3)
+(use srfi-1)
 (use medea)
 (use vector-lib)
 (use posix)
 (use files)
 (use srfi-13)
+(use format)
+(use list-bindings)
+
+
+
+(define *db* (lmdb-open (make-pathname "." "mydb.mdb")))
 
 (define *fields* '(
 		   "additionalEventData"
@@ -33,7 +40,7 @@
     (close-input-port gzip-stream)
     json))
 
-(define (parse-ct-file file)
+(define (process-ct-file file)
   (parse-ct-contents file))
 
 (define (parse-ct-contents file)
@@ -41,19 +48,44 @@
 	 (entries (vector->list (cdr (car json)))))
     (for-each
      (lambda (x)
-       (normalize-insert (process-record x)))
+       (normalize-insert (process-record x '() *fields*)))
      entries)))
 
 (define (normalize-insert record)
-  (format #t "normalize-insert:~{ ~A ~}~%" record)
-  )
+  (bind (
+	 additionalEventData
+	 awsRegion
+	 errorCode
+	 errorMessage
+	 eventID
+	 eventName
+	 eventSource
+	 eventTime
+	 eventType
+	 eventVersion
+	 recipientAccountId
+	 requestID
+	 requestParameters
+	 resources
+	 responseElements
+	 sourceIPAddress
+	 userAgent
+	 userIdentity
+	 userName
+	 )
+	(reverse record)
 
-(define (process-record line fields)
-  ;;(format #t "line:~A~%" line)
-  (for-each
-   (lambda (x)
-     (get-value x line))
-   fields))
+	(format #t "NI: eventID:~A~%" eventID)))
+
+(define (process-record line results fields)
+  (cond ((null-list? fields)
+	 results)
+	(else
+	 (let ((value (get-value (car fields) line)))
+	   ;;(format #t "PR: field:~A value:~A~%" (car fields) value)
+	   (process-record line
+			   (cons value results)
+			   (cdr fields))))))
 
 (define (ct-report-sync dir)
   (for-each
@@ -62,27 +94,23 @@
 	    (process-ct-file x))))
    (find-files dir)))
 
+(define (type-of x)
+  (cond ((number? x) "Number")
+	((list? x) "list")
+	((pair? x) "Pair")
+	((vector? x) "Vector")
+	((null? x) "null")
+	((string? x) "String")
+	(else "Unknown type")))
+
 (define (get-value field record)
-  (cond
-   ((string= "additionalEventData" field) (assoc 'additionalEventData record))
-   ((string= "awsRegion" field) (assoc 'awsRegion record))
-   ((string= "errorCode" field) (assoc 'errorCode record))
-   ((string= "errorMessage" field) (assoc 'errorMessage record))
-   ((string= "eventID" field) (assoc 'eventID record))
-   ((string= "eventName" field) (assoc 'eventName record))
-   ((string= "eventSource" field) (assoc 'eventSource record))
-   ((string= "eventTime" field) (assoc 'eventTime record))
-   ((string= "eventType" field) (assoc 'eventType record))
-   ((string= "eventVersion" field) (assoc 'eventVersion record))
-   ((string= "recipientAccountId" field) (assoc 'recipientAccountId record))
-   ((string= "requestID" field) (assoc 'requestID record))
-   ((string= "requestParameters" field) (assoc 'requestParameters record))
-   ((string= "resources" field) (assoc 'resources record))
-   ((string= "responseElements" field) (assoc 'responseElements record))
-   ((string= "sourceIPAddress" field) (assoc 'sourceIPAddress record))
-   ((string= "userAgent" field) (assoc 'userAgent record))
-   ((string= "userIdentity" field) (assoc 'userIdentity record))
-   ((string= "userName" field) (assoc 'userName record))
-   ))
+  (let* ((field-sym (string->symbol field))
+	(value (assoc field-sym record)))
+    (cond ((pair? value)
+	(cdr value))
+	  (else value))))
+
 
 (ct-report-sync "/Users/akkad/CT")
+
+(lmdb-close *db*)
