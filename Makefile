@@ -46,7 +46,6 @@ chicken:
 	@ /usr/local/bin/csc -deploy -o dist/chicken chicken/metis.scm
 	@ mv dist/chicken/chicken dist/chicken/metis
 
-
 bench: all
 	rm -rf /tmp/m-a && mkdir /tmp/m-a
 	METIS="/tmp/m-a/" time metis-sbcl s ~/ct-test > results/sbcl 2>&1
@@ -60,4 +59,3 @@ bench: all
 	git add results && git commit -a -m "benchmark results" && git push
 
 all: lispworks sbcl ccl allegro
-m
