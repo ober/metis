@@ -1,16 +1,15 @@
-(use z3)
-(use srfi-1)
-(use medea)
-(use vector-lib)
-(use posix)
 (use files)
-(use srfi-13)
 (use format)
 (use list-bindings)
 (use lmdb)
+(use medea)
+(use posix)
 (use s11n)
+(use srfi-1)
+(use srfi-13)
 (use srfi-19)
-(use srfi-18)
+(use vector-lib)
+(use z3)
 
 (define *db* (lmdb-open (make-pathname "/Users/akkad/" "metis.mdb") mapsize: 1000000000))
 
@@ -113,8 +112,6 @@
 	    )))
    (find-files dir)))
 
-
-
 (define (type-of x)
   (cond ((number? x) "Number")
 	((list? x) "list")
@@ -143,5 +140,14 @@
                           (else (return #f))))))
           (r obj))))))
 
+
 (ct-report-sync "/Users/akkad/CT")
+
+;; (lmdb-begin *db*)
+;; (for-each
+;;  (lambda (x)
+;;    ;;(format #t "~A~%" (call-with-input-string (->string x) (lambda (x) (deserialize)))))
+;;    (format #t "~A~%" (deserialize (blob->string x))))
+;;  (lmdb-keys *db*))
+;; (lmdb-end *db*)
 (lmdb-close *db*)
