@@ -7,10 +7,14 @@
 (use srfi-13)
 (use format)
 (use list-bindings)
+(use lmdb)
+(use s11n)
+(use srfi-19)
+(use srfi-18)
 
+(define *db* (lmdb-open (make-pathname "/Users/akkad/" "metis.mdb") mapsize: 1000000000))
 
-
-(define *db* (lmdb-open (make-pathname "." "mydb.mdb")))
+;;(define *db* (lmdb-open (make-pathname "/Users/akkad/" "metis.mdb") key: (string->blob "omg") mapsize: 1000000000))
 
 (define *fields* '(
 		   "additionalEventData"
@@ -41,15 +45,22 @@
     json))
 
 (define (process-ct-file file)
-  (parse-ct-contents file))
+  (lmdb-begin *db*)
+  (format #t "count:~A~%" (lmdb-count *db*))
+  (parse-ct-contents file)
+  (lmdb-end *db*))
 
 (define (parse-ct-contents file)
-  (let* ((json (parse-json-gz-file file))
-	 (entries (vector->list (cdr (car json)))))
+  (let* ((btime (current-seconds))
+	 (json (parse-json-gz-file file))
+	 (entries (vector->list (cdr (car json))))
+	 (length (list-length entries)))
     (for-each
      (lambda (x)
        (normalize-insert (process-record x '() *fields*)))
-     entries)))
+     entries)
+    (format #t "length: ~A delta: ~A~%" length (- (current-seconds) btime))
+    ))
 
 (define (normalize-insert record)
   (bind (
@@ -75,7 +86,14 @@
 	 )
 	(reverse record)
 
-	(format #t "NI: eventID:~A~%" eventID)))
+	(let ((key (string-join (list eventTime eventName eventSource) "-"))
+	      (value (list additionalEventData awsRegion errorCode errorMessage eventID eventName eventSource eventType eventVersion recipientAccountId requestID requestParameters resources responseElements sourceIPAddress userAgent userIdentity userName)))
+	  (lmdb-set! *db*
+		     (string->blob (->string key))
+		     (string->blob (with-output-to-string
+				     (lambda ()
+				       (serialize value)))))
+	)))
 
 (define (process-record line results fields)
   (cond ((null-list? fields)
@@ -91,8 +109,11 @@
   (for-each
    (lambda (x)
      (cond ((string-suffix? ".json.gz" x)
-	    (process-ct-file x))))
+	    (process-ct-file x)
+	    )))
    (find-files dir)))
+
+
 
 (define (type-of x)
   (cond ((number? x) "Number")
@@ -110,7 +131,17 @@
 	(cdr value))
 	  (else value))))
 
+(define list-length
+  (lambda (obj)
+    (call-with-current-continuation
+      (lambda (return)
+        (letrec ((r
+                  (lambda (obj)
+                    (cond ((null? obj) 0)
+                          ((pair? obj)
+                           (+ (r (cdr obj)) 1))
+                          (else (return #f))))))
+          (r obj))))))
 
 (ct-report-sync "/Users/akkad/CT")
-
 (lmdb-close *db*)
