@@ -11,31 +11,32 @@
 (use srfi-19)
 (use vector-lib)
 (use z3)
+(use natural-sort)
 
-(define *db* (lmdb-open (make-pathname "/Users/akkad/" "metis.mdb") mapsize: 1000000000))
+(define *db* (lmdb-open (make-pathname "/Users/akkad/" "metis.mdb") mapsize: 100000000000))
 
 ;;(define *db* (lmdb-open (make-pathname "/Users/akkad/" "metis.mdb") key: (string->blob "omg") mapsize: 1000000000))
 
 (define *fields* '(
-		   "additionalEventData"
-		   "awsRegion"
-		   "errorCode"
-		   "errorMessage"
-		   "eventID"
-		   "eventName"
-		   "eventSource"
-		   "eventTime"
-		   "eventType"
-		   "eventVersion"
-		   "recipientAccountId"
-		   "requestID"
-		   "requestParameters"
-		   "resources"
-		   "responseElements"
-		   "sourceIPAddress"
-		   "userAgent"
-		   "userIdentity"
-		   "userName"
+		   "additionalEventData" ;; 1
+		   "awsRegion" ;; 2
+		   "errorCode" ;; 3
+		   "errorMessage" ;; 4
+		   "eventID" ;; 5
+		   "eventName" ;; 6
+		   "eventSource" ;; 7
+		   "eventTime" ;; 8
+		   "eventType" ;; 9
+		   "eventVersion" ;; 10
+		   "recipientAccountId" ;; 11
+		   "requestID" ;; 12
+		   "requestParameters" ;; 13
+		   "resources" ;; 14
+		   "responseElements" ;; 15
+		   "sourceIPAddress" ;; 16
+		   "userAgent" ;; 17
+		   "userIdentity" ;; 18
+		   "userName" ;; 19
 		   ))
 
 (define (parse-json-gz-file file)
@@ -46,7 +47,6 @@
 
 (define (process-ct-file file)
   (lmdb-begin *db*)
-  (format #t "count:~A~%" (lmdb-count *db*))
   (parse-ct-contents file)
   (lmdb-end *db*))
 
@@ -59,7 +59,7 @@
      (lambda (x)
        (normalize-insert (process-record x '() *fields*)))
      entries)
-    (format #t "length: ~A delta: ~A~%" length (- (current-seconds) btime))
+    ;;(format #t "length: ~A delta: ~A~%" length (- (current-seconds) btime))
     ))
 
 (define (normalize-insert record)
@@ -105,11 +105,11 @@
 			   (cdr fields))))))
 
 (define (ct-report-sync dir)
+  (format #t "ct-report-sync: dir:~A~%" dir)
   (for-each
    (lambda (x)
      (cond ((string-suffix? ".json.gz" x)
-	    (process-ct-file x)
-	    )))
+	    (process-ct-file x))))
    (find-files dir)))
 
 (define (type-of x)
@@ -140,23 +140,69 @@
                           (else (return #f))))))
           (r obj))))))
 
+(define (get-field-num op)
+  (format #t "get-field-num: ~A~%" (string? op))
+  (cond ((string= "additionalEventData" op) 0)
+	((string= "awsRegion" op) 1)
+	((string= "errorCode" op) 2)
+	((string= "errorMessage" op) 3)
+	((string= "eventID" op) 4)
+	((string= "eventName" op) 5)
+	((string= "eventSource" op) 6)
+	((string= "eventTime" op) 7)
+	((string= "eventType" op) 8)
+	((string= "eventVersion" op) 9)
+	((string= "recipientAccountId" op) 10)
+	((string= "requestID" op) 11)
+	((string= "requestParameters" op) 12)
+	((string= "resources" op) 13)
+	((string= "responseElements" op) 14)
+	((string= "sourceIPAddress" op) 15)
+	((string= "userAgent" op) 16)
+	((string= "userIdentity" op) 17)
+	((string= "userName" op) 18)
+	(else 0)))
 
-(define show-ops ()
+(define (get-all-eventnames)
+  (lmdb-begin *db*)
+  (let ((results '()))
+    (for-each
+     (lambda (key)
+       (let* ((ourkey (blob->string key))
+	     (ourevent (list-ref (string-split ourkey "-") 3)))
+	 (unless (member ourevent results)
+	   (set! results (cons ourevent results)))))
+       (lmdb-keys *db*))
+    (lmdb-end *db*)
+    (for-each
+     (lambda (x)
+       (format #t "~A~%" x))
+     (natural-sort results))))
+
+(define (get-by-eventname eventname)
   (lmdb-begin *db*)
   (for-each
-   (lambda (value)
-     (format #t "~A~%" (list-ref (with-input-from-string (blob->string (lmdb-ref *db* value)) (cut deserialize)) 5)))
+   (lambda (key)
+     (let* ((ourkey (blob->string key))
+	    (ourevent (list-ref (string-split ourkey "-") 3)))
+       (if (string= ourevent eventname)
+	   (format #t "~A~%" (with-input-from-string
+				 (blob->string (lmdb-ref *db* key))
+			       (cut deserialize))))))
    (lmdb-keys *db*))
   (lmdb-end *db*))
 
-
-(lmdb-close *db*)
-
 (define opts
- (list (args:make-option (l load) (required: "DIR")  "Load Cloudtrail files in directory"
-			 (ct-report-dir arg))
-       (args:make-option (h help)      #:none     "Display this text"
-         (usage))))
+  (list
+   (args:make-option (l load) (required: "DIR") "Load Cloudtrail files in directory" (ct-report-sync arg))
+   (args:make-option (so) (required: "OP") "Return all records of eventType OP" (show-ops arg))
+   (args:make-option (lev) #:none "List all event types." (get-all-eventnames))
+   (args:make-option (c) #:none "Get Entry Count." (begin
+						     (lmdb-begin *db*)
+						     (format #t "count:~A~%" (lmdb-count *db*))
+						     (lmdb-end *db*)))
+   (args:make-option (sev) (required: "ENV") "Search by eventName." (get-by-eventname arg))
+   (args:make-option (h help) #:none "Display this text" (usage))))
 
 (define (usage)
  (with-output-to-port (current-error-port)
@@ -167,5 +213,7 @@
      (print "Report bugs to ober at linbsd.org")))
  (exit 1))
 
-(receive (options operands)
-    (args:parse (command-line-arguments) opts))
+(define (main)
+    (args:parse (command-line-arguments) opts)
+    (lmdb-close *db*))
+(main)
