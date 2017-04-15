@@ -46,9 +46,7 @@
     json))
 
 (define (process-ct-file file)
-  (lmdb-begin *db*)
-  (parse-ct-contents file)
-  (lmdb-end *db*))
+  (parse-ct-contents file))
 
 (define (parse-ct-contents file)
   (let* ((btime (current-seconds))
@@ -59,7 +57,6 @@
      (lambda (x)
        (normalize-insert (process-record x '() *fields*)))
      entries)
-    ;;(format #t "length: ~A delta: ~A~%" length (- (current-seconds) btime))
     ))
 
 (define (normalize-insert record)
@@ -99,18 +96,25 @@
 	 results)
 	(else
 	 (let ((value (get-value (car fields) line)))
-	   ;;(format #t "PR: field:~A value:~A~%" (car fields) value)
 	   (process-record line
 			   (cons value results)
 			   (cdr fields))))))
 
 (define (ct-report-sync dir)
-  (format #t "ct-report-sync: dir:~A~%" dir)
-  (for-each
-   (lambda (x)
-     (cond ((string-suffix? ".json.gz" x)
-	    (process-ct-file x))))
-   (find-files dir)))
+  (let ((i 0))
+    (lmdb-begin *db*)
+    (for-each
+     (lambda (x)
+       (cond ((string-suffix? ".json.gz" x)
+	      (begin
+		(process-ct-file x)
+		(set! i (+ i 1))
+		(when (eq? (modulo i 100) 0)
+		  (lmdb-end *db*)
+		  (lmdb-begin *db*))
+	       ))))
+     (find-files dir)))
+  (lmdb-end *db*))
 
 (define (type-of x)
   (cond ((number? x) "Number")
@@ -192,11 +196,25 @@
    (lmdb-keys *db*))
   (lmdb-end *db*))
 
+(define (get-by-username username)
+  (lmdb-begin *db*)
+  (for-each
+   (lambda (key)
+     (let* ((ourkey (blob->string key))
+	    (ourevent (list-ref (string-split ourkey "-") 3)))
+       (if (string= ourevent eventname)
+	   (format #t "~A~%" (with-input-from-string
+				 (blob->string (lmdb-ref *db* key))
+			       (cut deserialize))))))
+   (lmdb-keys *db*))
+  (lmdb-end *db*))
+
 (define opts
   (list
    (args:make-option (l load) (required: "DIR") "Load Cloudtrail files in directory" (ct-report-sync arg))
    (args:make-option (so) (required: "OP") "Return all records of eventType OP" (show-ops arg))
    (args:make-option (lev) #:none "List all event types." (get-all-eventnames))
+   (args:make-option (sev) (required: "ENV") "Return all records of eventType." (get-by-eventname arg))
    (args:make-option (c) #:none "Get Entry Count." (begin
 						     (lmdb-begin *db*)
 						     (format #t "count:~A~%" (lmdb-count *db*))
