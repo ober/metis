@@ -13,7 +13,7 @@
 (use z3)
 (use natural-sort)
 
-(define *db* (lmdb-open (make-pathname "/Users/akkad/" "metis.mdb") mapsize: 100000000000))
+(define *db* (lmdb-open (make-pathname "/home/ubuntu/" "metis.mdb") mapsize: 100000000000))
 
 ;;(define *db* (lmdb-open (make-pathname "/Users/akkad/" "metis.mdb") key: (string->blob "omg") mapsize: 1000000000))
 
@@ -46,7 +46,7 @@
     json))
 
 (define (process-ct-file file)
-  (parse-ct-contents file))
+  (time (parse-ct-contents file)))
 
 (define (parse-ct-contents file)
   (let* ((btime (current-seconds))
@@ -57,7 +57,8 @@
      (lambda (x)
        (normalize-insert (process-record x '() *fields*)))
      entries)
-    ))
+    (format #t " entries: ~A " length)))
+
 
 (define (normalize-insert record)
   (bind (
@@ -113,7 +114,7 @@
 		  (lmdb-end *db*)
 		  (lmdb-begin *db*))
 	       ))))
-     (find-files dir)))
+     (find-files dir follow-symlinks: #t)))
   (lmdb-end *db*))
 
 (define (type-of x)
