@@ -18,26 +18,30 @@
 ;;(define *db* (lmdb-open (make-pathname "/Users/akkad/" "metis.mdb") key: (string->blob "omg") mapsize: 1000000000))
 
 (define *fields* '(
-		   "additionalEventData" ;; 1
-		   "awsRegion" ;; 2
-		   "errorCode" ;; 3
-		   "errorMessage" ;; 4
-		   "eventID" ;; 5
-		   "eventName" ;; 6
-		   "eventSource" ;; 7
-		   "eventTime" ;; 8
-		   "eventType" ;; 9
-		   "eventVersion" ;; 10
-		   "recipientAccountId" ;; 11
-		   "requestID" ;; 12
-		   "requestParameters" ;; 13
-		   "resources" ;; 14
-		   "responseElements" ;; 15
-		   "sourceIPAddress" ;; 16
-		   "userAgent" ;; 17
-		   "userIdentity" ;; 18
-		   "userName" ;; 19
+		   "additionalEventData" ;; 0
+		   "awsRegion" ;; 1
+		   "errorCode" ;; 2
+		   "errorMessage" ;; 3
+		   "eventID" ;; 4
+		   "eventName" ;; 5
+		   "eventSource" ;; 6
+		   "eventTime" ;; 7
+		   "eventType" ;; 8
+		   "eventVersion" ;; 9
+		   "recipientAccountId" ;; 10
+		   "requestID" ;; 11
+		   "requestParameters" ;; 12
+		   "resources" ;; 13
+		   "responseElements" ;; 14
+		   "sourceIPAddress" ;; 15
+		   "userAgent" ;; 16
+		   "userIdentity" ;; 17
+		   "userName" ;; 18
 		   ))
+
+
+(define (add-event-type event)
+  (format #t "hi"))
 
 (define (parse-json-gz-file file)
   (let* ((gzip-stream (z3:open-compressed-input-file file))
@@ -90,7 +94,7 @@
 		     (string->blob (->string key))
 		     (string->blob (with-output-to-string
 				     (cut serialize value))))
-	)))
+	  )))
 
 (define (process-record line results fields)
   (cond ((null-list? fields)
@@ -100,6 +104,16 @@
 	   (process-record line
 			   (cons value results)
 			   (cdr fields))))))
+
+
+(define (print-records records)
+  (for-each
+   (lambda (x)
+     (format-record x))
+   (natural-sort records)))
+
+(define (format-record record)
+  (format #t "~A~%" record))
 
 (define (ct-report-sync dir)
   (let ((i 0))
@@ -113,7 +127,7 @@
 		(when (eq? (modulo i 100) 0)
 		  (lmdb-end *db*)
 		  (lmdb-begin *db*))
-	       ))))
+		))))
      (find-files dir follow-symlinks: #t)))
   (lmdb-end *db*))
 
@@ -128,25 +142,25 @@
 
 (define (get-value field record)
   (let* ((field-sym (string->symbol field))
-	(value (assoc field-sym record)))
+	 (value (assoc field-sym record)))
     (cond ((pair? value)
-	(cdr value))
+	   (cdr value))
 	  (else value))))
 
 (define list-length
   (lambda (obj)
     (call-with-current-continuation
-      (lambda (return)
-        (letrec ((r
-                  (lambda (obj)
-                    (cond ((null? obj) 0)
-                          ((pair? obj)
-                           (+ (r (cdr obj)) 1))
-                          (else (return #f))))))
-          (r obj))))))
+     (lambda (return)
+       (letrec ((r
+		 (lambda (obj)
+		   (cond ((null? obj) 0)
+			 ((pair? obj)
+			  (+ (r (cdr obj)) 1))
+			 (else (return #f))))))
+	 (r obj))))))
 
 (define (get-field-num op)
-  (format #t "get-field-num: ~A~%" (string? op))
+  ;;(format #t "get-field-num: ~A~%" (string? op))
   (cond ((string= "additionalEventData" op) 0)
 	((string= "awsRegion" op) 1)
 	((string= "errorCode" op) 2)
@@ -174,15 +188,39 @@
     (for-each
      (lambda (key)
        (let* ((ourkey (blob->string key))
-	     (ourevent (list-ref (string-split ourkey "-") 3)))
+	      (ourevent (list-ref (string-split ourkey "-") 3)))
 	 (unless (member ourevent results)
 	   (set! results (cons ourevent results)))))
-       (lmdb-keys *db*))
+     (lmdb-keys *db*))
     (lmdb-end *db*)
     (for-each
      (lambda (x)
        (format #t "~A~%" x))
      (natural-sort results))))
+
+(define (get-all-users)
+  (lmdb-begin *db*)
+  (let ((results '()))
+    (for-each
+     (lambda (key)
+       (let* ((record (with-input-from-string
+			  (blob->string (lmdb-ref *db* key))
+			(cut deserialize)))
+	      (userIdentity (or (list-ref record 16) "NoUser"))
+	      (user (find-username userIdentity)))
+	 (unless (member user results)
+	   (set! results (cons user results)))))
+     (lmdb-keys *db*))
+    (lmdb-end *db*)
+    (print-records results)))
+
+(define (find-username userIdentity)
+  (let ((a (cdr (assoc 'userName (cdr (assoc 'sessionIssuer (cdr (assoc 'sessionContext userIdentity)))))))
+   	(b (cdr (assoc 'userName (cdr (assoc 'sessionContext userIdentity)))))
+   	(c (cdr (assoc 'userName userIdentity)))
+   	(d (string-split (cdr (assoc 'arn userIdentity)) ":"))
+   	(e (cdr (assoc 'type userIdentity))))
+    (or a b c d e)))
 
 (define (get-by-eventname eventname)
   (lmdb-begin *db*)
@@ -203,7 +241,7 @@
    (lambda (key)
      (let* ((ourkey (blob->string key))
 	    (ourevent (list-ref (string-split ourkey "-") 3)))
-       (if (string= ourevent eventname)
+       (if (string= ourevent username)
 	   (format #t "~A~%" (with-input-from-string
 				 (blob->string (lmdb-ref *db* key))
 			       (cut deserialize))))))
@@ -215,6 +253,8 @@
    (args:make-option (l load) (required: "DIR") "Load Cloudtrail files in directory" (ct-report-sync arg))
    (args:make-option (so) (required: "OP") "Return all records of eventType OP" (show-ops arg))
    (args:make-option (lev) #:none "List all event types." (get-all-eventnames))
+   (args:make-option (sn) (required: "NAME") "Return all records of NAME." (get-by-username arg))
+   (args:make-option (ln) #:none "Return all unique users." (get-all-users))
    (args:make-option (sev) (required: "ENV") "Return all records of eventType." (get-by-eventname arg))
    (args:make-option (c) #:none "Get Entry Count." (begin
 						     (lmdb-begin *db*)
@@ -224,15 +264,16 @@
    (args:make-option (h help) #:none "Display this text" (usage))))
 
 (define (usage)
- (with-output-to-port (current-error-port)
-   (lambda ()
-     (print "Usage: " (car (argv)) " [options...] [files...]")
-     (newline)
-     (print (args:usage opts))
-     (print "Report bugs to ober at linbsd.org")))
- (exit 1))
+  (with-output-to-port (current-error-port)
+    (lambda ()
+      (print "Usage: " (car (argv)) " [options...] [files...]")
+      (newline)
+      (print (args:usage opts))
+      (print "Report bugs to ober at linbsd.org")))
+  (exit 1))
 
 (define (main)
-    (args:parse (command-line-arguments) opts)
-    (lmdb-close *db*))
+  (args:parse (command-line-arguments) opts)
+  (lmdb-close *db*))
+
 (main)
