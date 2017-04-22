@@ -12,6 +12,7 @@
 (use vector-lib)
 (use z3)
 (use natural-sort)
+(use r7rs)
 
 (define *db* (lmdb-open (make-pathname "/home/ubuntu/" "metis.mdb") mapsize: 100000000000))
 
@@ -50,10 +51,11 @@
     json))
 
 (define (process-ct-file file)
-  (time (parse-ct-contents file)))
+  (when (or (file-is-new file) #t)
+    (parse-ct-contents file)))
 
 (define (parse-ct-contents file)
-  (let* ((btime (current-seconds))
+  (let* ((btime (current-milliseconds))
 	 (json (parse-json-gz-file file))
 	 (entries (vector->list (cdr (car json))))
 	 (length (list-length entries)))
@@ -61,9 +63,45 @@
      (lambda (x)
        (normalize-insert (process-record x '() *fields*)))
      entries)
-    (format #t " entries: ~A " length)))
+    (format #t "rps: ~A~%" (truncate (/ length (/ (- (current-milliseconds) btime) 1000)))))
+  (mark-file-processed file))
 
-   ;;(hash-table-set! HASH-TABLE KEY VALUE)
+(define (mark-file-processed file)
+  (let ((files (with-input-from-string (blob->string (lmdb-ref *db* (string->blob "files"))) (cut deserialize))))
+    (define files (cons file files))
+    (lmdb-set! *db*
+	       (string->blob "files")
+	       (string->blob (with-output-to-string
+			       (cut serialize files))))))
+
+(define (init-files)
+  (lmdb-begin *db*)
+  (let ((files '()))
+    (lmdb-set! *db*
+	       (string->blob "files")
+	       (string->blob (with-output-to-string
+			       (cut serialize files)))))
+  (lmdb-end *db*))
+
+
+(define (file-is-new file)
+  (let ((files (with-input-from-string
+		   (blob->string
+		    (lmdb-ref *db* (string->blob "files")))
+		 (cut deserialize))))
+    (if (hash-table? files)
+	(member file files)
+	#f)))
+
+(define (list-files-done)
+  (lmdb-begin *db*)
+  (let ((files (with-input-from-string (blob->string (lmdb-ref *db* (string->blob "files"))) (cut deserialize))))
+    (lmdb-end *db*)
+    (for-each
+     (lambda (x)
+       (format #t "~A~%" x))
+     files)))
+
 
 (define (normalize-insert record)
   (let ((value-hash (make-hash-table)))
@@ -137,7 +175,9 @@
 (define (format-record record)
   (format #t "~A~%" record))
 
+
 (define (ct-report-sync dir)
+  (init-files)
   (let ((i 0))
     (lmdb-begin *db*)
     (for-each
@@ -207,7 +247,7 @@
 			(cut deserialize))))
 	      (userIdentity (cdr (assoc 'userIdentity record)))
 	      (ver (cdr (assoc 'eventVersion record)))
-	      (user (find-username ver userIdentity)))
+	      (user (find-username record)))
 
 	 (unless (member user results)
 	   (set! results (cons user results)))))
@@ -215,36 +255,33 @@
        (lmdb-end *db*)
        (print-records results)))
 
-(define (find-username ver userIdentity)
-  (format #t "ver:~A userid:~A~%" ver userIdentity)
-  (cond
-   ((string= ver "1.02")
-d . "134183635603"))
-ver:1.02 userid:((type . "IAMUser") (principalId . "AIDAI5Q2OWTVFRAPB7BK6") (arn . "arn:aws:iam::22
-4108527019:user/wchen") (accountId . "224108527019") (accessKeyId . "ASIAIPCAZKIHCQZE3YSQ") (userNa
-me . "wchen") (sessionContext (attributes (mfaAuthenticated . "false") (creationDate . "2017-04-04T
-20:28:26Z"))) (invokedBy . "signin.amazonaws.com"))
+(define (find-username-102 ui record)
+  (cond ((assoc 'userName ui) (cdr (assoc 'userName ui)))
+	;; ((assoc 'sessionContext ui
+	;; 	(cdr (assoc 'userName (
+	;; 			       cdr (assoc 'sessionIssuer
+	;; 					  (cdr (assoc 'sessionContext ui))))))))
+	(else (format #t "102-bad: ~A~%" ui))))
 
+(define (find-username-105 ui record)
+  (cond ((assoc 'type ui) (cdr (assoc 'type ui)))
+	((string= (cdr (assoc 'eventName record)) "BidFulfilledEvent") "BidFulfilledEvent")
+	(else (format #t "105-bad: ~A~%" record))))
 
-    (if (assoc 'userName
-    (cdr (assoc 'userName
-		(cdr (assoc 'sessionIssuer
-			    (cdr (assoc 'sessionContext userIdentity)))))))
-   ((string= ver "1.05")
-    (if (assoc 'type userIdentity)
-	(cdr (assoc 'type userIdentity))
-	userIdentity))
-   (else (format #f " ver:~A" ver))))
+(define (find-username-104 ui record)
+  (cond ((assoc 'type ui) (cdr (assoc 'type ui)))
+	((string= (cdr (assoc 'eventName record)) "BidFulfilledEvent") "BidFulfilledEvent")
+	(else (format #t "104-bad: ~A~%" record))))
 
-  ;; (let ((a
-  ;;  	(b (cdr (assoc 'userName (cdr (assoc 'sessionContext userIdentity)))))
-  ;;  	(c (cdr (assoc 'userName userIdentity)))
-  ;;  	(d (string-split (cdr (assoc 'arn userIdentity)) ":"))
-  ;;  	(e (cdr (assoc 'type userIdentity))))
-  ;;   (or a b c d e))))
-
-
-
+(define (find-username record)
+  (let ((ver (cdr (assoc 'eventVersion record)))
+	(ui (cdr (assoc 'userIdentity record))))
+    ;;(format #t "ver:~A userid:~A~%" ver userIdentity)
+    (cond
+     ((string= ver "1.02") (find-username-102 ui record))
+     ((string= ver "1.04") (find-username-104 ui record))
+     ((string= ver "1.05") (find-username-105 ui record))
+     (else (format #f "Unsupported version ver:~A" ver)))))
 
 (define (get-by-eventname eventname)
   (lmdb-begin *db*)
@@ -279,6 +316,7 @@ me . "wchen") (sessionContext (attributes (mfaAuthenticated . "false") (creation
    (args:make-option (lev) #:none "List all event types." (get-all-eventnames))
    (args:make-option (sn) (required: "NAME") "Return all records of NAME." (get-by-username arg))
    (args:make-option (ln) #:none "Return all unique users." (get-all-users))
+   (args:make-option (lfd) #:none "Return all files processed." (list-files-done))
    (args:make-option (sev) (required: "ENV") "Return all records of eventType." (get-by-eventname arg))
    (args:make-option (c) #:none "Get Entry Count." (begin
 						     (lmdb-begin *db*)
