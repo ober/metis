@@ -8,7 +8,7 @@
 (use s11n)
 (use srfi-1)
 (use srfi-13)
-(use srfi-19)
+(use srfi-69)
 (use vector-lib)
 (use z3)
 (use natural-sort)
@@ -63,38 +63,60 @@
      entries)
     (format #t " entries: ~A " length)))
 
+   ;;(hash-table-set! HASH-TABLE KEY VALUE)
 
 (define (normalize-insert record)
-  (bind (
-	 additionalEventData
-	 awsRegion
-	 errorCode
-	 errorMessage
-	 eventID
-	 eventName
-	 eventSource
-	 eventTime
-	 eventType
-	 eventVersion
-	 recipientAccountId
-	 requestID
-	 requestParameters
-	 resources
-	 responseElements
-	 sourceIPAddress
-	 userAgent
-	 userIdentity
-	 userName
-	 )
-	(reverse record)
+  (let ((value-hash (make-hash-table)))
+    (bind (
+	   additionalEventData
+	   awsRegion
+	   errorCode
+	   errorMessage
+	   eventID
+	   eventName
+	   eventSource
+	   eventTime
+	   eventType
+	   eventVersion
+	   recipientAccountId
+	   requestID
+	   requestParameters
+	   resources
+	   responseElements
+	   sourceIPAddress
+	   userAgent
+	   userIdentity
+	   userName
+	   )
 
-	(let ((key (string-join (list eventTime eventName eventSource) "-"))
-	      (value (list additionalEventData awsRegion errorCode errorMessage eventID eventName eventSource eventType eventVersion recipientAccountId requestID requestParameters resources responseElements sourceIPAddress userAgent userIdentity userName)))
-	  (lmdb-set! *db*
-		     (string->blob (->string key))
-		     (string->blob (with-output-to-string
-				     (cut serialize value))))
-	  )))
+	  (reverse record)
+	  (hash-table-set! value-hash 'additionalEventData additionalEventData)
+	  (hash-table-set! value-hash 'awsRegion awsRegion)
+	  (hash-table-set! value-hash 'errorCode errorCode)
+	  (hash-table-set! value-hash 'errorMessage errorMessage)
+	  (hash-table-set! value-hash 'eventID eventID)
+	  (hash-table-set! value-hash 'eventName eventName)
+	  (hash-table-set! value-hash 'eventSource eventSource)
+	  (hash-table-set! value-hash 'eventTime eventTime)
+	  (hash-table-set! value-hash 'eventType eventType)
+	  (hash-table-set! value-hash 'eventVersion eventVersion)
+	  (hash-table-set! value-hash 'recipientAccountId recipientAccountId)
+	  (hash-table-set! value-hash 'requestID requestID)
+	  (hash-table-set! value-hash 'requestParameters requestParameters)
+	  (hash-table-set! value-hash 'resources resources)
+	  (hash-table-set! value-hash 'responseElements responseElements)
+	  (hash-table-set! value-hash 'sourceIPAddress sourceIPAddress)
+	  (hash-table-set! value-hash 'userAgent userAgent)
+	  (hash-table-set! value-hash 'userIdentity userIdentity)
+	  (hash-table-set! value-hash 'userName userName)
+
+	  (let ((key (string-join (list eventTime eventName eventSource) "-"))
+		(value (list additionalEventData awsRegion errorCode errorMessage eventID eventName eventSource eventType eventVersion recipientAccountId requestID requestParameters resources responseElements sourceIPAddress userAgent userIdentity userName)))
+	    (lmdb-set! *db*
+		       (string->blob (->string key))
+		       (string->blob (with-output-to-string
+				       (cut serialize value-hash))))
+	    ))))
 
 (define (process-record line results fields)
   (cond ((null-list? fields)
@@ -159,29 +181,6 @@
 			 (else (return #f))))))
 	 (r obj))))))
 
-(define (get-field-num op)
-  ;;(format #t "get-field-num: ~A~%" (string? op))
-  (cond ((string= "additionalEventData" op) 0)
-	((string= "awsRegion" op) 1)
-	((string= "errorCode" op) 2)
-	((string= "errorMessage" op) 3)
-	((string= "eventID" op) 4)
-	((string= "eventName" op) 5)
-	((string= "eventSource" op) 6)
-	((string= "eventTime" op) 7)
-	((string= "eventType" op) 8)
-	((string= "eventVersion" op) 9)
-	((string= "recipientAccountId" op) 10)
-	((string= "requestID" op) 11)
-	((string= "requestParameters" op) 12)
-	((string= "resources" op) 13)
-	((string= "responseElements" op) 14)
-	((string= "sourceIPAddress" op) 15)
-	((string= "userAgent" op) 16)
-	((string= "userIdentity" op) 17)
-	((string= "userName" op) 18)
-	(else 0)))
-
 (define (get-all-eventnames)
   (lmdb-begin *db*)
   (let ((results '()))
@@ -203,23 +202,38 @@
   (let ((results '()))
     (for-each
      (lambda (key)
-       (let* ((record (with-input-from-string
+       (let* ((record (hash-table->alist (with-input-from-string
 			  (blob->string (lmdb-ref *db* key))
-			(cut deserialize)))
-	      (userIdentity (or (list-ref record 16) "NoUser"))
-	      (ver (list-ref record 8))
+			(cut deserialize))))
+	      (userIdentity (cdr (assoc 'userIdentity record)))
+	      (ver (cdr (assoc 'eventVersion record)))
 	      (user (find-username ver userIdentity)))
-	 (format #t "record:~A~%" record)
+
 	 (unless (member user results)
 	   (set! results (cons user results)))))
-     (lmdb-keys *db*))
-    (lmdb-end *db*)
-    (print-records results)))
+	 (lmdb-keys *db*))
+       (lmdb-end *db*)
+       (print-records results)))
 
 (define (find-username ver userIdentity)
+  (format #t "ver:~A userid:~A~%" ver userIdentity)
   (cond
-   ((string= ver "1.02") (cdr (assoc 'userName (cdr (assoc 'sessionIssuer (cdr (assoc 'sessionContext userIdentity)))))))
-   ((string= ver "1.05") (cdr (assoc 'type userIdentity)))
+   ((string= ver "1.02")
+d . "134183635603"))
+ver:1.02 userid:((type . "IAMUser") (principalId . "AIDAI5Q2OWTVFRAPB7BK6") (arn . "arn:aws:iam::22
+4108527019:user/wchen") (accountId . "224108527019") (accessKeyId . "ASIAIPCAZKIHCQZE3YSQ") (userNa
+me . "wchen") (sessionContext (attributes (mfaAuthenticated . "false") (creationDate . "2017-04-04T
+20:28:26Z"))) (invokedBy . "signin.amazonaws.com"))
+
+
+    (if (assoc 'userName
+    (cdr (assoc 'userName
+		(cdr (assoc 'sessionIssuer
+			    (cdr (assoc 'sessionContext userIdentity)))))))
+   ((string= ver "1.05")
+    (if (assoc 'type userIdentity)
+	(cdr (assoc 'type userIdentity))
+	userIdentity))
    (else (format #f " ver:~A" ver))))
 
   ;; (let ((a
@@ -229,6 +243,9 @@
   ;;  	(e (cdr (assoc 'type userIdentity))))
   ;;   (or a b c d e))))
 
+
+
+
 (define (get-by-eventname eventname)
   (lmdb-begin *db*)
   (for-each
@@ -236,9 +253,9 @@
      (let* ((ourkey (blob->string key))
 	    (ourevent (list-ref (string-split ourkey "-") 3)))
        (if (string= ourevent eventname)
-	   (format #t "~A~%" (with-input-from-string
+	   (format #t "~A~%" (hash-table->alist (with-input-from-string
 				 (blob->string (lmdb-ref *db* key))
-			       (cut deserialize))))))
+			       (cut deserialize)))))))
    (lmdb-keys *db*))
   (lmdb-end *db*))
 
