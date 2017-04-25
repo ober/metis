@@ -1,9 +1,6 @@
 (in-package :metis)
-;; (defvar *lmdb-files* (thread-safe-hash-table))
-;; (defvar *metis-fields* (thread-safe-hash-table))
-;; (defvar *metis-counters* (thread-safe-hash-table))
-;; (defvar *metis-need-files* nil)
-(defvar *lmdb-dir* #P"~/metis.mdb")
+
+(defvar *lmdb-dir* #P"~/metis.mdb/")
 
 (defvar ct-fields '(
 		    metis::additionalEventData
