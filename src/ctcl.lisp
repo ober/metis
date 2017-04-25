@@ -44,11 +44,21 @@
   "process the json output"
   (handler-case
       (progn
-	(let* ((records (second (read-json-gzip-file x)))
+	(let* ((db nil)
+	       (results '())
+	       (records (second (read-json-gzip-file x)))
 	       (num (length records))
 	       (btime (get-internal-real-time)))
-	  (dolist (x records)
-	    (lmdb-normalize-insert (process-record x *fields*)))
+
+	    (dolist (x records)
+	      (push (lmdb-normalize-insert (process-record x *fields*)) results))
+
+	    (with-lmdb (db)
+	    (mapc
+	     #'(lambda (x)
+		 (format t "x:~A~%" x))
+		 results))
+	  ;;`,(format t "with-lmdb: db:~A post:~A record:~A~%" ,db post record))))
 	  (let* ((etime (get-internal-real-time))
 		 (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
 		 (rps (ignore-errors (/ (float num) (float delta)))))
