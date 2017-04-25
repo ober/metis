@@ -1,31 +1,31 @@
 (in-package :metis)
-(defvar *lmdb-files* (thread-safe-hash-table))
-(defvar *metis-fields* (thread-safe-hash-table))
-(defvar *metis-counters* (thread-safe-hash-table))
-(defvar *metis-need-files* nil)
-(defvar cl-store:*current-backend* cl-store:*default-backend*)
+;; (defvar *lmdb-files* (thread-safe-hash-table))
+;; (defvar *metis-fields* (thread-safe-hash-table))
+;; (defvar *metis-counters* (thread-safe-hash-table))
+;; (defvar *metis-need-files* nil)
 
-;; (defvar ct-fields '(
-;; 		    metis::additionalEventData
-;; 		    metis::awsRegion
-;; 		    metis::errorCode
-;; 		    metis::errorMessage
-;; 		    ;;metis::eventID
-;; 		    metis::eventName
-;; 		    metis::eventSource
-;; 		    ;;metis::eventTime
-;; 		    metis::eventType
-;; 		    metis::eventVersion
-;; 		    metis::recipientAccountId
-;; 		    ;;metis::requestID
-;; 		    ;;metis::requestParameters
-;; 		    metis::resources
-;; 		    ;;metis::responseElements
-;; 		    metis::sourceIPAddress
-;; 		    metis::userAgent
-;; 		    ;;metis::userIdentity
-;; 		    metis::userName
-;; 		    ))
+
+(defvar ct-fields '(
+		    metis::additionalEventData
+		    metis::awsRegion
+		    metis::errorCode
+		    metis::errorMessage
+		    ;;metis::eventID
+		    metis::eventName
+		    metis::eventSource
+		    ;;metis::eventTime
+		    metis::eventType
+		    metis::eventVersion
+		    metis::recipientAccountId
+		    ;;metis::requestID
+		    ;;metis::requestParameters
+		    metis::resources
+		    ;;metis::responseElements
+		    metis::sourceIPAddress
+		    metis::userAgent
+		    ;;metis::userIdentity
+		    metis::userName
+		    ))
 
 
 (defun lmdb-have-we-seen-this-file (file)
@@ -35,18 +35,11 @@
   nil)
 
 (defun init-lmdb()
-  ;;  (unless (boundp 'lmdb-use-mmap-dir)
-  ;;    (lmdb:use-mmap-dir (or (uiop:getenv "METIS") "~/ct-lmdb/")))
-  ;;  (if (and (eql (hash-table-count *lmdb-files*) 0) *metis-need-files*)
-  ;;      (allocate-file-hash)))
   (format t "Done Initializing~%")
   )
 
 (defun init-ct-hashes ()
-  (mapc
-   #'(lambda (x)
-       (allocate-klass-hash x))
-   ct-fields))
+  nil)
 
 (defun get-stats ()
   (format t "Totals ct:~A~%"
@@ -77,39 +70,41 @@
 	  store-me))))
 
 (defun lmdb-normalize-insert (record)
-  (destructuring-bind (
-		       additionalEventData
-		       awsRegion
-		       errorCode
-		       errorMessage
-		       eventID
-		       eventName
-		       eventSource
-		       eventTime
-		       eventType
-		       eventVersion
-		       recipientAccountId
-		       requestID
-		       requestParameters
-		       resources
-		       responseElements
-		       sourceIPAddress
-		       userAgent
-		       userIdentity
-		       userName
-		       )
-      record
+  (format t "got ~A~%" record)
+  (handler-case
+      (progn
+	(destructuring-bind (
+			     additionalEventData
+			     awsRegion
+			     errorCode
+			     errorMessage
+			     eventID
+			     eventName
+			     eventSource
+			     eventTime
+			     eventType
+			     eventVersion
+			     recipientAccountId
+			     requestID
+			     requestParameters
+			     resources
+			     responseElements
+			     sourceIPAddress
+			     userAgent
+			     userIdentity
+			     userName
+			     )
+	    record
 
-    (let ((env (lmdb:make-environment #P"/home/ubuntu/metis-sbcl.mdb/")))
-      (lmdb:with-environment (env)
-	(let ((txn (lmdb:make-transaction env)))
-	  (lmdb:begin-transaction txn)
-	  (let ((db (lmdb:make-database txn "db"))
-		(values (list additionalEventData awsRegion errorCode errorMessage eventID eventName eventSource eventType eventVersion recipientAccountId requestID requestParameters resources responseElements sourceIPAddress userAgent userIdentity userName)))
-	    (lmdb:with-database (db)
-	      (lmdb:put db (format nil "~A-~A-~A" eventTime eventName eventSource)
-			(flexi-streams:with-output-to-sequence (value) (cl-store:store-object values value))))))))))
-
+	  (let ((env (lmdb:make-environment #P"/home/ubuntu/metis-sbcl.mdb/")))
+	    (lmdb:with-environment (env)
+	      (let ((txn (lmdb:make-transaction env)))
+		(lmdb:begin-transaction txn)
+		(let ((db (lmdb:make-database txn "db"))
+		      (values (list additionalEventData awsRegion errorCode errorMessage eventID eventName eventSource eventType eventVersion recipientAccountId requestID requestParameters resources responseElements sourceIPAddress userAgent userIdentity userName)))
+		  (lmdb:with-database (db)
+		    (lmdb:put db (format nil "~A-~A-~A" eventTime eventName eventSource) (conspack:encode values)))))))))
+    (t (e) (error-print "lmdb-normalize-insert" e))))
 
 (defun cleanse (var)
   (typecase var
