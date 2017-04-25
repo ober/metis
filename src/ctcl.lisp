@@ -47,7 +47,7 @@
 	(let* ((records (second (read-json-gzip-file x)))
 	       (num (length records))
 	       (btime (get-internal-real-time))
-	       (env (lmdb:make-environment #P"/home/ubuntu/metis-sbcl.mdb/")))
+	       (env (lmdb:make-environment #P"/home/ubuntu/metis-sbcl.mdb/" :mapsize (* 100000 1024 1024)))
 	  (lmdb:with-environment (env)
 	    (let* ((txn (lmdb:make-transaction env)))
 	      (lmdb:begin-transaction txn)
