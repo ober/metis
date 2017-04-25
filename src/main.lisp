@@ -122,7 +122,7 @@
   (manardb:close-all-mmaps)))
 
 (defun main ()
-  (init-manardb)
+  (if (boundp 'init-manardb) (init-manardb))
   #+sbcl
   (handler-case (process-args (argv))
     (sb-sys:interactive-interrupt ()
