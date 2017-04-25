@@ -42,7 +42,6 @@
 
 (defun parse-ct-contents (x)
   "process the json output"
-  (defvar *lmdb-env* (lmdb:make-environment #P"/home/ubuntu/metis-sbcl.mdb/"))
   (handler-case
       (progn
 	(let* ((records (second (read-json-gzip-file x)))
@@ -50,7 +49,7 @@
 	       (btime (get-internal-real-time))
 	       (env (lmdb:make-environment #P"/home/ubuntu/metis-sbcl.mdb/")))
 	  (lmdb:with-environment (env)
-	    (let ((txn (lmdb:make-transaction env)))
+	    (let* ((txn (lmdb:make-transaction env)))
 	      (lmdb:begin-transaction txn)
 	      (let ((db (lmdb:make-database txn "db" :create t)))
 		(lmdb:with-database (db)
@@ -60,10 +59,9 @@
 			 (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
 			 (rps (ignore-errors (/ (float num) (float delta)))))
 		    (if (> num 100)
-			(format t "~%rps:~A rows:~A delta:~A" rps num delta))
-		    )))))))
+			(format t "~%rps:~A rows:~A delta:~A" rps num delta)))
+		  (lmdb:commit-transaction txn)))))))
     (t (e) (error-print "parse-ct-contents" e))))
-
 
 (defun cloudtrail-report-sync (path)
   ;;(setf *metis-need-files* t)
