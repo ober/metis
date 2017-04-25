@@ -59,8 +59,8 @@
 			 (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
 			 (rps (ignore-errors (/ (float num) (float delta)))))
 		    (if (> num 100)
-			(format t "~%rps:~A rows:~A delta:~A" rps num delta)))
-		  (lmdb:commit-transaction txn)))))))
+			(format t "~%rps:~A rows:~A delta:~A" rps num delta)))))
+		  (lmdb:commit-transaction txn)))))
     (t (e) (error-print "parse-ct-contents" e))))
 
 (defun cloudtrail-report-sync (path)
