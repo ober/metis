@@ -1,6 +1,7 @@
 (in-package :metis)
 
-(defvar *lmdb-dir* #P"~/metis.mdb/")
+(defparameter +lmdb-dir+
+           (merge-pathnames #p"metis-sbcl.mdb/" (user-homedir-pathname)))
 
 (defvar ct-fields '(
 		    metis::additionalEventData
@@ -27,7 +28,7 @@
 
 (defmacro with-lmdb ((db) &body body)
   (alexandria:with-gensyms (env txn)
-    `(let ((,env (lmdb:make-environment *lmdb-dir* :mapsize 1024000000)))
+    `(let ((,env (lmdb:make-environment +lmdb-dir+ :mapsize 1024000000)))
        (lmdb:with-environment (,env)
 	 (let ((,txn (lmdb:make-transaction ,env)))
 	   (lmdb:begin-transaction ,txn)
