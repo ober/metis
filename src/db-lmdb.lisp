@@ -3,6 +3,7 @@
 ;; (defvar *metis-fields* (thread-safe-hash-table))
 ;; (defvar *metis-counters* (thread-safe-hash-table))
 ;; (defvar *metis-need-files* nil)
+(defvar *lmdb-env* (lmdb:make-environment #P"/home/ubuntu/metis-sbcl.mdb/"))
 
 (defvar ct-fields '(
 		    metis::additionalEventData
@@ -68,7 +69,7 @@
 	  (flexi-streams:octets-to-string (thnappy:compress-string store-me))
 	  store-me))))
 
-(defun lmdb-normalize-insert (record)
+(defun lmdb-normalize-insert (record db)
   (handler-case
       (progn
 	(destructuring-bind (
@@ -94,21 +95,13 @@
 			     )
 	    record
 
-	  (let ((env (lmdb:make-environment #P"/home/ubuntu/metis-sbcl.mdb/")))
-	    (lmdb:with-environment (env)
-
-	      (let ((txn (lmdb:make-transaction env)))
-		(lmdb:begin-transaction txn)
-		(let ((db (lmdb:make-database txn "db" :create t))
-		      (values (list additionalEventData awsRegion errorCode errorMessage eventID eventName eventSource eventType eventVersion recipientAccountId requestID requestParameters resources responseElements sourceIPAddress userAgent userIdentity userName)))
-		  (lmdb:open-database db)
-		  ;;(lmdb:with-database (db)
-		  (lmdb:put db (format nil "~A-~A-~A" eventTime eventName eventSource) (conspack:encode values))
-		  (lmdb:close-database db)
-		  ;;(print (lmdb:environment-info env))
-		  ;;(lmdb:commit-transaction txn)
-		  ))))))
-  (t (e) (error-print "lmdb-normalize-insert" e))))
+	  (let ((key (concatenate 'string  eventTime "-" eventName "-" eventSource))
+		(value (conspack:encode (list additionalEventData awsRegion errorCode errorMessage eventID eventName eventSource eventType eventVersion recipientAccountId requestID requestParameters resources responseElements sourceIPAddress userAgent userIdentity userName))))
+	    (lmdb:put db key value)
+	    ;;(print (lmdb:environment-info env))
+	    ;;(lmdb:commit-transaction txn)
+	    )))
+    (t (e) (error-print "lmdb-normalize-insert" e))))
 
 (defun cleanse (var)
   (typecase var

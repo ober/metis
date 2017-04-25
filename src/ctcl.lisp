@@ -22,7 +22,7 @@
 
 (defun async-ct-file (x)
   (push (pcall:pexec
-	 (funcall #'process-ct-file x)) *mytasks*))
+	  (funcall #'process-ct-file x)) *mytasks*))
 
 (defun process-ct-file (x)
   "Handle the contents of the json gzip file"
@@ -42,31 +42,39 @@
 
 (defun parse-ct-contents (x)
   "process the json output"
+  (defvar *lmdb-env* (lmdb:make-environment #P"/home/ubuntu/metis-sbcl.mdb/"))
   (handler-case
       (progn
 	(let* ((records (second (read-json-gzip-file x)))
 	       (num (length records))
-	       (btime (get-internal-real-time)))
-	  (dolist (x records)
-	    (normalize-insert (process-record x *fields*)))
-	  (let* ((etime (get-internal-real-time))
-		 (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
-		 (rps (ignore-errors (/ (float num) (float delta)))))
-	    (if (> num 100)
-		(format t "~%rps:~A rows:~A delta:~A" rps num delta))
-	    )))
-    (t (e) (error-print "parse-ct-contents" e)))
+	       (btime (get-internal-real-time))
+	       (env (lmdb:make-environment #P"/home/ubuntu/metis-sbcl.mdb/")))
+	  (lmdb:with-environment (env)
+	    (let ((txn (lmdb:make-transaction env)))
+	      (lmdb:begin-transaction txn)
+	      (let ((db (lmdb:make-database txn "db" :create t)))
+		(lmdb:with-database (db)
+		  (dolist (x records)
+		    (lmdb-normalize-insert (process-record x *fields*) db))
+		  (let* ((etime (get-internal-real-time))
+			 (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
+			 (rps (ignore-errors (/ (float num) (float delta)))))
+		    (if (> num 100)
+			(format t "~%rps:~A rows:~A delta:~A" rps num delta))
+		    )))
+	      (t (e) (error-print "parse-ct-contents" e)))
   ;;#+sbcl (room) ;; (trivial-garbage:gc)
-  )
+  )))))
 
 (defun cloudtrail-report-sync (path)
-  (setf *metis-need-files* t)
-  (if (boundp 'init-manardb) (init-manardb))
-  (init-ct-hashes)
+  ;;(setf *metis-need-files* t)
+  ;;(if (boundp 'init-manardb) (init-manardb))
+  ;;(init-ct-hashes)
   (force-output)
   (let ((cloudtrail-reports (or path "~/CT")))
     (walk-ct cloudtrail-reports
 	     #'sync-ct-file)))
+
 
 (defun cloudtrail-report-async (workers path)
   (setf *metis-need-files* t)
