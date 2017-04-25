@@ -31,8 +31,7 @@
 	       :usocket
 	       :lmdb
 	       :zs3
-	       :cl-store
-	       ;;:postmodern
+	       :cl-conspack
 	       ;;:sqlite
 	       )
   :components ((:module src :serial t
