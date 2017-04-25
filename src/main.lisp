@@ -67,7 +67,7 @@
   ;;(define-alien-variable "gencgc-oldest-gen-to-gc" (unsigned 8))(setf gencgc-oldest-gen-to-gc 1)
   ;;(setf gencgc-oldest-gen-to-gc 1)
   ;;(in-package :metis)
-  (init-manardb)
+  (if (boundp 'init-manardb) (init-manardb))
 
   (let (
 	(verb (nth 1 args))

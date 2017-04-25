@@ -217,7 +217,7 @@
 
 (defun allocate-vpc-file-hash ()
   (if (eql (hash-table-count *manard-flow-files*) 0)
-      (init-manardb)
+      (if (boundp 'init-manardb) (init-manardb))
       (mapc
        #'(lambda (x)
 	   (setf (gethash (slot-value x 'file) *manard-flow-files*) t))
