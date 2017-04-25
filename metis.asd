@@ -29,6 +29,7 @@
 	       :trivial-garbage
 	       :uiop
 	       :usocket
+	       :lmdb
 	       :zs3
 	       ;;:postmodern
 	       ;;:sqlite
@@ -44,6 +45,7 @@
 				     ;;	       (:file "db-postgres" :depends-on ("package" "database"))
 				     ;;	       (:file "db-sqlite" :depends-on ("package" "database"))
 				     (:file "db-manardb" :depends-on ("package" "database"))
+				     (:file "db-lmdb" :depends-on ("package" "database"))
 				     (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))
 				     (:file "main" :depends-on ("package" "ctcl" "utils" "database" "flows"))
 				     (:file "pkgdcl" :depends-on ("package" "ctcl" "utils" "database"))
