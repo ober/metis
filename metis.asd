@@ -31,6 +31,7 @@
 	       :usocket
 	       :lmdb
 	       :zs3
+	       :cl-store
 	       ;;:postmodern
 	       ;;:sqlite
 	       )
