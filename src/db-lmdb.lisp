@@ -70,7 +70,6 @@
 	  store-me))))
 
 (defun lmdb-normalize-insert (record)
-  (format t "got ~A~%" record)
   (handler-case
       (progn
 	(destructuring-bind (
