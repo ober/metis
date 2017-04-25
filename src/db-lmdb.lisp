@@ -98,8 +98,7 @@
 	  (let ((key (concatenate 'string  eventTime "-" eventName "-" eventSource))
 		(value (conspack:encode (list additionalEventData awsRegion errorCode errorMessage eventID eventName eventSource eventType eventVersion recipientAccountId requestID requestParameters resources responseElements sourceIPAddress userAgent userIdentity userName))))
 	    (lmdb:put db key value)
-	    ;;(print (lmdb:environment-info env))
-	    ;;(lmdb:commit-transaction txn)
+	    ;;(format t "value:~A db:~A key:~A ~%" (conspack:decode (lmdb:get db key)) db key)
 	    )))
     (t (e) (error-print "lmdb-normalize-insert" e))))
 
