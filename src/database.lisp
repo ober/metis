@@ -37,6 +37,7 @@
     ((equal :sqlite *db-backend*) (sqlite-have-we-seen-this-file file))
     ((equal :postgres *db-backend*)(sqlite-have-we-seen-this-file file))
     ((equal :manardb *db-backend*)(manardb-have-we-seen-this-file file))
+    ((equal :lmdb *db-backend*)(lmdb-have-we-seen-this-file file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-mark-file-processed (file)
@@ -44,6 +45,7 @@
     ((equal :sqlite *db-backend*) (sqlite-mark-file-processed file))
     ((equal :postgres *db-backend*)(psql-mark-file-processed file))
     ((equal :manardb *db-backend*)(manardb-mark-file-processed file))
+    ((equal :lmdb *db-backend*)(lmdb-mark-file-processed file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-recreate-tables (db)
@@ -51,6 +53,7 @@
     ((equal :sqlite *db-backend*) (sqlite-recreate-tables))
     ((equal :postgres *db-backend*)(psql-recreate-tables))
     ((equal :manardb *db-backend*)(manardb-recreate-tables))
+    ((equal :lmdb *db-backend*)(lmdb-recreate-tables))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun normalize-insert (record)
@@ -58,6 +61,7 @@
     ((equal :sqlite *db-backend*) (sqlite-normalize-insert record))
     ((equal :postgres *db-backend*)(psql-normalize-insert record))
     ((equal :manardb *db-backend*)(manardb-normalize-insert record))
+    ((equal :lmdb *db-backend*)(lmdb-normalize-insert record))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-get-or-insert-id (table value)
@@ -65,6 +69,7 @@
     ((equal :sqlite *db-backend*) (sqlite-get-or-insert-id table value))
     ((equal :postgres *db-backend*)(psql-get-or-insert-id table value))
     ((equal :manardb *db-backend*)(manardb-get-or-insert-id table value))
+    ((equal :lmdb *db-backend*)(lmdb-get-or-insert-id table value))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-do-query (query)
@@ -72,6 +77,7 @@
     ((equal :sqlite *db-backend*) (sqlite-do-query query))
     ((equal :postgres *db-backend*)(psql-do-query query))
     ((equal :manardb *db-backend*)(manardb-do-query query))
+    ((equal :lmdb *db-backend*)(lmdb-do-query query))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-drop-table (query)
@@ -79,6 +85,7 @@
     ((equal :sqlite *db-backend*) (sqlite-drop-table query))
     ((equal :postgres *db-backend*)(psql-drop-table query))
     ((equal :manardb *db-backend*)(manardb-drop-table query))
+    ((equal :lmdb *db-backend*)(lmdb-drop-table query))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun make-safe-string (str)
