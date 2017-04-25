@@ -62,9 +62,8 @@
 		    (if (> num 100)
 			(format t "~%rps:~A rows:~A delta:~A" rps num delta))
 		    )))))))
-	      (t (e) (error-print "parse-ct-contents" e))))
-  ;;#+sbcl (room) ;; (trivial-garbage:gc)
-  )))))
+    (t (e) (error-print "parse-ct-contents" e))))
+
 
 (defun cloudtrail-report-sync (path)
   ;;(setf *metis-need-files* t)
