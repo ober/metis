@@ -61,8 +61,8 @@
 			 (rps (ignore-errors (/ (float num) (float delta)))))
 		    (if (> num 100)
 			(format t "~%rps:~A rows:~A delta:~A" rps num delta))
-		    )))
-	      (t (e) (error-print "parse-ct-contents" e)))
+		    )))))))
+	      (t (e) (error-print "parse-ct-contents" e))))
   ;;#+sbcl (room) ;; (trivial-garbage:gc)
   )))))
 
