@@ -28,10 +28,12 @@
 		    ))
 
 (defun init-lmdb()
-  (unless (boundp 'lmdb:use-mmap-dir)
-    (lmdb:use-mmap-dir (or (uiop:getenv "METIS") "~/ct-lmdb/")))
-  (if (and (eql (hash-table-count *lmdb-files*) 0) *metis-need-files*)
-      (allocate-file-hash)))
+;;  (unless (boundp 'lmdb-use-mmap-dir)
+;;    (lmdb:use-mmap-dir (or (uiop:getenv "METIS") "~/ct-lmdb/")))
+;;  (if (and (eql (hash-table-count *lmdb-files*) 0) *metis-need-files*)
+  ;;      (allocate-file-hash)))
+  (format t "init~%")
+  )
 
 (defclass files ()
   ((value :initarg :value :accessor value)
@@ -172,7 +174,7 @@
    (lambda (x) (string-equal
 		(get-filename-hash file)
 		(slot-value x :value2)))
-   (lmdb:retrieve-all-instances 'metis::files)))
+   (lmdb-retrieve-all-instances 'metis::files)))
 
 (defun lmdb-mark-file-processed (file)
   (let ((name (get-filename-hash file)))
@@ -180,7 +182,7 @@
     (make-instance 'files :value name :idx 1)))
 
 (defun allocate-file-hash ()
-  (lmdb:doclass (x 'metis::files :fresh-instances nil)
+  (lmdb-doclass (x 'metis::files :fresh-instances nil)
     (setf (gethash (slot-value x 'value) *lmdb-files*) t)))
 
 (defun allocate-klass-hash (klass)
@@ -188,7 +190,7 @@
       (progn
 	(format t "allocating class:~A~%" klass)
 	(create-klass-hash klass)
-	(lmdb:doclass (x klass :fresh-instances nil)
+	(lmdb-doclass (x klass :fresh-instances nil)
 	  (with-slots (value idx) x
 	    (setf (gethash value
 			   (gethash klass *metis-fields*)) idx)))
@@ -216,16 +218,16 @@
 
 (defun get-stats ()
   (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"
-	  (lmdb:count-all-instances 'metis::ct)
-	  (lmdb:count-all-instances 'metis::files)
-	  (lmdb:count-all-instances 'metis::flow)
-	  (lmdb:count-all-instances 'metis::flow-files)
-	  (lmdb:count-all-instances 'metis::errorCode)
-	  (lmdb:count-all-instances 'metis::srcaddr)
-	  (lmdb:count-all-instances 'metis::dstaddr)
-	  (lmdb:count-all-instances 'metis::srcport)
-	  (lmdb:count-all-instances 'metis::dstport)
-	  (lmdb:count-all-instances 'metis::protocol)
+	  (lmdb-count-all-instances 'metis::ct)
+	  (lmdb-count-all-instances 'metis::files)
+	  (lmdb-count-all-instances 'metis::flow)
+	  (lmdb-count-all-instances 'metis::flow-files)
+	  (lmdb-count-all-instances 'metis::errorCode)
+	  (lmdb-count-all-instances 'metis::srcaddr)
+	  (lmdb-count-all-instances 'metis::dstaddr)
+	  (lmdb-count-all-instances 'metis::srcport)
+	  (lmdb-count-all-instances 'metis::dstport)
+	  (lmdb-count-all-instances 'metis::protocol)
 	  ))
 
 (defun find-username (userIdentity)
@@ -242,14 +244,14 @@
 
 (defun get-unique-values (klass)
   "Return unique list of klass objects"
-  (lmdb:doclass (x klass :fresh-instances nil)
+  (lmdb-doclass (x klass :fresh-instances nil)
     (with-slots (value idx) x
       (format t "~%~A: ~A" idx value))))
 
 (defun get-unique-values-list (klass)
   "Return unique list of klass objects"
   (let ((results '()))
-    (lmdb:doclass (x klass :fresh-instances nil)
+    (lmdb-doclass (x klass :fresh-instances nil)
       (with-slots (value idx) x
 	(push value results)))
     results))
@@ -282,7 +284,7 @@
 
 (defun get-obj-by-val (klass val)
   (let ((obj-list nil))
-    (lmdb:doclass (x klass :fresh-instances nil)
+    (lmdb-doclass (x klass :fresh-instances nil)
       (with-slots (value) x
 	(if (string-equal val value)
 	    (push x obj-list))))
@@ -299,7 +301,7 @@
     (multiple-value-bind (id seen)
 	(gethash value klass-hash)
       (when (or seen inverse)
-	(lmdb:doclass (x 'metis::ct :fresh-instances nil)
+	(lmdb-doclass (x 'metis::ct :fresh-instances nil)
 	  (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
 	    (cond
 	      ((equal (find-class klass) (find-class 'metis::userName)) (setf slotv userName))
