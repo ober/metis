@@ -1,7 +1,7 @@
 (ql:quickload '(:clack :ningle :metis))
 
 (defvar *app* (make-instance 'ningle:<app>))
-(if (boundp 'init-manardb) (metis::init-manardb))
+(metis::init-manardb)
 
 (setf (ningle:route *app* "/") "Welcome to metis")
 
