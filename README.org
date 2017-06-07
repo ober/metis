@@ -1,0 +1,5 @@
+* Overview of metis.
+
+** This project was to learn Common Lisp while writing a useful tool.
+- It is designed to process AWS Cloudtrail logs as well as VPC flow logs.
+- It uses Manardb and is supported on SBCL, CCL, Lispworks, and Allegro CL.
