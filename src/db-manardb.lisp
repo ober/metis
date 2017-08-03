@@ -18,9 +18,9 @@
 		    metis::eventVersion
 		    metis::recipientAccountId
 		    ;;metis::requestID
-		    ;;metis::requestParameters
+		    metis::requestParameters
 		    metis::resources
-		    ;;metis::responseElements
+		    metis::responseElements
 		    metis::sourceIPAddress
 		    metis::userAgent
 		    ;;metis::userIdentity
@@ -186,7 +186,7 @@
 (defun allocate-klass-hash (klass)
   (or (hash-table-p (gethash klass *metis-fields*))
       (progn
-	(format t "allocating class:~A~%" klass)
+	;;(format t "allocating class:~A~%" klass)
 	(create-klass-hash klass)
 	(manardb:doclass (x klass :fresh-instances nil)
 	  (with-slots (value idx) x
@@ -300,20 +300,22 @@
 	(gethash value klass-hash)
       (when (or seen inverse)
 	(manardb:doclass (x 'metis::ct :fresh-instances nil)
-	  (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
+	  (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity requestParameters responseElements) x
 	    (cond
 	      ((equal (find-class klass) (find-class 'metis::userName)) (setf slotv userName))
 	      ((equal (find-class klass) (find-class 'metis::eventName)) (setf slotv eventName))
 	      ((equal (find-class klass) (find-class 'metis::eventSource)) (setf slotv eventSource))
 	      ((equal (find-class klass) (find-class 'metis::sourceIPAddress)) (setf slotv sourceIPAddress))
 	      ((equal (find-class klass) (find-class 'metis::errorMessage)) (setf slotv errorMessage))
-	      ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode)))
+	      ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode))
+	      ((equal (find-class klass) (find-class 'metis::requestParameters)) (setf slotv requestParameters))
+	      ((equal (find-class klass) (find-class 'metis::responseElements)) (setf slotv responseElements)))
 	    (when
 		(or
 		 (and inverse slotv)
 		 (and slotv (ignore-errors (= slotv id))))
 	      (push
-	       (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~%"
+	       (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
 		       (get-val-by-idx 'metis::eventTime eventTime)
 		       (get-val-by-idx 'metis::eventName eventName)
 		       (get-val-by-idx 'metis::userName userName)
@@ -322,6 +324,8 @@
 		       (get-val-by-idx 'metis::userAgent userAgent)
 		       (get-val-by-idx 'metis::errorMessage errorMessage)
 		       (get-val-by-idx 'metis::errorCode errorCode)
+		       (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::requestParameters requestParameters)) "")
+		       (cl-ppcre:regex-replace " +" (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) "") " ")
 		       (find-username (get-val-by-idx 'metis::userIdentity userIdentity)))
 	       results))))))
     results))
