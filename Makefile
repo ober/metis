@@ -15,7 +15,7 @@ ecl:
 
 sbcl:
 	@ mkdir -p dist/sbcl
-	@ cat src/deliver.lisp|sbcl  --dynamic-space-size 20480  2>&1 > /dev/null #--control-stack-size 2048  #--disable-debugger
+	@ cat src/deliver.lisp|sbcl --control-stack-size 2048 --dynamic-space-size 20480  2>&1 > /dev/null #--control-stack-size 2048  #--disable-debugger
 ccl:
 	@ mkdir -p dist/ccl || true
 	@ cd src && cat deliver.lisp|ccl64

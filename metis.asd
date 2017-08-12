@@ -18,10 +18,12 @@
 	       :cl-json
 	       :closer-mop
 	       :fare-memoization
+	       :clack
 	       :gzip-stream
 	       :jonathan
 	       :local-time
 	       :manardb
+	       :ningle
 	       :pcall
 	       :pcall-queue
 	       :split-sequence
@@ -47,4 +49,5 @@
 				     (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))
 				     (:file "main" :depends-on ("package" "ctcl" "utils" "database" "flows"))
 				     (:file "pkgdcl" :depends-on ("package" "ctcl" "utils" "database"))
+				     (:file "web" :depends-on ("ctcl"))
 				     ))))

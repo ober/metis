@@ -3,6 +3,7 @@
 		:cl-date-time-parser
 		:cl-fad
 		:cl-json
+		:clack
 		:fare-memoization
 		:gzip-stream
 		:jonathan

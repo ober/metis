@@ -3,7 +3,7 @@
 (defvar *metis-fields* (thread-safe-hash-table))
 (defvar *metis-counters* (thread-safe-hash-table))
 (defvar *metis-need-files* nil)
-
+(defvar *output-sep* "|")
 
 (defvar ct-fields '(
 		    metis::additionalEventData
@@ -315,20 +315,27 @@
 		 (and inverse slotv)
 		 (and slotv (ignore-errors (= slotv id))))
 	      (push
-	       (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
-		       (get-val-by-idx 'metis::eventTime eventTime)
-		       (get-val-by-idx 'metis::eventName eventName)
-		       (get-val-by-idx 'metis::userName userName)
-		       (get-val-by-idx 'metis::eventSource eventSource)
-		       (get-val-by-idx 'metis::sourceIPAddress sourceIPAddress)
-		       (get-val-by-idx 'metis::userAgent userAgent)
-		       (get-val-by-idx 'metis::errorMessage errorMessage)
-		       (get-val-by-idx 'metis::errorCode errorCode)
-		       (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::requestParameters requestParameters)) "")
-		       (cl-ppcre:regex-replace " +" (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) "") " ")
-		       (find-username (get-val-by-idx 'metis::userIdentity userIdentity)))
+	       (format nil "|~{~A | ~}~%"
+		       (list
+			(get-val-by-idx 'metis::eventTime eventTime)
+			(get-val-by-idx 'metis::eventName eventName)
+			(get-val-by-idx 'metis::userName userName)
+			(get-val-by-idx 'metis::eventSource eventSource)
+			(get-val-by-idx 'metis::sourceIPAddress sourceIPAddress)
+			(get-val-by-idx 'metis::userAgent userAgent)
+			(get-val-by-idx 'metis::errorMessage errorMessage)
+			(get-val-by-idx 'metis::errorCode errorCode)
+			(cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::requestParameters requestParameters)) ""))
+			(cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) ""))
+			(find-username (get-val-by-idx 'metis::userIdentity userIdentity))))
 	       results))))))
-    results))
+  results))
+
+
+(defun cleanup-output (str)
+  (let* ((no-dupes (cl-ppcre:regex-replace-all "[\\t ]+" str " "))
+	 (no-returns (cl-ppcre:regex-replace-all "\\n" no-dupes " "))
+	 no-returns)))
 
 (defun ct-get-all-errors ()
   (ct-get-by-klass-value 'metis::errorCode nil t))
