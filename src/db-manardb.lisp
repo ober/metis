@@ -271,6 +271,11 @@
   "Return unique list of events"
   (get-unique-values 'metis::username))
 
+(defun get-region-list ()
+  "Return unique list of events"
+  (get-unique-values 'metis::awsRegion))
+
+
 (defun get-sourceips-list ()
   "Return unique list of events"
   (get-unique-values 'metis::sourceIPAddress))
@@ -300,9 +305,10 @@
 	(gethash value klass-hash)
       (when (or seen inverse)
 	(manardb:doclass (x 'metis::ct :fresh-instances nil)
-	  (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity requestParameters responseElements) x
+	  (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity requestParameters responseElements awsRegion) x
 	    (cond
 	      ((equal (find-class klass) (find-class 'metis::userName)) (setf slotv userName))
+	      ((equal (find-class klass) (find-class 'metis::awsRegion)) (setf slotv awsRegion))
 	      ((equal (find-class klass) (find-class 'metis::eventName)) (setf slotv eventName))
 	      ((equal (find-class klass) (find-class 'metis::eventSource)) (setf slotv eventSource))
 	      ((equal (find-class klass) (find-class 'metis::sourceIPAddress)) (setf slotv sourceIPAddress))
@@ -342,6 +348,9 @@
 
 (defun ct-get-by-name (name)
   (ct-get-by-klass-value 'metis::userName name))
+
+(defun ct-get-by-region (region)
+  (ct-get-by-klass-value 'metis::awsRegion region))
 
 (defun ct-get-by-errorcode (name)
   (ct-get-by-klass-value 'metis::errorCode name))
