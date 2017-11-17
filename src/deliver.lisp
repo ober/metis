@@ -12,6 +12,7 @@
 		;;:postmodern
 		;;:sqlite
 		:thnappy
+                :zs3
 		:uiop
 		:usocket
 		))
