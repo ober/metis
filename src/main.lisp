@@ -127,10 +127,10 @@
 	   (usage))))
   (manardb:close-all-mmaps)))
 
-(defun main ()
+(defun main (&optional args)
   (init-manardb)
   #+sbcl
-  (handler-case (process-args (argv))
+  (handler-case (process-args (args))
     (sb-sys:interactive-interrupt ()
       (sb-ext:quit)))
   #-sbcl
