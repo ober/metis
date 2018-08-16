@@ -128,13 +128,14 @@
   (manardb:close-all-mmaps)))
 
 (defun main (&optional args)
-  (init-manardb)
-  #+sbcl
-  (handler-case (process-args (args))
-    (sb-sys:interactive-interrupt ()
-      (sb-ext:quit)))
-  #-sbcl
-  (process-args (argv)))
+  (let ((argz (or args '())))
+    (init-manardb)
+    #+sbcl
+    (handler-case (process-args (argz))
+      (sb-sys:interactive-interrupt ()
+	(sb-ext:quit)))
+    #-sbcl
+    (process-args (argz))))
 
 #+allegro
 (in-package :cl-user)
