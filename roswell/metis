@@ -1,0 +1,16 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+exec ros -Q -m metis -L sbcl-bin -- $0 "$@"
+|#
+(progn
+  (unless (find-package :metis)
+    (ql:quickload :metis :silent t)
+    (uiop:symbol-call :metis :load-site-init)))
+
+(defpackage :ros.metis.123456
+  (:use :cl))
+(in-package :ros.metis.123456)
+
+(defun main (&rest argv)
+  (apply #'metis:main argv))
+;;; vim: set ft=lisp lisp:
