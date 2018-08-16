@@ -1,4 +1,4 @@
-(load (merge-pathnames "~/quicklisp/setup.lisp" *default-pathname-defaults*))
+;;(load (merge-pathnames "~/quicklisp/setup.lisp" *default-pathname-defaults*))
 ;; (ql:quickload '(
 ;; 		:fare-memoization
 ;; 		:cl-fad

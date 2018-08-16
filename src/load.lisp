@@ -1,4 +1,4 @@
-#-cmucl (load "~/quicklisp/setup.lisp")
+;;#-cmucl (load "~/quicklisp/setup.lisp")
 (ql:quickload '(
 		:fare-memoization
 		:cl-fad
