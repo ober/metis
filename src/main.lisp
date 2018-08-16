@@ -135,7 +135,7 @@
     (sb-sys:interactive-interrupt ()
       (sb-ext:quit)))
   #-sbcl
-  (process-args (argv))))
+  (process-args (argv)))
 
 #+allegro
 (in-package :cl-user)
