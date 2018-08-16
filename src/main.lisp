@@ -127,15 +127,15 @@
 	   (usage))))
   (manardb:close-all-mmaps)))
 
-(defun main (&optional args)
-  (let ((argz (or args '())))
-    (init-manardb)
-    #+sbcl
-    (handler-case (process-args (argz))
-      (sb-sys:interactive-interrupt ()
-	(sb-ext:quit)))
-    #-sbcl
-    (process-args (argz))))
+(defun main (&rest argv)
+  (declare (ignorable argv))
+  (init-manardb)
+  #+sbcl
+  (handler-case (process-args (argv))
+    (sb-sys:interactive-interrupt ()
+      (sb-ext:quit)))
+  #-sbcl
+  (process-args (argv))))
 
 #+allegro
 (in-package :cl-user)
