@@ -70,14 +70,15 @@
   ;;(define-alien-variable "gencgc-oldest-gen-to-gc" (unsigned 8))(setf gencgc-oldest-gen-to-gc 1)
   ;;(setf gencgc-oldest-gen-to-gc 1)
   ;;(in-package :metis)
-  (init-manardb)
+  ;;(init-manardb)
 
   (let (
 	(verb (nth 1 args))
 	(alpha (nth 2 args))
 	(beta (nth 3 args))
 	)
-    ;;(format t "main:~A verb:~A alpha:~A beta:~A" (nth 0 args) verb alpha beta)
+
+;;    (format t "main:~A verb:~A alpha:~A beta:~A" (nth 0 args) verb alpha beta)
     (cond
       ((equal "a" verb) (cloudtrail-report-async alpha beta))
       ((equal "b" verb) (bench-vpc-flows-report-sync alpha))
@@ -127,15 +128,15 @@
 	   (usage))))
   (manardb:close-all-mmaps)))
 
-(defun main (&rest argv)
-  (declare (ignorable argv))
-  (init-manardb)
-  #+sbcl
-  (handler-case (process-args (argv))
-    (sb-sys:interactive-interrupt ()
-      (sb-ext:quit)))
-  #-sbcl
-  (process-args (argv)))
+(defun main (&optional argz)
+  (let ((args (or argz (argv))))
+    (init-manardb)
+    #+sbcl
+    (handler-case (process-args (list "metis" args))
+      (sb-sys:interactive-interrupt ()
+	(sb-ext:quit)))
+    #-sbcl
+    (process-args (argv))))
 
 #+allegro
 (in-package :cl-user)
