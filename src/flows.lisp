@@ -5,8 +5,7 @@
 (ql:quickload :split-sequence :cl-date-time-parser :local-time)
 (defvar *mytasks* (list))
 
-(defvar vpc-fields '(
-		     metis::bytez
+(defvar vpc-fields '(metis::bytez
 		     metis::date
 		     metis::dstaddr
 		     metis::dstport
@@ -18,8 +17,7 @@
 		     metis::srcport
 		     metis::start
 		     metis::status
-		     metis::action
-		     ))
+		     metis::action))
 
 (manardb:defmmclass date ()
   ((file :initarg :name :reader file)))
@@ -123,8 +121,8 @@
 		    dstaddr-i
 		    (get-val srcport)
 		    (get-val dstport)
-		    (get-val protocol)
-		    ))))))
+		    (get-val protocol)))))))
+
 
 (defun vpc-flows-report-sync (path)
   (init-vpc-hashes)
@@ -135,15 +133,14 @@
 
 (defun async-vf-file (x)
   (push (pcall:pexec
-	  (funcall #'process-vf-file x)) *mytasks*))
+	    (funcall #'process-vf-file x)) *mytasks*))
 
 (defun sync-vf-file (x)
   (process-vf-file x))
 
 (defun find-by-srcaddr (value)
   (manardb:doclass (x 'metis::flow :fresh-instances nil)
-    (with-slots (
-		 interface-id
+    (with-slots (interface-id
 		 srcaddr
 		 dstaddr
 		 srcport
@@ -154,8 +151,7 @@
 		 start
 		 endf
 		 action
-		 status
-		 ) x
+		 status) x
       (if (cl-ppcre:all-matches value srcaddr)
 	  (format t "|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A|~A~%"
 		  interface-id

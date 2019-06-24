@@ -5,8 +5,7 @@
 (defvar *metis-need-files* nil)
 (defvar *output-sep* "|")
 
-(defvar ct-fields '(
-		    metis::additionalEventData
+(defvar ct-fields '(metis::additionalEventData
 		    metis::awsRegion
 		    metis::errorCode
 		    metis::errorMessage
@@ -24,8 +23,7 @@
 		    metis::sourceIPAddress
 		    metis::userAgent
 		    ;;metis::userIdentity
-		    metis::userName
-		    ))
+		    metis::userName))
 
 (defun init-manardb()
   (unless (boundp 'manardb:use-mmap-dir)
@@ -170,8 +168,8 @@
   (format t "manardb-get-files:~A~%" file)
   (remove-if-not
    (lambda (x) (string-equal
-		(get-filename-hash file)
-		(slot-value x :value2)))
+	   (get-filename-hash file)
+	   (slot-value x :value2)))
    (manardb:retrieve-all-instances 'metis::files)))
 
 (defun manardb-mark-file-processed (file)
@@ -225,8 +223,7 @@
 	  (manardb:count-all-instances 'metis::dstaddr)
 	  (manardb:count-all-instances 'metis::srcport)
 	  (manardb:count-all-instances 'metis::dstport)
-	  (manardb:count-all-instances 'metis::protocol)
-	  ))
+	  (manardb:count-all-instances 'metis::protocol)))
 
 (defun find-username (userIdentity)
   (let ((a (fetch-value '(:|sessionContext| :|sessionIssuer| :|userName|) userIdentity))
@@ -335,7 +332,7 @@
 			(cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) ""))
 			(find-username (get-val-by-idx 'metis::userIdentity userIdentity))))
 	       results))))))
-  results))
+    results))
 
 
 (defun cleanup-output (str)
@@ -371,8 +368,7 @@
   (format t "manardb-recreate-tables~%"))
 
 (defun manardb-normalize-insert-2 (record)
-  (destructuring-bind (
-		       additionalEventData
+  (destructuring-bind (additionalEventData
 		       awsRegion
 		       errorCode
 		       errorMessage
@@ -390,8 +386,7 @@
 		       sourceIPAddress
 		       userAgent
 		       userIdentity
-		       userName
-		       )
+		       userName)
       record
     (make-instance 'ct
 		   :additionalEventData additionalEventData
@@ -412,9 +407,7 @@
 		   :sourceIPAddress sourceIPAddress
 		   :userAgent userAgent
 		   :userIdentity userIdentity
-		   :userName userName
-		   )
-    ))
+		   :userName userName)))
 
 (defun compress-str (str)
   (when str
@@ -428,8 +421,7 @@
 	  store-me))))
 
 (defun manardb-normalize-insert (record)
-  (destructuring-bind (
-		       additionalEventData
+  (destructuring-bind (additionalEventData
 		       awsRegion
 		       errorCode
 		       errorMessage
@@ -447,8 +439,7 @@
 		       sourceIPAddress
 		       userAgent
 		       userIdentity
-		       userName
-		       )
+		       userName)
       record
     (let ((additionalEventData-i (get-idx 'metis::additionalEventData additionalEventData))
 	  (awsRegion-i (get-idx 'metis::awsRegion awsRegion))
@@ -488,8 +479,7 @@
 		     :sourceIPAddress sourceIPAddress-i
 		     :userAgent userAgent-i
 		     :userIdentity userIdentity-i
-		     :userName userName-i
-		     ))))
+		     :userName userName-i))))
 
 (defun cleanse (var)
   (typecase var
@@ -498,13 +488,10 @@
     (list (format nil "~{~s = ~s~%~}" var))))
 
 (defun manardb-get-or-insert-id (table value)
-  (format t "manard-get-or-insert-id table:~A value:~A~%" table value)
-  )
+  (format t "manard-get-or-insert-id table:~A value:~A~%" table value))
 
 (defun manardb-drop-table (query)
-  (format t "manardb-drop-table query:~A~%" query)
-  )
+  (format t "manardb-drop-table query:~A~%" query) )
 
 (defun manardb-do-query (query)
-  (format nil "manardb-do-query query:~A~%" query)
-  )
+  (format nil "manardb-do-query query:~A~%" query))

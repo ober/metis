@@ -25,7 +25,7 @@
   #+allegro
   (progn
     (setf excl:*tenured-bytes-limit* 524288000)
-;;    (setf *maxsamples* 100)
+    ;;    (setf *maxsamples* 100)
     (prof::with-profiling (:type :time) (metis::do-bench))
     (prof::show-call-graph)
     (prof::show-flat-profile))

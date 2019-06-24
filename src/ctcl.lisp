@@ -1,6 +1,5 @@
 (in-package :metis)
 
-
 (defvar zs3::*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
 ;;(defvar cl-user:*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
 
@@ -22,7 +21,7 @@
 
 (defun async-ct-file (x)
   (push (pcall:pexec
-	 (funcall #'process-ct-file x)) *mytasks*))
+	    (funcall #'process-ct-file x)) *mytasks*))
 
 (defun process-ct-file (x)
   "Handle the contents of the json gzip file"

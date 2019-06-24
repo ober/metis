@@ -5,8 +5,7 @@
 (defvar *metis-need-files* nil)
 
 
-(defvar ct-fields '(
-		    metis::additionalEventData
+(defvar ct-fields '(metis::additionalEventData
 		    metis::awsRegion
 		    metis::errorCode
 		    metis::errorMessage
@@ -24,8 +23,7 @@
 		    metis::sourceIPAddress
 		    metis::userAgent
 		    ;;metis::userIdentity
-		    metis::userName
-		    ))
+		    metis::userName))
 
 (defun init-lmdb()
   (unless (boundp 'lmdb:use-mmap-dir)
@@ -170,8 +168,8 @@
   (format t "lmdb-get-files:~A~%" file)
   (remove-if-not
    (lambda (x) (string-equal
-		(get-filename-hash file)
-		(slot-value x :value2)))
+	   (get-filename-hash file)
+	   (slot-value x :value2)))
    (lmdb:retrieve-all-instances 'metis::files)))
 
 (defun lmdb-mark-file-processed (file)
@@ -302,12 +300,24 @@
 	(lmdb:doclass (x 'metis::ct :fresh-instances nil)
 	  (with-slots (userName eventTime eventName eventSource sourceIPAddress userAgent errorMessage errorCode userIdentity) x
 	    (cond
-	      ((equal (find-class klass) (find-class 'metis::userName)) (setf slotv userName))
-	      ((equal (find-class klass) (find-class 'metis::eventName)) (setf slotv eventName))
-	      ((equal (find-class klass) (find-class 'metis::eventSource)) (setf slotv eventSource))
-	      ((equal (find-class klass) (find-class 'metis::sourceIPAddress)) (setf slotv sourceIPAddress))
-	      ((equal (find-class klass) (find-class 'metis::errorMessage)) (setf slotv errorMessage))
-	      ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode)))
+	      ((equal (find-class klass)
+		      (find-class 'metis::userName))
+	       (setf slotv userName))
+	      ((equal (find-class klass)
+		      (find-class 'metis::eventName))
+	       (setf slotv eventName))
+	      ((equal (find-class klass)
+		      (find-class 'metis::eventSource))
+	       (setf slotv eventSource))
+	      ((equal (find-class klass)
+		      (find-class 'metis::sourceIPAddress))
+	       (setf slotv sourceIPAddress))
+	      ((equal (find-class klass)
+		      (find-class 'metis::errorMessage))
+	       (setf slotv errorMessage))
+	      ((equal (find-class klass)
+		      (find-class 'metis::errorCode))
+	       (setf slotv errorCode)))
 	    (when
 		(or
 		 (and inverse slotv)
@@ -351,8 +361,7 @@
   (format t "lmdb-recreate-tables~%"))
 
 (defun lmdb-normalize-insert-2 (record)
-  (destructuring-bind (
-		       additionalEventData
+  (destructuring-bind (additionalEventData
 		       awsRegion
 		       errorCode
 		       errorMessage
@@ -370,8 +379,7 @@
 		       sourceIPAddress
 		       userAgent
 		       userIdentity
-		       userName
-		       )
+		       userName)
       record
     (make-instance 'ct
 		   :additionalEventData additionalEventData
@@ -392,9 +400,7 @@
 		   :sourceIPAddress sourceIPAddress
 		   :userAgent userAgent
 		   :userIdentity userIdentity
-		   :userName userName
-		   )
-    ))
+		   :userName userName)))
 
 (defun compress-str (str)
   (when str
@@ -408,8 +414,7 @@
 	  store-me))))
 
 (defun lmdb-normalize-insert (record)
-  (destructuring-bind (
-		       additionalEventData
+  (destructuring-bind (additionalEventData
 		       awsRegion
 		       errorCode
 		       errorMessage
@@ -427,8 +432,7 @@
 		       sourceIPAddress
 		       userAgent
 		       userIdentity
-		       userName
-		       )
+		       userName)
       record
     (let ((additionalEventData-i (get-idx 'metis::additionalEventData additionalEventData))
 	  (awsRegion-i (get-idx 'metis::awsRegion awsRegion))

@@ -1,6 +1,5 @@
 (load (merge-pathnames "~/quicklisp/setup.lisp" *default-pathname-defaults*))
-(ql:quickload '(
-		:cl-date-time-parser
+(ql:quickload '(:cl-date-time-parser
 		:cl-fad
 		:cl-json
 		:clack
@@ -14,8 +13,7 @@
 		:thnappy
                 :zs3
 		:uiop
-		:usocket
-		))
+		:usocket))
 
 ;;(load "package.lisp")
 
@@ -42,8 +40,7 @@
 (deliver 'metis:main "../dist/lispworks/metis" 0 :keep-package-manipulation t :multiprocessing t :keep-eval t :keep-fasl-dump t :keep-editor t :keep-foreign-symbols t :keep-function-name t :keep-gc-cursor t :keep-keyword-names t :keep-lisp-reader t :keep-macros t :keep-modules t :keep-top-level t :license-info nil  :keep-walker t :KEEP-PRETTY-PRINTER t)
 
 #+allegro
-(let ((lfiles '(
-		"package.lisp"
+(let ((lfiles '("package.lisp"
 		"utils.lisp"
 		"ctcl.lisp"
 		"database.lisp"
@@ -52,11 +49,9 @@
 		"db-manardb.lisp"
 		"main.lisp"
 		"bench.lisp"
-		"flows.lisp"
-		)))
+		"flows.lisp")))
   (mapcar #'compile-file lfiles)
-  (cl-user::generate-executable "../dist/allegro/metis" '(
-							  "package.fasl"
+  (cl-user::generate-executable "../dist/allegro/metis" '("package.fasl"
 							  "utils.fasl"
 							  "database.fasl"
 							  ;;"db-postgres.fasl"
@@ -65,8 +60,7 @@
 							  "ctcl.fasl"
 							  "main.fasl"
 							  "bench.fasl"
-							  "flows.fasl"
-							  )
+							  "flows.fasl")
 				:runtime :partners
 				:show-window :shownoactivate
 				:system-dlls-path "system-dlls/"

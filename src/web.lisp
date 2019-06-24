@@ -2,10 +2,19 @@
 
 (defvar *app* (make-instance 'ningle:<app>))
 
+(defun create-links (url items hdr foot)
+  (concatenate 'string
+	       hdr
+	       (format nil url (sort items #'string-lessp))
+	       foot))
+
+(defvar
+
 (defun web/get-user-list ()
-  (let ((users (metis::get-unique-values-list 'metis::username)))
+  (let ((users (metis::get-unique-values-list 'metis::username))
+    (create-links url users (web/pretty-header "users")
     (concatenate 'string
-		 (web/pretty-header "users")
+
 		 (format nil "~{<tr><td><a href=\"http://localhost:5002/user-search?user=~A\"> ~:* ~A </aref></td></tr>~}" (sort users #'string-lessp))
 		 (web/pretty-footer "users"))))
 
