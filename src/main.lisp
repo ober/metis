@@ -72,11 +72,11 @@
   ;;(in-package :metis)
   ;;(init-manardb)
 
-  (let ((verb (nth 1 args))
-	(alpha (nth 2 args))
-	(beta (nth 3 args)))
+  (let* ((argz (nth 1 args))
+	 (verb (nth 1 argz))
+	 (alpha (nth 2 argz))
+	 (beta (nth 3 argz)))
 
-    ;;    (format t "main:~A verb:~A alpha:~A beta:~A" (nth 0 args) verb alpha beta)
     (cond
       ((equal "a" verb) (cloudtrail-report-async alpha beta))
       ((equal "b" verb) (bench-vpc-flows-report-sync alpha))
@@ -124,7 +124,7 @@
       ((equal "web" verb) (web/start))
       (t (progn
 	   (usage))))
-    (manardb:close-all-mmaps)))
+  (manardb:close-all-mmaps)))
 
 (defun main (&optional argz)
   (let ((args (or argz (argv))))

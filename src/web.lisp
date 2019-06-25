@@ -1,6 +1,12 @@
 (in-package :metis)
 
 (defvar *app* (make-instance 'ningle:<app>))
+(defvar *server* "localhost")
+(defvar *port* "5002")
+
+(defun create-url (verb name)
+  "Create a url given the verb root and name of items"
+  (format nil "~~{<tr><td><a href=\"http://~a:~a/~a?~a=~~A\"> ~~:* ~~A </aref></td></tr>~~}" *server* *port* verb name))
 
 (defun create-links (url items hdr foot)
   (concatenate 'string
@@ -8,15 +14,10 @@
 	       (format nil url (sort items #'string-lessp))
 	       foot))
 
-(defvar
-
 (defun web/get-user-list ()
   (let ((users (metis::get-unique-values-list 'metis::username))
-    (create-links url users (web/pretty-header "users")
-    (concatenate 'string
-
-		 (format nil "~{<tr><td><a href=\"http://localhost:5002/user-search?user=~A\"> ~:* ~A </aref></td></tr>~}" (sort users #'string-lessp))
-		 (web/pretty-footer "users"))))
+	(url (create-url "user-search" "users")))
+    (create-links url users (web/pretty-header "users") (web/pretty-footer "users"))))
 
 (defun web/get-region-list ()
   (let ((users (metis::get-unique-values-list 'metis::awsREgion)))
