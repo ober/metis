@@ -161,7 +161,7 @@ is replaced with replacement."
     ))
 
 (fare-memoization:define-memo-function reverse-hash-kv (old)
-  (let ((new (make-hash-table)))
+  (let ((new (thread-safe-hash-table)))
     (maphash #'(lambda (k v) (setf (gethash v new) k)) old) new))
 
 
