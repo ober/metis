@@ -18,7 +18,7 @@
 	       :cl-json
 	       :closer-mop
 	       :fare-memoization
-	       :clack
+;;	       :clack
 	       :gzip-stream
 	       :jonathan
 	       :local-time

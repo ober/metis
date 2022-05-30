@@ -72,36 +72,6 @@
         ,store-var)
      `(cdr (assoc ,item-var ,a-list-var ,@ keys)))))
 
-;; (defclass queue ()
-;;   ((list :initform nil)
-;;    (tail :initform nil)))
-
-;; (defmethod print-object ((queue queue) stream)
-;;   (print-unreadable-object (queue stream :type t)
-;;     (with-slots (list tail) queue
-;;       (cond ((cddddr list)
-;; 	     ;; at least five elements, so print ellipsis
-;; 	     (format stream "(~{T~S ~}... ~S)"
-;; 		     (subseq list 0 3) (first tail)))
-;; 	    ;; otherwise print whole list
-;; 	    (t (format stream "~:S" list))))))
-
-;; (defmethod dequeue ((queue queue))
-;;   (with-slots (list) queue
-;;     (pop list)))
-
-;; (defmethod queue-length ((queue queue))
-;;   (with-slots (list) queue
-;;     (list-length list)))
-
-;; (defmethod enqueue (new-item (queue queue))
-;;   (with-slots (list tail) queue
-;;     (let ((new-tail (list new-item)))
-;;       (cond ((null list) (setf list new-tail))
-;; 	    (t (setf (cdr tail) new-tail)))
-;;       (setf tail new-tail)))
-;;   queue)
-
 (defun flatten (obj)
   (do* ((result (list obj))
         (node result))
@@ -163,42 +133,6 @@ is replaced with replacement."
 (fare-memoization:define-memo-function reverse-hash-kv (old)
   (let ((new (thread-safe-hash-table)))
     (maphash #'(lambda (k v) (setf (gethash v new) k)) old) new))
-
-
-;; from David McClain
-
-;; #+lispworks
-;; (defun %par (fn &rest fns)
-;;   (let* ((nfns (length fns))
-;;          (sem  (mp:make-semaphore :count 0)))
-;;     (dolist (fn fns)
-;;       (mp:funcall-async (lambda ()
-;;                           (unwind-protect
-;; 			       (funcall fn)
-;;                             (mp:semaphore-release sem)))
-;;                         ))
-;;     (prog1
-;;         (funcall fn)
-;;       (mp:semaphore-acquire sem :count nfns))))
-
-;; #+lispworks
-;; (defmacro par1 (&rest clauses)
-;;   ;; like PROG1, but executes all clauses in parallel, synchronizing
-;;   ;; at the closing paren, and returning value of first clause
-;;   (when clauses
-;;     (if (rest clauses)
-;;         `(%par ,@(mapcar #`(lambda ()
-;;                              ,a1)
-;;                          clauses))
-;; 	;; else
-;; 	(first clauses))))
-
-;; #+lispworks
-;; (defmacro par (&rest clauses)
-;;   ;; like PROGN, but executes all clauses in parallel, synchronizing
-;;   ;; at the closing paren, and returning value of last clause
-;;   `(par1 ,@(nreverse clauses)))
-
 
 (defun get-size (file)
   (let ((stat (get-stat file)))

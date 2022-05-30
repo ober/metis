@@ -217,7 +217,7 @@
 	    (let ((ip (cdr (assoc "ip" params :test #'string=))))
 	      `(200 (:content-type "text/html") (,(web/search-ip ip))))))
 
-  (clack:clackup *app* :port 5002 :server :hunchentoot)
+  ;;(clack:clackup *app* :port 5002 :server :hunchentoot)
   #+sbcl (loop (sleep 1))
   #+ccl (loop (sleep 1))
   )
