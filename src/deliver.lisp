@@ -1,10 +1,16 @@
 (load (merge-pathnames "~/quicklisp/setup.lisp" *default-pathname-defaults*))
+
+#+lispworks
+(progn
+	(setf *redefinition-action* :WARN)
+	(setf *handle-warn-on-redefinition* :WARN))
+
 (ql:quickload '(:cl-date-time-parser
 		:cl-fad
 		:cl-json
 		:fare-memoization
 		:gzip-stream
-		:jonathan
+    :jonathan
 		:manardb
 		:pcall
 		;;:postmodern
@@ -36,7 +42,24 @@
 (ext:saveinitmem "dist/clisp/metis" :init-function #'metis:main :executable t :quiet t)
 
 #+lispworks
-(deliver 'metis:main "../dist/lispworks/metis" 0 :keep-package-manipulation t :multiprocessing t :keep-eval t :keep-fasl-dump t :keep-editor t :keep-foreign-symbols t :keep-function-name t :keep-gc-cursor t :keep-keyword-names t :keep-lisp-reader t :keep-macros t :keep-modules t :keep-top-level t :license-info nil  :keep-walker t :KEEP-PRETTY-PRINTER t)
+(deliver 'metis:main "../dist/lispworks/metis"
+				 0
+				 :keep-package-manipulation t
+				 :multiprocessing t
+				 :keep-eval t
+				 :keep-fasl-dump t
+				 :keep-editor t
+				 :keep-foreign-symbols t
+				 :keep-function-name t
+				 :keep-gc-cursor t
+				 :keep-keyword-names t
+				 :keep-lisp-reader t
+				 :keep-macros t
+				 :keep-modules t
+				 :keep-top-level t
+				 :license-info nil
+				 :keep-walker t
+				 :KEEP-PRETTY-PRINTER t)
 
 #+allegro
 (let ((lfiles '("package.lisp"
