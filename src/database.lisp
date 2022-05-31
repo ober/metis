@@ -10,84 +10,65 @@
 
 (defparameter to-db (pcall-queue:make-queue))
 
-(defvar *fields* '(:additionalEventData
-		   :awsRegion
-		   :errorCode
-		   :errorMessage
-		   :eventID
-		   :eventName
-		   :eventSource
-		   :eventTime
-		   :eventType
-		   :eventVersion
-		   :recipientAccountId
-		   :requestID
-		   :requestParameters
-		   :resources
-		   :responseElements
-		   :sourceIPAddress
-		   :userAgent
-		   :userIdentity
-		   :userName))
+(defvar *fields* '(
+                   :additionalEventData
+                   :awsRegion
+                   :errorCode
+                   :errorMessage
+                   :eventID
+                   :eventName
+                   :eventSource
+                   :eventTime
+                   :eventType
+                   :eventVersion
+                   :recipientAccountId
+                   :requestID
+                   :requestParameters
+                   :resources
+                   :responseElements
+                   :sourceIPAddress
+                   :userAgent
+                   :userIdentity
+                   :userName))
 
 (defun db-have-we-seen-this-file (file)
   (cond
-    ((equal :sqlite *db-backend*)
-     (sqlite-have-we-seen-this-file file))
-    ((equal :postgres *db-backend*)
-     (sqlite-have-we-seen-this-file file))
-    ((equal :manardb *db-backend*)
-     (manardb-have-we-seen-this-file file))
-    ((equal :lmdb *db-backend*)
-     (lmdb-have-we-seen-this-file file))
+    ((equal :sqlite *db-backend*) (sqlite-have-we-seen-this-file file))
+    ((equal :postgres *db-backend*) (sqlite-have-we-seen-this-file file))
+    ((equal :manardb *db-backend*) (manardb-have-we-seen-this-file file))
+    ((equal :lmdb *db-backend*) (lmdb-have-we-seen-this-file file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-mark-file-processed (file)
   (cond
-    ((equal :sqlite *db-backend*)
-     (sqlite-mark-file-processed file))
-    ((equal :postgres *db-backend*)
-     (psql-mark-file-processed file))
-    ((equal :manardb *db-backend*)
-     (manardb-mark-file-processed file))
-    ((equal :lmdb *db-backend*)
-     (lmdb-mark-file-processed file))
+    ((equal :sqlite *db-backend*) (sqlite-mark-file-processed file))
+    ((equal :postgres *db-backend*) (psql-mark-file-processed file))
+    ((equal :manardb *db-backend*) (manardb-mark-file-processed file))
+    ((equal :lmdb *db-backend*) (lmdb-mark-file-processed file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-recreate-tables (db)
   (cond
-    ((equal :sqlite *db-backend*)
-     (sqlite-recreate-tables))
-    ((equal :postgres *db-backend*)
-     (psql-recreate-tables))
-    ((equal :manardb *db-backend*)
-     (manardb-recreate-tables))
-    ((equal :lmdb *db-backend*)
-     (lmdb-recreate-tables))
+    ((equal :sqlite *db-backend*) (sqlite-recreate-tables))
+    ((equal :postgres *db-backend*) (psql-recreate-tables))
+    ((equal :manardb *db-backend*) (manardb-recreate-tables))
+    ((equal :lmdb *db-backend*) (lmdb-recreate-tables))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun normalize-insert (record)
   (cond
-    ((equal :sqlite *db-backend*)
-     (sqlite-normalize-insert record))
-    ((equal :postgres *db-backend*)
-     (psql-normalize-insert record))
-    ((equal :manardb *db-backend*)
-     (manardb-normalize-insert record))
-    ((equal :lmdb *db-backend*)
-     (lmdb-normalize-insert record))
+    ((equal :sqlite *db-backend*) (sqlite-normalize-insert record))
+    ((equal :postgres *db-backend*) (psql-normalize-insert record))
+    ((equal :manardb *db-backend*) (manardb-normalize-insert record))
+    ((equal :lmdb *db-backend*) (lmdb-normalize-insert record))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-get-or-insert-id (table value)
   (cond
-    ((equal :sqlite *db-backend*)
-     (sqlite-get-or-insert-id table value))
-    ((equal :postgres *db-backend*)
-     (psql-get-or-insert-id table value))
-    ((equal :manardb *db-backend*)
-     (manardb-get-or-insert-id table value))
-    ((equal :lmdb *db-backend*)
-     (lmdb-get-or-insert-id table value))
+    ((equal :sqlite *db-backend*) (sqlite-get-or-insert-id table value))
+    ((equal :postgres *db-backend*) (psql-get-or-insert-id table value))
+    ((equal :manardb *db-backend*) (manardb-get-or-insert-id table value))
+    ((equal :lmdb *db-backend*) (lmdb-get-or-insert-id table value))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-do-query (query)
@@ -100,14 +81,10 @@
 
 (defun db-drop-table (query)
   (cond
-    ((equal :sqlite *db-backend*)
-     (sqlite-drop-table query))
-    ((equal :postgres *db-backend*)
-     (psql-drop-table query))
-    ((equal :manardb *db-backend*)
-     (manardb-drop-table query))
-    ((equal :lmdb *db-backend*)
-     (lmdb-drop-table query))
+    ((equal :sqlite *db-backend*) (sqlite-drop-table query))
+    ((equal :postgres *db-backend*) (psql-drop-table query))
+    ((equal :manardb *db-backend*) (manardb-drop-table query))
+    ((equal :lmdb *db-backend*) (lmdb-drop-table query))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun make-safe-string (str)
@@ -116,53 +93,42 @@
       str))
 
 (defun process-record (record fields)
+    (dolist (r record)
+      (if (keywordp r)
+          (unless (member (format nil "~a" r) fields)
+            (format t "!! missing field. r: ~a type: ~a~%" r (type-of r)))))
+
   (loop for i in fields
-     collect (make-safe-string (get-value i record))))
+        collect (make-safe-string (get-value i record))))
 
 (defun get-value (field record)
-  (cond
-    ((equal :accessKeyId field)
-     (fetch-value '(:|userIdentity| :|accessKeyId|) record))
-    ((equal :additionalEventData field)
-     (getf record :|additionalEventData|))
-    ((equal :awsRegion field)
-     (getf record :|awsRegion|))
-    ((equal :errorCode field)
-     (getf record :|errorCode|))
-    ((equal :errorMessage field)
-     (getf record :|errorMessage|))
-    ((equal :eventID field)
-     (getf record :|eventID|))
-    ((equal :eventName field)
-     (getf record :|eventName|))
-    ((equal :eventSource field)
-     (getf record :|eventSource|))
-    ((equal :eventTime field)
-     (getf record :|eventTime|))
-    ((equal :eventType field)
-     (getf record :|eventType|))
-    ((equal :eventVersion field)
-     (getf record :|eventVersion|))
-    ((equal :recipientAccountId field)
-     (getf record :|recipientAccountId|))
-    ((equal :requestID field)
-     (getf record :|requestID|))
-    ((equal :requestParameters field)
-     (getf record :|requestParameters|))
-    ((equal :resources field)
-     (getf record :|resources|))
-    ((equal :responseElements field)
-     (getf record :|responseElements|))
-    ((equal :sourceIPAddress field)
-     (get-hostname-by-ip (getf record :|sourceIPAddress|)))
-    ((equal :userAgent field)
-     (getf record :|userAgent|))
-    ((equal :userIdentity field)
-     (getf record :|userIdentity|))
-    ((equal :userName field)
-     (fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record))
-    ;;((equal :userName field)(fetch-value '(:|userIdentity| :|userName|) record))
-    (t (format nil "Unknown arg:~A~%" field))))
+  (let ((result nil))
+    (cond
+      ((equal :accessKeyId field) (setf result (fetch-value '(:|userIdentity| :|accessKeyId|) record)))
+      ((equal :additionalEventData field) (setf result (getf record :|additionalEventData|)))
+      ((equal :awsRegion field) (setf result (getf record :|awsRegion|)))
+      ((equal :errorCode field) (setf result (getf record :|errorCode|)))
+      ((equal :errorMessage field) (setf result (getf record :|errorMessage|)))
+      ((equal :eventID field) (setf result (getf record :|eventID|)))
+      ((equal :eventName field) (setf result (getf record :|eventName|)))
+      ((equal :eventSource field) (setf result (getf record :|eventSource|)))
+      ((equal :eventTime field) (setf result (getf record :|eventTime|)))
+      ((equal :eventType field) (setf result (getf record :|eventType|)))
+      ((equal :eventVersion field) (setf result (getf record :|eventVersion|)))
+      ((equal :recipientAccountId field) (setf result (getf record :|recipientAccountId|)))
+      ((equal :requestID field) (setf result (getf record :|requestID|)))
+      ((equal :requestParameters field) (setf result (getf record :|requestParameters|)))
+      ((equal :resources field) (setf result (getf record :|resources|)))
+      ((equal :responseElements field) (setf result (getf record :|responseElements|)))
+      ((equal :sourceIPAddress field) (setf result (get-hostname-by-ip (getf record :|sourceIPAddress|))))
+      ((equal :userAgent field) (setf result (getf record :|userAgent|)))
+      ((equal :userIdentity field) (setf result (getf record :|userIdentity|)))
+      ((equal :userName field) (setf result (fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record)))
+      ;;((equal :userName field)(fetch-value '(:|userIdentity| :|userName|) record))
+      (t (format nil "Unknown arg:~A~%" field)))
+    ;;(unless result
+      ;;(format t "!!result: ~a field: ~a~%" result field))
+  result))
 
 (defun try-twice (table query)
   (let ((val (or
