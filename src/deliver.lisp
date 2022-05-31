@@ -2,8 +2,8 @@
 
 #+lispworks
 (progn
-	(setf *redefinition-action* :WARN)
-	(setf *handle-warn-on-redefinition* :WARN))
+	(setf *redefinition-action* nil)
+	(setf *handle-warn-on-redefinition* nil))
 
 (ql:quickload '(:cl-date-time-parser
 		:cl-fad
@@ -16,7 +16,7 @@
 		;;:postmodern
 		;;:sqlite
 		:thnappy
-                :zs3
+    :zs3
 		:uiop
 		:usocket))
 

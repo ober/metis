@@ -25,7 +25,8 @@
   (handler-case
       (progn
 	(let ((json (get-json-gzip-contents file)))
-	  (jonathan:parse json)))
+      (jonathan:parse json)
+      ))
     (t (e) (error-print "read-json-gzip-file" e))))
 
 #+ecl

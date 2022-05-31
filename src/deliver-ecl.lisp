@@ -18,7 +18,6 @@
 		     :closer-mop
 		     :fare-memoization
 		     :gzip-stream
-		     :jonathan
 		     :local-time
 		     :manardb
 		     :pcall

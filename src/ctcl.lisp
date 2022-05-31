@@ -70,7 +70,7 @@
 (defun cloudtrail-report-async (workers path)
   (setf *metis-need-files* t)
   (time (init-manardb))
-  ;;(time (init-ct-hashes))
+  (time (init-ct-hashes))
   (force-output)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)
@@ -91,3 +91,11 @@
                       (get-filename-hash
                        (slot-value x 'zs3:name))))
           (coerce (all-keys bucket) 'list))))
+
+(defun myexit ()
+  (let ((code 0))
+    #+allegro (excl:exit code)
+    #+sbcl (sb-ext::exit)
+    #+lispworks (cl-user::quit)
+    #+clozure (ccl::quit)
+    #+cmucl (quit)))
