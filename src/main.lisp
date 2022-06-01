@@ -91,6 +91,7 @@
       ((equal "lecat" verb) (get-eventCategory))
       ((equal "ltls" verb) (get-tlsDetails))
       ((equal "lapi" verb) (get-apiVersion))
+      ((equal "lconsole" verb) (get-sessionCredentialFromConsole))
       ((equal "lvcep" verb) (get-vpcEndpointId))
       ((equal "ln" verb) (get-name-list))
       ((equal "lva" verb)(get-vpc-action-list))

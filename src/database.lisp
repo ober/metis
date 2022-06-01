@@ -11,33 +11,35 @@
 (defparameter to-db (pcall-queue:make-queue))
 
 (defvar *fields* '(
-                   :serviceEventDetails
-                   :eventCategory
-                   :readOnly
-                   :managementEvent
-                   :sharedEventID
-                   :tlsDetails
-                   :vpcEndpointId
-                   :apiVersion
                    :additionalEventData
+                   :apiVersion
                    :awsRegion
                    :errorCode
                    :errorMessage
+                   :eventCategory
                    :eventID
                    :eventName
                    :eventSource
                    :eventTime
                    :eventType
                    :eventVersion
+                   :managementEvent
+                   :readOnly
                    :recipientAccountId
                    :requestID
                    :requestParameters
                    :resources
                    :responseElements
+                   :serviceEventDetails
+                   :sessionCredentialFromConsole
+                   :sharedEventID
                    :sourceIPAddress
+                   :tlsDetails
                    :userAgent
                    :userIdentity
-                   :userName))
+                   :userName
+                   :vpcEndpointId
+                   ))
 
 (defun db-have-we-seen-this-file (file)
   (cond
@@ -117,32 +119,33 @@
     (cond
       ((equal :accessKeyId field) (setf result (fetch-value '(:|userIdentity| :|accessKeyId|) record)))
       ((equal :additionalEventData field) (setf result (getf record :|additionalEventData|)))
-      ((equal :awsRegion field) (setf result (getf record :|awsRegion|)))
-      ((equal :eventCategory field) (setf result (getf record :|eventCategory|)))
-      ((equal :readOnly field) (setf result (getf record :|readOnly|)))
-      ((equal :serviceEventDetails field) (setf result (getf record :|serviceEventDetails|)))
-      ((equal :managementEvent field) (setf result (getf record :|managementEvent|)))
-      ((equal :sharedEventID field) (setf result (getf record :|sharedEventID|)))
-      ((equal :tlsDetails field) (setf result (getf record :|tlsDetails|)))
-      ((equal :vpcEndpointId field) (setf result (getf record :|vpcEndpointId|)))
       ((equal :apiVersion field) (setf result (getf record :|apiVersion|)))
+      ((equal :awsRegion field) (setf result (getf record :|awsRegion|)))
       ((equal :errorCode field) (setf result (getf record :|errorCode|)))
       ((equal :errorMessage field) (setf result (getf record :|errorMessage|)))
+      ((equal :eventCategory field) (setf result (getf record :|eventCategory|)))
       ((equal :eventID field) (setf result (getf record :|eventID|)))
       ((equal :eventName field) (setf result (getf record :|eventName|)))
       ((equal :eventSource field) (setf result (getf record :|eventSource|)))
       ((equal :eventTime field) (setf result (getf record :|eventTime|)))
       ((equal :eventType field) (setf result (getf record :|eventType|)))
       ((equal :eventVersion field) (setf result (getf record :|eventVersion|)))
+      ((equal :managementEvent field) (setf result (getf record :|managementEvent|)))
+      ((equal :readOnly field) (setf result (getf record :|readOnly|)))
       ((equal :recipientAccountId field) (setf result (getf record :|recipientAccountId|)))
       ((equal :requestID field) (setf result (getf record :|requestID|)))
       ((equal :requestParameters field) (setf result (getf record :|requestParameters|)))
       ((equal :resources field) (setf result (getf record :|resources|)))
       ((equal :responseElements field) (setf result (getf record :|responseElements|)))
+      ((equal :serviceEventDetails field) (setf result (getf record :|serviceEventDetails|)))
+      ((equal :sessionCredentialFromConsole field) (setf result (getf record :|sessionCredentialFromConsole|)))
+      ((equal :sharedEventID field) (setf result (getf record :|sharedEventID|)))
       ((equal :sourceIPAddress field) (setf result (get-hostname-by-ip (getf record :|sourceIPAddress|))))
+      ((equal :tlsDetails field) (setf result (getf record :|tlsDetails|)))
       ((equal :userAgent field) (setf result (getf record :|userAgent|)))
       ((equal :userIdentity field) (setf result (getf record :|userIdentity|)))
       ((equal :userName field) (setf result (fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record)))
+      ((equal :vpcEndpointId field) (setf result (getf record :|vpcEndpointId|)))
       (t (format nil "Unknown arg:~A~%" field)))
     ;;(unless result
       ;;(format t "!!result: ~a field: ~a~%" result field))
