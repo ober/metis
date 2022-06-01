@@ -6,25 +6,33 @@
 (defvar *output-sep* "|")
 
 (defvar ct-fields '(
-                    metis::additionalEventData
-                    metis::awsRegion
-                    ;;metis::errorCode
-                    ;;metis::errorMessage
+                    ;;metis::additionalEventData
                     ;;metis::eventID
-                    ;;metis::eventName
-                    ;;metis::eventSource
-                    ;;metis::eventTime
-                    metis::eventType
-                    metis::eventVersion
                     ;;metis::recipientAccountId
                     ;;metis::requestID
                     ;;metis::requestParameters
                     ;;metis::resources
                     ;;metis::responseElements
-                    ;;metis::sourceIPAddress
-                    ;;metis::userAgent
                     ;;metis::userIdentity
-                    metis::userName))
+                    metis::eventCategory
+                    metis::readOnly
+                    metis::managementEvent
+                    metis::sharedEventID
+                    metis::tlsDetails
+                    metis::vpcEndpointId
+                    metis::apiVersion
+                    metis::awsRegion
+                    metis::errorCode
+                    metis::errorMessage
+                    metis::eventName
+                    metis::eventSource
+                    metis::eventTime
+                    metis::eventType
+                    metis::eventVersion
+                    metis::sourceIPAddress
+                    metis::userAgent
+                    metis::userName
+                    ))
 
 (defun init-manardb()
   (unless (boundp 'manardb:use-mmap-dir)
@@ -33,6 +41,34 @@
       (allocate-file-hash)))
 
 (manardb:defmmclass files ()
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
+
+(manardb:defmmclass eventCategory ()
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
+
+(manardb:defmmclass readOnly ()
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
+
+(manardb:defmmclass managementEvent ()
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
+
+(manardb:defmmclass sharedEventID ()
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
+
+(manardb:defmmclass tlsDetails ()
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
+
+(manardb:defmmclass vpcEndpointId ()
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
+
+(manardb:defmmclass apiVersion ()
   ((value :initarg :value :accessor value)
    (idx :initarg :idx :accessor idx)))
 
@@ -113,7 +149,15 @@
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass ct ()
-  ((addionalEventData :initarg :additionalEventData :accessor additionalEventData)
+  (
+   (addionalEventData :initarg :additionalEventData :accessor additionalEventData)
+   (eventCategory :initarg :eventCategory :accessor eventCategory)
+   (readOnly :initarg :readOnly :accessor readOnly)
+   (managementEvent :initarg :managementEvent :accessor managementEvent)
+   (sharedEventID :initarg :sharedEventID :accessor sharedEventID)
+   (tlsDetails :initarg :tlsDetails :accessor tlsDetails)
+   (vpcEndpointId :initarg :vpcEndpointId :accessor vpcEndpointId)
+   (apiVersion :initarg :apiVersion :accessor apiVersion)
    (awsRegion :initarg :awsRegion :accessor awsRegion)
    (errorCode :initarg :errorCode :accessor errorCode)
    (errorMessage :initarg :errorMessage :accessor errorMessage)
@@ -131,7 +175,9 @@
    (sourceIPAddress :initarg :sourceIPAddress :accessor sourceIPAddress)
    (userAgent :initarg :userAgent :accessor userAgent)
    (userIdentity :initarg :userIdentity :accessor userIdentity)
-   (userName :initarg :userName :accessor username)))
+   (userName :initarg :userName :accessor username)
+   )
+  )
 
 (defun create-klass-hash (klass)
   (multiple-value-bind (id seen)
@@ -206,6 +252,7 @@
 (defun init-ct-hashes ()
   (mapc
    #'(lambda (x)
+       (format t "Allocating hash for class ~a~%" x)
        (allocate-klass-hash x))
    ct-fields))
 
