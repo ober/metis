@@ -21,6 +21,7 @@
                     metis::sharedEventID
                     metis::tlsDetails
                     metis::vpcEndpointId
+                    metis::sessionCredentialFromConsole
                     metis::apiVersion
                     metis::awsRegion
                     metis::errorCode
@@ -74,6 +75,10 @@
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass apiVersion ()
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
+
+(manardb:defmmclass sessionCredentialFromConsole ()
   ((value :initarg :value :accessor value)
    (idx :initarg :idx :accessor idx)))
 
@@ -156,32 +161,33 @@
 (manardb:defmmclass ct ()
   (
    (addionalEventData :initarg :additionalEventData :accessor additionalEventData)
-   (eventCategory :initarg :eventCategory :accessor eventCategory)
-   (serviceEventDetails :initarg :serviceEventDetails :accessor serviceEventDetails)
-   (readOnly :initarg :readOnly :accessor readOnly)
-   (managementEvent :initarg :managementEvent :accessor managementEvent)
-   (sharedEventID :initarg :sharedEventID :accessor sharedEventID)
-   (tlsDetails :initarg :tlsDetails :accessor tlsDetails)
-   (vpcEndpointId :initarg :vpcEndpointId :accessor vpcEndpointId)
    (apiVersion :initarg :apiVersion :accessor apiVersion)
    (awsRegion :initarg :awsRegion :accessor awsRegion)
    (errorCode :initarg :errorCode :accessor errorCode)
    (errorMessage :initarg :errorMessage :accessor errorMessage)
+   (eventCategory :initarg :eventCategory :accessor eventCategory)
    (eventID :initarg :eventID :accessor eventID)
    (eventName :initarg :eventName :accessor eventName)
    (eventSource :initarg :eventSource :accessor eventSource)
    (eventTime :initarg :eventTime :accessor eventTime)
    (eventType :initarg :eventType :accessor eventType)
    (eventVersion :initarg :eventVersion :accessor eventVersion)
+   (managementEvent :initarg :managementEvent :accessor managementEvent)
+   (readOnly :initarg :readOnly :accessor readOnly)
    (recipientAccountId :initarg :recipientAccountId :accessor recipientAccountId)
    (requestID :initarg :requestID :accessor requestID)
    (requestParameters :initarg :requestParameters :accessor requestParameters)
    (resources :initarg :resources :accessor resources)
    (responseElements :initarg :responseElements :accessor responseElements)
+   (serviceEventDetails :initarg :serviceEventDetails :accessor serviceEventDetails)
+   (sessionCredentialFromConsole :initarg :sessionCredentialFromConsole :accessor sessionCredentialFromConsole)
+   (sharedEventID :initarg :sharedEventID :accessor sharedEventID)
    (sourceIPAddress :initarg :sourceIPAddress :accessor sourceIPAddress)
+   (tlsDetails :initarg :tlsDetails :accessor tlsDetails)
    (userAgent :initarg :userAgent :accessor userAgent)
    (userIdentity :initarg :userIdentity :accessor userIdentity)
    (userName :initarg :userName :accessor username)
+   (vpcEndpointId :initarg :vpcEndpointId :accessor vpcEndpointId)
    )
   )
 
@@ -334,6 +340,10 @@
 (defun get-apiVersion ()
   "return unique list of apiVersion"
   (get-unique-values 'metis::apiVersion))
+
+(defun get-apiVersion ()
+  "return unique list of apiVersion"
+  (get-unique-values 'metis::sessionCredentialFromConsole))
 
 (defun get-ct-files ()
   "Return unique list of ct files"
@@ -520,90 +530,96 @@
 
 (defun manardb-normalize-insert (record)
   (destructuring-bind (
-                       eventCategory
-                       serviceEventDetails
-                       readOnly
-                       managementEvent
-                       sharedEventID
-                       tlsDetails
-                       vpcEndpointId
-                       apiVersion
                        additionalEventData
+                       apiVersion
                        awsRegion
                        errorCode
                        errorMessage
+                       eventCategory
                        eventID
                        eventName
                        eventSource
                        eventTime
                        eventType
                        eventVersion
+                       managementEvent
+                       readOnly
                        recipientAccountId
                        requestID
                        requestParameters
                        resources
                        responseElements
+                       serviceEventDetails
+                       sessionCredentialFromConsole
+                       sharedEventID
                        sourceIPAddress
+                       tlsDetails
                        userAgent
                        userIdentity
-                       userName)
+                       userName
+                       vpcEndpointId
+                       )
       record
     (let (
-          (eventCategory-i (get-idx 'metis::eventCategory eventCategory ))
-          (readOnly-i (get-idx 'metis::readOnly  readOnly))
-          (serviceEventDetails-i (get-idx 'metis::serviceEventDetails serviceEventDetails))
-          (managementEvent-i (get-idx 'metis::managementEvent managementEvent))
-          (sharedEventID-i (get-idx 'metis::sharedEventID sharedEventID))
-          (tlsDetails-i (get-idx 'metis::tlsDetails tlsDetails))
-          (vpcEndpointId-i (get-idx 'metis::vpcEndpointId vpcEndpointId))
-          (apiVersion-i (get-idx 'metis::apiVersion apiVersion))
           (additionalEventData-i (get-idx 'metis::additionalEventData additionalEventData))
+          (apiVersion-i (get-idx 'metis::apiVersion apiVersion))
           (awsRegion-i (get-idx 'metis::awsRegion awsRegion))
           (errorCode-i (get-idx 'metis::errorCode errorCode))
           (errorMessage-i (get-idx 'metis::errorMessage errorMessage))
+          (eventCategory-i (get-idx 'metis::eventCategory eventCategory ))
           (eventID-i (get-idx 'metis::eventID eventID))
           (eventName-i (get-idx 'metis::eventName eventName))
           (eventSource-i (get-idx 'metis::eventSource eventSource))
           (eventTime-i (get-idx 'metis::eventTime eventTime))
           (eventType-i (get-idx 'metis::eventType eventType))
           (eventVersion-i (get-idx 'metis::eventVersion eventVersion))
+          (managementEvent-i (get-idx 'metis::managementEvent managementEvent))
+          (readOnly-i (get-idx 'metis::readOnly  readOnly))
           (recipientAccountId-i (get-idx 'metis::recipientAccountId recipientAccountId))
           (requestID-i (get-idx 'metis::requestID requestID))
           (requestParameters-i (get-idx 'metis::requestParameters requestParameters))
           (resources-i (get-idx 'metis::resources resources))
           (responseElements-i (get-idx 'metis::responseElements (compress-str responseElements)))
+          (serviceEventDetails-i (get-idx 'metis::serviceEventDetails serviceEventDetails))
+          (sessionCredentialFromConsole-i (get-idx 'metis::sessionCredentialFromConsole sessionCredentialFromConsole))
+          (sharedEventID-i (get-idx 'metis::sharedEventID sharedEventID))
           (sourceIPAddress-i (get-idx 'metis::sourceIPAddress sourceIPAddress))
+          (tlsDetails-i (get-idx 'metis::tlsDetails tlsDetails))
           (userAgent-i (get-idx 'metis::userAgent userAgent))
           (userIdentity-i (get-idx 'metis::userIdentity userIdentity))
-          (userName-i (get-idx 'metis::userName (or userName (find-username userIdentity)))))
+          (userName-i (get-idx 'metis::userName (or userName (find-username userIdentity))))
+          (vpcEndpointId-i (get-idx 'metis::vpcEndpointId vpcEndpointId))
+                            )
       (make-instance 'ct
-                     :eventCategory eventCategory-i
-                     :serviceEventDetails serviceEventDetails-i
-                     :readOnly readOnly-i
-                     :managementEvent managementEvent-i
-                     :sharedEventID sharedEventID-i
-                     :tlsDetails tlsDetails-i
-                     :vpcEndpointId vpcEndpointId-i
-                     :apiVersion apiVersion-i
                      :additionalEventData additionalEventData-i
+                     :apiVersion apiVersion-i
                      :awsRegion awsRegion-i
                      :errorCode errorCode-i
                      :errorMessage errorMessage-i
+                     :eventCategory eventCategory-i
                      :eventID eventID-i
                      :eventName eventName-i
                      :eventSource eventSource-i
                      :eventTime eventTime-i
                      :eventType eventType-i
                      :eventVersion eventVersion-i
+                     :managementEvent managementEvent-i
+                     :readOnly readOnly-i
                      :recipientAccountId recipientAccountId-i
                      :requestID requestID-i
                      :requestParameters requestParameters-i
                      :resources resources-i
                      :responseElements responseElements-i
+                     :serviceEventDetails serviceEventDetails-i
+                     :sessionCredentialFromConsole sessionCredentialFromConsole-i
+                     :sharedEventID sharedEventID-i
                      :sourceIPAddress sourceIPAddress-i
+                     :tlsDetails tlsDetails-i
                      :userAgent userAgent-i
                      :userIdentity userIdentity-i
-                     :userName userName-i))))
+                     :userName userName-i
+                     :vpcEndpointId vpcEndpointId-i
+                     ))))
 
 (defun cleanse (var)
   (typecase var
