@@ -15,6 +15,7 @@
                     ;;metis::responseElements
                     ;;metis::userIdentity
                     metis::eventCategory
+                    metis::serviceEventDetails
                     metis::readOnly
                     metis::managementEvent
                     metis::sharedEventID
@@ -49,6 +50,10 @@
    (idx :initarg :idx :accessor idx)))
 
 (manardb:defmmclass readOnly ()
+  ((value :initarg :value :accessor value)
+   (idx :initarg :idx :accessor idx)))
+
+(manardb:defmmclass serviceEventDetails ()
   ((value :initarg :value :accessor value)
    (idx :initarg :idx :accessor idx)))
 
@@ -152,6 +157,7 @@
   (
    (addionalEventData :initarg :additionalEventData :accessor additionalEventData)
    (eventCategory :initarg :eventCategory :accessor eventCategory)
+   (serviceEventDetails :initarg :serviceEventDetails :accessor serviceEventDetails)
    (readOnly :initarg :readOnly :accessor readOnly)
    (managementEvent :initarg :managementEvent :accessor managementEvent)
    (sharedEventID :initarg :sharedEventID :accessor sharedEventID)
@@ -296,6 +302,39 @@
     results))
 
 ;; lists
+
+(defun get-serviceEventDetails ()
+  "return unique list of serviceEventDetails"
+  (get-unique-values 'metis::serviceEventDetails))
+
+(defun get-eventCategory ()
+  "return unique list of eventCategory"
+  (get-unique-values 'metis::eventCategory))
+
+(defun get-readOnly ()
+  "return unique list of readOnly"
+  (get-unique-values 'metis::readOnly))
+
+(defun get-managementEvent ()
+  "return unique list of managementEvent"
+  (get-unique-values 'metis::managementEvent))
+
+(defun get-sharedEventID ()
+  "return unique list of sharedEventID"
+  (get-unique-values 'metis::sharedEventID))
+
+(defun get-tlsDetails ()
+  "return unique list of tlsDetails"
+  (get-unique-values 'metis::tlsDetails))
+
+(defun get-vpcEndpointId ()
+  "return unique list of vpcEndpointId"
+  (get-unique-values 'metis::vpcEndpointId))
+
+(defun get-apiVersion ()
+  "return unique list of apiVersion"
+  (get-unique-values 'metis::apiVersion))
+
 (defun get-ct-files ()
   "Return unique list of ct files"
   (get-unique-values 'metis::files))
@@ -482,6 +521,7 @@
 (defun manardb-normalize-insert (record)
   (destructuring-bind (
                        eventCategory
+                       serviceEventDetails
                        readOnly
                        managementEvent
                        sharedEventID
@@ -511,6 +551,7 @@
     (let (
           (eventCategory-i (get-idx 'metis::eventCategory eventCategory ))
           (readOnly-i (get-idx 'metis::readOnly  readOnly))
+          (serviceEventDetails-i (get-idx 'metis::serviceEventDetails serviceEventDetails))
           (managementEvent-i (get-idx 'metis::managementEvent managementEvent))
           (sharedEventID-i (get-idx 'metis::sharedEventID sharedEventID))
           (tlsDetails-i (get-idx 'metis::tlsDetails tlsDetails))
@@ -537,6 +578,7 @@
           (userName-i (get-idx 'metis::userName (or userName (find-username userIdentity)))))
       (make-instance 'ct
                      :eventCategory eventCategory-i
+                     :serviceEventDetails serviceEventDetails-i
                      :readOnly readOnly-i
                      :managementEvent managementEvent-i
                      :sharedEventID sharedEventID-i

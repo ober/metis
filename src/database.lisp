@@ -11,6 +11,7 @@
 (defparameter to-db (pcall-queue:make-queue))
 
 (defvar *fields* '(
+                   :serviceEventDetails
                    :eventCategory
                    :readOnly
                    :managementEvent
@@ -119,6 +120,7 @@
       ((equal :awsRegion field) (setf result (getf record :|awsRegion|)))
       ((equal :eventCategory field) (setf result (getf record :|eventCategory|)))
       ((equal :readOnly field) (setf result (getf record :|readOnly|)))
+      ((equal :serviceEventDetails field) (setf result (getf record :|serviceEventDetails|)))
       ((equal :managementEvent field) (setf result (getf record :|managementEvent|)))
       ((equal :sharedEventID field) (setf result (getf record :|sharedEventID|)))
       ((equal :tlsDetails field) (setf result (getf record :|tlsDetails|)))
