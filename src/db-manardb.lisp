@@ -480,7 +480,15 @@
           store-me))))
 
 (defun manardb-normalize-insert (record)
-  (destructuring-bind (additionalEventData
+  (destructuring-bind (
+                       eventCategory
+                       readOnly
+                       managementEvent
+                       sharedEventID
+                       tlsDetails
+                       vpcEndpointId
+                       apiVersion
+                       additionalEventData
                        awsRegion
                        errorCode
                        errorMessage
@@ -500,7 +508,15 @@
                        userIdentity
                        userName)
       record
-    (let ((additionalEventData-i (get-idx 'metis::additionalEventData additionalEventData))
+    (let (
+          (eventCategory-i (get-idx 'metis::eventCategory eventCategory ))
+          (readOnly-i (get-idx 'metis::readOnly  readOnly))
+          (managementEvent-i (get-idx 'metis::managementEvent managementEvent))
+          (sharedEventID-i (get-idx 'metis::sharedEventID sharedEventID))
+          (tlsDetails-i (get-idx 'metis::tlsDetails tlsDetails))
+          (vpcEndpointId-i (get-idx 'metis::vpcEndpointId vpcEndpointId))
+          (apiVersion-i (get-idx 'metis::apiVersion apiVersion))
+          (additionalEventData-i (get-idx 'metis::additionalEventData additionalEventData))
           (awsRegion-i (get-idx 'metis::awsRegion awsRegion))
           (errorCode-i (get-idx 'metis::errorCode errorCode))
           (errorMessage-i (get-idx 'metis::errorMessage errorMessage))
@@ -520,6 +536,13 @@
           (userIdentity-i (get-idx 'metis::userIdentity userIdentity))
           (userName-i (get-idx 'metis::userName (or userName (find-username userIdentity)))))
       (make-instance 'ct
+                     :eventCategory eventCategory-i
+                     :readOnly readOnly-i
+                     :managementEvent managementEvent-i
+                     :sharedEventID sharedEventID-i
+                     :tlsDetails tlsDetails-i
+                     :vpcEndpointId vpcEndpointId-i
+                     :apiVersion apiVersion-i
                      :additionalEventData additionalEventData-i
                      :awsRegion awsRegion-i
                      :errorCode errorCode-i
