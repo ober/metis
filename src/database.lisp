@@ -11,6 +11,13 @@
 (defparameter to-db (pcall-queue:make-queue))
 
 (defvar *fields* '(
+                   :eventCategory
+                   :readOnly
+                   :managementEvent
+                   :sharedEventID
+                   :tlsDetails
+                   :vpcEndpointId
+                   :apiVersion
                    :additionalEventData
                    :awsRegion
                    :errorCode
@@ -93,10 +100,13 @@
       str))
 
 (defun process-record (record fields)
-    (dolist (r record)
-      (if (keywordp r)
-          (unless (member (format nil "~a" r) fields)
-            (format t "!! missing field. r: ~a type: ~a~%" r (type-of r)))))
+
+  ;; (format t "~a~%" (set-difference record fields :test 'string-equal))
+  (dolist (r record)
+    (if (and r
+             (keywordp r))
+        (unless (member r fields :test (function string-equal))
+          (format t "!! missing field. r: ~a type: ~a~%" r (type-of r)))))
 
   (loop for i in fields
         collect (make-safe-string (get-value i record))))
@@ -107,6 +117,13 @@
       ((equal :accessKeyId field) (setf result (fetch-value '(:|userIdentity| :|accessKeyId|) record)))
       ((equal :additionalEventData field) (setf result (getf record :|additionalEventData|)))
       ((equal :awsRegion field) (setf result (getf record :|awsRegion|)))
+      ((equal :eventCategory field) (setf result (getf record :|eventCategory|)))
+      ((equal :readOnly field) (setf result (getf record :|readOnly|)))
+      ((equal :managementEvent field) (setf result (getf record :|managementEvent|)))
+      ((equal :sharedEventID field) (setf result (getf record :|sharedEventID|)))
+      ((equal :tlsDetails field) (setf result (getf record :|tlsDetails|)))
+      ((equal :vpcEndpointId field) (setf result (getf record :|vpcEndpointId|)))
+      ((equal :apiVersion field) (setf result (getf record :|apiVersion|)))
       ((equal :errorCode field) (setf result (getf record :|errorCode|)))
       ((equal :errorMessage field) (setf result (getf record :|errorMessage|)))
       ((equal :eventID field) (setf result (getf record :|eventID|)))
@@ -124,7 +141,6 @@
       ((equal :userAgent field) (setf result (getf record :|userAgent|)))
       ((equal :userIdentity field) (setf result (getf record :|userIdentity|)))
       ((equal :userName field) (setf result (fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record)))
-      ;;((equal :userName field)(fetch-value '(:|userIdentity| :|userName|) record))
       (t (format nil "Unknown arg:~A~%" field)))
     ;;(unless result
       ;;(format t "!!result: ~a field: ~a~%" result field))

@@ -10,11 +10,3 @@
 
 (in-package :ctcl)
 
-(defun myexit ()
-  (let ((code 0))
-    #+allegro (excl:exit code)
-    #+sbcl (sb-ext::exit)
-    #+lispworks (quit)
-    #+clozure (ccl::quit)
-    #+cmucl (quit)))
-

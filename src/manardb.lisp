@@ -1,4 +1,4 @@
-(ql:quickload :manardb)
+ (ql:quickload :manardb)
 (manardb:use-mmap-dir "/tmp/")
 
 (manardb:defmmclass person ()
