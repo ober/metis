@@ -25,6 +25,7 @@
                  :ningle
                  :pcall
                  :pcall-queue
+                 :shasht
                  :split-sequence
                  :thnappy
                  :trivial-garbage

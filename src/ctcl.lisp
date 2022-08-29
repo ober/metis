@@ -45,16 +45,17 @@
       (progn
         (let* ((records (second (read-json-gzip-file x)))
                (num (length records))
-               (btime (get-internal-real-time)))
+               (btime (get-internal-real-time))
+               (fields *fields*))
           (dolist (x records)
-            (normalize-insert (process-record x *fields*)))
+            (normalize-insert (process-record x fields)))
           (let* ((etime (get-internal-real-time))
                  (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))
                  (rps (ignore-errors (/ (float num) (float delta)))))
             (if (> num 100)
                 (format t "~%rps:~A rows:~A delta:~A" rps num delta))
             )))
-    (t (e) (error-print "read-json-gzip-file" e)))
+    (t (e) (error-print "parse-ct-contents" e)))
   ;;#+sbcl (room) ;; (trivial-garbage:gc)
   )
 
@@ -99,3 +100,6 @@
     #+lispworks (cl-user::quit)
     #+clozure (ccl::quit)
     #+cmucl (quit)))
+
+(defun hash-keys (hash-table)
+  (loop for key being the hash-keys of hash-table collect key))
