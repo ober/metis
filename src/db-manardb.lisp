@@ -18,7 +18,7 @@
                     metis::serviceEventDetails
                     metis::readOnly
                     metis::managementEvent
-                    metis::sharedEventID
+                    ;;metis::sharedEventID
                     metis::tlsDetails
                     metis::vpcEndpointId
                     metis::sessionCredentialFromConsole
