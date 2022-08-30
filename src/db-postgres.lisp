@@ -66,7 +66,6 @@
     (mapcar
      #'(lambda (x)
 	 (psql-create-table x database)) *fields*)
-
     (psql-do-query (format nil "create table if not exists log(id serial, ~{~A ~^ integer, ~} integer)" *fields*) database)
     (psql-do-query
      (format nil "create or replace view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*)

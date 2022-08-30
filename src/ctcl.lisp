@@ -3,7 +3,7 @@
 (defvar zs3::*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
 ;;(defvar cl-user:*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
 
-(defvar *db-backend* :manardb) ;;:lmdb) ;;:manardb) ;; :sqlite :postgres
+(defvar *db-backend* :manardb) ;; (or :postgres :sqlite :lmdb)
 
 (defvar *mytasks* (list))
 

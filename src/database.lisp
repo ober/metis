@@ -44,7 +44,7 @@
 (defun db-have-we-seen-this-file (file)
   (cond
     ((equal :sqlite *db-backend*) (sqlite-have-we-seen-this-file file))
-    ((equal :postgres *db-backend*) (sqlite-have-we-seen-this-file file))
+    ((equal :postgres *db-backend*) (psql-have-we-seen-this-file file))
     ((equal :manardb *db-backend*) (manardb-have-we-seen-this-file file))
     ((equal :lmdb *db-backend*) (lmdb-have-we-seen-this-file file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
@@ -67,15 +67,15 @@
 
 (defun normalize-insert (record)
   (if record
-    (handler-case
-        (cond
-          ((equal :sqlite *db-backend*) (sqlite-normalize-insert record))
-          ((equal :postgres *db-backend*) (psql-normalize-insert record))
-          ((equal :manardb *db-backend*) (manardb-normalize-insert record))
-          ((equal :lmdb *db-backend*) (lmdb-normalize-insert record))
-          (t (format t "unknown *db-backend*:~A~%" *db-backend*)))
-      (t (e) (error-print "normalize-insert" e)))
-    (format t "normalize-insert record empty")))
+      (handler-case
+          (cond
+            ((equal :sqlite *db-backend*) (sqlite-normalize-insert record))
+            ((equal :postgres *db-backend*) (psql-normalize-insert record))
+            ((equal :manardb *db-backend*) (manardb-normalize-insert record))
+            ((equal :lmdb *db-backend*) (lmdb-normalize-insert record))
+            (t (format t "unknown *db-backend*:~A~%" *db-backend*)))
+        (t (e) (error-print "normalize-insert" e)))
+      (format t "normalize-insert record empty")))
 
 (defun db-get-or-insert-id (table value)
   (cond
@@ -109,11 +109,11 @@
 (defun process-record (record fields)
   (handler-case
       (progn
-  ;;      (dolist (r record)
-;;          (if (and r
-;;                   (keywordp r))
-;;              (unless (member r fields :test (function string-equal))
-;;                (format t "!! missing field. r: ~a type: ~a~%" r (type-of r)))))
+        (dolist (r record)
+          (if (and r
+                   (keywordp r))
+              (unless (member r fields :test (function string-equal))
+                (format t "!! missing field. r: ~a type: ~a~%" r (type-of r)))))
 
         (loop for i in fields
               collect (make-safe-string (get-value i record))))
@@ -159,8 +159,8 @@
 
 (defun try-twice (table query)
   (let ((val (or
-	      (ignore-errors (db-get-or-insert-id table query))
-	      (db-get-or-insert-id table query))))
+              (ignore-errors (db-get-or-insert-id table query))
+              (db-get-or-insert-id table query))))
     val))
 
 ;;create unique index concurrently if not exists event_names_idx1 on event_names(id)
@@ -177,10 +177,10 @@
 (defun load-file-values ()
   (unless *files*
     (setf *files*
-	  (db-do-query "select value from files"))
+          (db-do-query "select value from files"))
     (mapcar #'(lambda (x)
-		(setf (gethash (car x) *h*) t))
-	    *files*))
+                (setf (gethash (car x) *h*) t))
+            *files*))
   *h*)
 
 (defun emit-drain-file (queue)
@@ -189,8 +189,8 @@
   (with-open-file (drain "/tmp/loadme.txt" :direction :output :if-exists :supersede)
     (format drain "\COPY log(~{~A~^, ~}) FROM STDIN;~%" *fields*)
     (loop while (not (pcall-queue:queue-empty-p queue))
-       do (progn
-	    (format drain "~A~%" (pcall-queue:queue-pop queue))))
+          do (progn
+               (format drain "~A~%" (pcall-queue:queue-pop queue))))
     (format drain "\\.~%"))
   (uiop:run-program (format nil "cat /tmp/loadme.txt|psql -U metis -d metis"))
   (format t "Draining complete.~%"))
@@ -198,17 +198,17 @@
 (defun periodic-sync ()
   (if (null syncing)
       (progn
-	(setf syncing t)
-	;;(psql-commit)
-	(let ((q-len (pcall-queue:queue-length to-db)))
-	  (format t "Sync limit of ~A hit." q-len)
-	  (emit-drain-file to-db)
-	  ;;(psql-begin)
-	  (setf syncing nil))
-	(format t "sync already running...~%"))))
+        (setf syncing t)
+        ;;(psql-commit)
+        (let ((q-len (pcall-queue:queue-length to-db)))
+          (format t "Sync limit of ~A hit." q-len)
+          (emit-drain-file to-db)
+          ;;(psql-begin)
+          (setf syncing nil))
+        (format t "sync already running...~%"))))
 
 (defun block-if-syncing ()
   (loop while syncing
-     do (progn
-	  (format t "s")
-	  (sleep 1))))
+        do (progn
+             (format t "s")
+             (sleep 1))))
