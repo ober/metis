@@ -2,43 +2,43 @@
 
 (defun psql-do-query (query &optional db)
   (let ((database (or db "metis"))
-	(user-name "metis")
-	(password "metis")
-	(host "localhost"))
+        (user-name "metis")
+        (password "metis")
+        (host "localhost"))
     (block-if-syncing)
     (postmodern:with-connection
-	`(,database ,user-name ,password ,host :pooled-p t)
+        `(,database ,user-name ,password ,host :pooled-p t)
       (postmodern:query query))))
 
 (defun psql-begin ()
   (if (equal *db-backend* :postgres)
       (let ((user-name "metis")
-	    (database "metis")
-	    (password "metis")
-	    (host "localhost"))
-	(postmodern:with-connection
-	    `(,database ,user-name ,password ,host :pooled-p t)
-	  (postmodern:query "begin")))))
+            (database "metis")
+            (password "metis")
+            (host "localhost"))
+        (postmodern:with-connection
+            `(,database ,user-name ,password ,host :pooled-p t)
+          (postmodern:query "begin")))))
 
 (defun psql-commit ()
   (let ((user-name "metis")
-	(database "metis")
-	(password "metis")
-	(host "localhost"))
+        (database "metis")
+        (password "metis")
+        (host "localhost"))
     (postmodern:with-connection
-	`(,database ,user-name ,password ,host :pooled-p t)
+        `(,database ,user-name ,password ,host :pooled-p t)
       (postmodern:query "commit"))))
 
 (defun psql-do-trans (query &optional db)
   (let ((database (or db "metis"))
-	(user-name "metis")
-	(password "metis")
-	(host "localhost"))
+        (user-name "metis")
+        (password "metis")
+        (host "localhost"))
     (block-if-syncing)
     (postmodern:with-connection
-	`(,database ,user-name ,password ,host :pooled-p t)
+        `(,database ,user-name ,password ,host :pooled-p t)
       (postmodern:with-transaction ()
-	(postmodern:query query)))))
+        (postmodern:query query)))))
 
 (defun psql-drop-table (table &optional db)
   (let ((database (or db "metis")))
@@ -48,9 +48,9 @@
 (defun psql-ensure-connection (&optional db)
   (unless postmodern:*database*
     (setf postmodern:*database*
-	  (postmodern:connect
-	   (or db "metis")
-	   "metis" "metis" "localhost" :pooled-p t))))
+          (postmodern:connect
+           (or db "metis")
+           "metis" "metis" "localhost" :pooled-p t))))
 
 (defun psql-recreate-tables (&optional db)
   (psql-drop-table "files")
@@ -65,12 +65,11 @@
     (psql-create-table "files" database)
     (mapcar
      #'(lambda (x)
-	 (psql-create-table x database)) *fields*)
+         (psql-create-table x database)) *fields*)
     (psql-do-query (format nil "create table if not exists log(id serial, ~{~A ~^ integer, ~} integer)" *fields*) database)
     (psql-do-query
      (format nil "create or replace view ct as select ~{~A.value as~:* ~A ~^,  ~} from log, ~{~A ~^, ~} where ~{~A.id = ~:*log.~A ~^and ~};" *fields* *fields* *fields*)
      database)))
-
 
 (defun psql-create-table (table &optional db)
   (let ((database (or db "metis")))
@@ -82,15 +81,15 @@
 (defun psql-get-ids (record)
   (let ((n 0))
     (loop for i in *fields*
-       collect (let ((value (try-twice i (format nil "~A" (nth n record)))))
-		 (incf n)
-		 (if (null value)
-		     (format t "i:~A val:~A try:~A~%"  i (nth n record) value))
-		 value))))
+          collect (let ((value (try-twice i (format nil "~A" (nth n record)))))
+                    (incf n)
+                    (if (null value)
+                        (format t "i:~A val:~A try:~A~%"  i (nth n record) value))
+                    value))))
 
 (defun psql-normalize-insert (record)
   (let ((values (psql-get-ids record))
-	(tables (get-tables)))
+        (tables (get-tables)))
     (pcall-queue:queue-push
      (format nil "~{~A~^	 ~}" values) to-db)))
 
@@ -100,12 +99,12 @@
     ;;(format t "~%Q:~A~%" query)
     (psql-do-query query)
     (let ((id
-	   (flatten
-	    (car
-	     (car
-	      (psql-do-query
-	       (format nil "select id from ~A where value = '~A'" table value)))))))
+            (flatten
+             (car
+              (car
+               (psql-do-query
+                (format nil "select id from ~A where value = '~A'" table value)))))))
       ;;(format t "gioip: table:~A value:~A id:~A~%" table value id)
       (if (listp id)
-	  (car id)
-	  id))))
+          (car id)
+          id))))

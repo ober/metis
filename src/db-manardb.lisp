@@ -237,7 +237,7 @@
 
 (defun allocate-file-hash ()
   (manardb:doclass (x 'metis::files :fresh-instances nil)
-                   (setf (gethash (slot-value x 'value) *manard-files*) t)))
+    (setf (gethash (slot-value x 'value) *manard-files*) t)))
 
 (defun allocate-klass-hash (klass)
   (or (hash-table-p (gethash klass *metis-fields*))
@@ -245,9 +245,9 @@
         ;;(format t "allocating class:~A~%" klass)
         (create-klass-hash klass)
         (manardb:doclass (x klass :fresh-instances nil)
-                         (with-slots (value idx) x
-                           (setf (gethash value
-                                          (gethash klass *metis-fields*)) idx)))
+          (with-slots (value idx) x
+            (setf (gethash value
+                           (gethash klass *metis-fields*)) idx)))
         (setf (gethash klass *metis-counters*)
               (get-max-id-from-hash
                (gethash klass *metis-fields*))))))
@@ -296,15 +296,15 @@
 (defun get-unique-values (klass)
   "Return unique list of klass objects"
   (manardb:doclass (x klass :fresh-instances nil)
-                   (with-slots (value idx) x
-                     (format t "~%~A: ~A" idx value))))
+    (with-slots (value idx) x
+      (format t "~%~A: ~A" idx value))))
 
 (defun get-unique-values-list (klass)
   "Return unique list of klass objects"
   (let ((results '()))
     (manardb:doclass (x klass :fresh-instances nil)
-                     (with-slots (value idx) x
-                       (push value results)))
+      (with-slots (value idx) x
+        (push value results)))
     results))
 
 ;; lists
@@ -381,9 +381,9 @@
 (defun get-obj-by-val (klass val)
   (let ((obj-list nil))
     (manardb:doclass (x klass :fresh-instances nil)
-                     (with-slots (value) x
-                       (if (string-equal val value)
-                           (push x obj-list))))
+      (with-slots (value) x
+        (if (string-equal val value)
+            (push x obj-list))))
     obj-list))
 
 (defun ct-get-by-klass-value  (klass value &optional inverse)
@@ -398,48 +398,48 @@
         (gethash value klass-hash)
       (when (or seen inverse)
         (manardb:doclass
-         (x 'metis::ct :fresh-instances nil)
-         (with-slots (userName
-                      eventTime
-                      eventName
-                      eventSource
-                      sourceIPAddress
-                      userAgent
-                      errorMessage
-                      errorCode
-                      userIdentity
-                      requestParameters
-                      responseElements
-                      awsRegion) x
-           (cond
-             ((equal (find-class klass) (find-class 'metis::userName)) (setf slotv userName))
-             ((equal (find-class klass) (find-class 'metis::awsRegion)) (setf slotv awsRegion))
-             ((equal (find-class klass) (find-class 'metis::eventName)) (setf slotv eventName))
-             ((equal (find-class klass) (find-class 'metis::eventSource)) (setf slotv eventSource))
-             ((equal (find-class klass) (find-class 'metis::sourceIPAddress)) (setf slotv sourceIPAddress))
-             ((equal (find-class klass) (find-class 'metis::errorMessage)) (setf slotv errorMessage))
-             ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode))
-             ((equal (find-class klass) (find-class 'metis::requestParameters)) (setf slotv requestParameters))
-             ((equal (find-class klass) (find-class 'metis::responseElements)) (setf slotv responseElements)))
-           (when
-               (or
-                (and inverse slotv)
-                (and slotv (ignore-errors (= slotv id))))
-             (push
-              (format nil "|~{~A | ~}~%"
-                      (list
-                       (get-val-by-idx 'metis::eventTime eventTime)
-                       (get-val-by-idx 'metis::eventName eventName)
-                       (get-val-by-idx 'metis::userName userName)
-                       (get-val-by-idx 'metis::eventSource eventSource)
-                       (get-val-by-idx 'metis::sourceIPAddress sourceIPAddress)
-                       (get-val-by-idx 'metis::userAgent userAgent)
-                       (get-val-by-idx 'metis::errorMessage errorMessage)
-                       (get-val-by-idx 'metis::errorCode errorCode)
-                       (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::requestParameters requestParameters)) ""))
-                       (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) ""))
-                       (find-username (get-val-by-idx 'metis::userIdentity userIdentity))))
-              results))))))
+            (x 'metis::ct :fresh-instances nil)
+          (with-slots (userName
+                       eventTime
+                       eventName
+                       eventSource
+                       sourceIPAddress
+                       userAgent
+                       errorMessage
+                       errorCode
+                       userIdentity
+                       requestParameters
+                       responseElements
+                       awsRegion) x
+            (cond
+              ((equal (find-class klass) (find-class 'metis::userName)) (setf slotv userName))
+              ((equal (find-class klass) (find-class 'metis::awsRegion)) (setf slotv awsRegion))
+              ((equal (find-class klass) (find-class 'metis::eventName)) (setf slotv eventName))
+              ((equal (find-class klass) (find-class 'metis::eventSource)) (setf slotv eventSource))
+              ((equal (find-class klass) (find-class 'metis::sourceIPAddress)) (setf slotv sourceIPAddress))
+              ((equal (find-class klass) (find-class 'metis::errorMessage)) (setf slotv errorMessage))
+              ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode))
+              ((equal (find-class klass) (find-class 'metis::requestParameters)) (setf slotv requestParameters))
+              ((equal (find-class klass) (find-class 'metis::responseElements)) (setf slotv responseElements)))
+            (when
+                (or
+                 (and inverse slotv)
+                 (and slotv (ignore-errors (= slotv id))))
+              (push
+               (format nil "|~{~A | ~}~%"
+                       (list
+                        (get-val-by-idx 'metis::eventTime eventTime)
+                        (get-val-by-idx 'metis::eventName eventName)
+                        (get-val-by-idx 'metis::userName userName)
+                        (get-val-by-idx 'metis::eventSource eventSource)
+                        (get-val-by-idx 'metis::sourceIPAddress sourceIPAddress)
+                        (get-val-by-idx 'metis::userAgent userAgent)
+                        (get-val-by-idx 'metis::errorMessage errorMessage)
+                        (get-val-by-idx 'metis::errorCode errorCode)
+                        (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::requestParameters requestParameters)) ""))
+                        (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) ""))
+                        (find-username (get-val-by-idx 'metis::userIdentity userIdentity))))
+               results))))))
     results))
 
 
@@ -589,7 +589,7 @@
           (userIdentity-i (get-idx 'metis::userIdentity userIdentity))
           (userName-i (get-idx 'metis::userName (or userName (find-username userIdentity))))
           (vpcEndpointId-i (get-idx 'metis::vpcEndpointId vpcEndpointId))
-                            )
+          )
       (make-instance 'ct
                      :additionalEventData additionalEventData-i
                      :apiVersion apiVersion-i
