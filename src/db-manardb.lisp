@@ -36,7 +36,7 @@
                     metis::userName
                     ))
 
-(defun init-manardb()
+(defun manardb-init()
   (unless (boundp 'manardb:use-mmap-dir)
     (manardb:use-mmap-dir (or (uiop:getenv "METIS") "~/ct-manardb/")))
   (if (and (eql (hash-table-count *manard-files*) 0) *metis-need-files*)

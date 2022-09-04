@@ -21,5 +21,4 @@
 	#+allegro :prof)
 
   (:export
-   #:main
-   #:run-bench))
+   #:main))

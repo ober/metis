@@ -73,9 +73,9 @@
 
   ;;(format t "!! args: ~a type: ~a length: ~a" args (type-of args) (length args))
   (if (< (length args) 1)
-    (progn
-      (usage)
-      (exit)))
+      (progn
+        (usage)
+        (exit)))
   (let* ((verb (nth 1 args))
          (rest (cdr args)))
     (cond
@@ -131,12 +131,12 @@
       ((equal "ctf" verb) (get-ct-files))
       ((equal "web" verb) (web/start))
       (t (progn
-           (usage))))
-    (manardb:close-all-mmaps)))
+           (usage))))))
+;;(manardb:close-all-mmaps)))
+
 
 (defun main (&optional argz)
   (let ((args (or argz (argv))))
-    (init-manardb)
     #+sbcl
     (handler-case (process-args (list "metis" args))
       (sb-sys:interactive-interrupt ()

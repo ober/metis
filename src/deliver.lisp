@@ -13,7 +13,7 @@
     :jonathan
 		:manardb
 		:pcall
-		;;:postmodern
+		:postmodern
 		;;:sqlite
 		:thnappy
     :zs3
@@ -70,7 +70,7 @@
 		;;"db-sqlite.lisp"
 		"db-manardb.lisp"
 		"main.lisp"
-		"bench.lisp"
+		;;"bench.lisp"
 		"flows.lisp")))
   (mapcar #'compile-file lfiles)
   (cl-user::generate-executable "../dist/allegro/metis" '("package.fasl"

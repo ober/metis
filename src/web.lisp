@@ -178,7 +178,7 @@
 
 (defun web/start ()
   (defvar output-sep "<td>")
-  (metis::init-manardb)
+  ;;(metis::init-manardb)
   (setf (ningle:route *app* "/") `(200 (:content-type "text/html") (,(web/get-operations))))
   (setf (ningle:route *app* "/users") `(200 (:content-type "text/html") (,(web/get-user-list))))
   (setf (ningle:route *app* "/regions") `(200 (:content-type "text/html") (,(web/get-region-list))))

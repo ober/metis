@@ -41,6 +41,14 @@
                    :vpcEndpointId
                    ))
 
+(defun db-init ()
+  (cond
+    ((equal :sqlite *db-backend*) (sqlite-init))
+    ((equal :postgres *db-backend*) (psql-init))
+    ((equal :manardb *db-backend*) (manardb-init))
+    ((equal :lmdb *db-backend*) (lmdb-init))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
 (defun db-have-we-seen-this-file (file)
   (cond
     ((equal :sqlite *db-backend*) (sqlite-have-we-seen-this-file file))

@@ -3,7 +3,7 @@
 (defvar zs3::*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
 ;;(defvar cl-user:*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
 
-(defvar *db-backend* :manardb) ;; (or :postgres :sqlite :lmdb)
+(defvar *db-backend* :postgres) ;; (or :postgres :sqlite :lmdb)
 
 (defvar *mytasks* (list))
 
@@ -61,7 +61,8 @@
 
 (defun cloudtrail-report-sync (path)
   (setf *metis-need-files* t)
-  (init-manardb)
+  (db-init)
+  ;;(init-manardb)
   ;;(init-ct-hashes)
   (force-output)
   (let ((cloudtrail-reports (or path "~/CT")))
@@ -70,8 +71,8 @@
 
 (defun cloudtrail-report-async (workers path)
   (setf *metis-need-files* t)
-  (time (init-manardb))
-  (time (init-ct-hashes))
+  ;;(time (init-manardb))
+  ;;(time (init-ct-hashes))
   (force-output)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)

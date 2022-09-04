@@ -18,13 +18,13 @@
                  :cl-json
                  :closer-mop
                  :fare-memoization
-                 :jonathan
                  :gzip-stream
+                 :jonathan
                  :local-time
-                 :manardb
                  :ningle
                  :pcall
                  :pcall-queue
+                 :postmodern
                  :shasht
                  :split-sequence
                  :thnappy
@@ -32,7 +32,7 @@
                  :uiop
                  :usocket
                  :zs3
-                 ;;:postmodern
+                 ;;:manardb
                  ;;:sqlite
                  )
     :components ((:module src :serial t
@@ -41,11 +41,11 @@
                                (:file "ctcl")
                                (:file "utils")
                                (:file "version" :depends-on ("package"))
-                               (:file "bench" :depends-on ("package" "ctcl"))
+                               ;;(:file "bench" :depends-on ("package" "ctcl"))
                                (:file "database" :depends-on ("package"))
-                               ;;	       (:file "db-postgres" :depends-on ("package" "database"))
+                               (:file "db-postgres" :depends-on ("package" "database"))
                                ;;	       (:file "db-sqlite" :depends-on ("package" "database"))
-                               (:file "db-manardb" :depends-on ("package" "database"))
+                               ;;          (:file "db-manardb" :depends-on ("package" "database"))
                                (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))
                                (:file "main" :depends-on ("package" "ctcl" "utils" "database" "flows"))
                                (:file "pkgdcl" :depends-on ("package" "ctcl" "utils" "database"))

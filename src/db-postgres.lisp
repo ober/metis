@@ -1,5 +1,29 @@
 (in-package :metis)
 
+(defvar *psql-files* (thread-safe-hash-table))
+(defvar *metis-fields* (thread-safe-hash-table))
+(defvar *metis-counters* (thread-safe-hash-table))
+(defvar *metis-need-files* nil)
+
+(defun psql-have-we-seen-this-file (file)
+  (let* ((name (get-filename-hash file)))
+    (multiple-value-bind (name seen) (gethash name *psql-files*)
+    seen)))
+
+(defun psql-init ()
+  (let ((files (psql-do-query "select value from files")))
+    (mapc
+     (lambda (f)
+       (format t "XXX f is ~a type:~a ~%" (car f) (type-of (car f)))
+       (setf (gethash (car f) *psql-files*) t))
+     files)
+    (format t "XXX: size of *psql-files* ~a~%" (hash-table-size *psql-files*))))
+
+(defun psql-mark-file-processed (file)
+  (let ((name (get-filename-hash file)))
+    (psql-do-query (format nil "insert into files(value) values('~a')" (or name file)))
+    (setf (gethash name *psql-files*) t)))
+
 (defun psql-do-query (query &optional db)
   (let ((database (or db "metis"))
         (user-name "metis")
@@ -79,19 +103,26 @@
     (psql-do-query (format nil "create unique index concurrently if not exists ~A_idx2 on ~A(value)" table table) database)))
 
 (defun psql-get-ids (record)
-  (let ((n 0))
-    (loop for i in *fields*
-          collect (let ((value (try-twice i (format nil "~A" (nth n record)))))
-                    (incf n)
-                    (if (null value)
-                        (format t "i:~A val:~A try:~A~%"  i (nth n record) value))
-                    value))))
+  (handler-case
+      (let ((n 0)
+            (fields *fields*)
+            (record record))
+        (loop for i in fields
+              collect (let ((value (try-twice i (format nil "~A" (nth n record)))))
+                        (incf n)
+                        (if (null value)
+                            (format t "i:~A val:~A try:~A~%"  i (nth n record) value))
+                        value)))
+    (t (e) (error-print "psql-get-ids" e))))
 
 (defun psql-normalize-insert (record)
-  (let ((values (psql-get-ids record))
-        (tables (get-tables)))
-    (pcall-queue:queue-push
-     (format nil "~{~A~^	 ~}" values) to-db)))
+  (handler-case
+      (let* ((record record)
+             (values (psql-get-ids record))
+             (tables (get-tables)))
+        (pcall-queue:queue-push
+         (format nil "~{~A~^	 ~}" values) to-db))
+  (t (e) (error-print "psql-normalize-insert" e))))
 
 (fare-memoization:define-memo-function psql-get-or-insert-id (table value)
   (setf *print-circle* nil)

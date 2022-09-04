@@ -25,7 +25,7 @@
 		    ;;metis::userIdentity
 		    metis::userName))
 
-(defun init-lmdb()
+(defun lmdb-init()
   (unless (boundp 'lmdb:use-mmap-dir)
     (lmdb:use-mmap-dir (or (uiop:getenv "METIS") "~/ct-lmdb/")))
   (if (and (eql (hash-table-count *lmdb-files*) 0) *metis-need-files*)
