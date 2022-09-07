@@ -343,10 +343,6 @@
   "return unique list of apiVersion"
   (get-unique-values 'metis::apiVersion))
 
-(defun get-apiVersion ()
-  "return unique list of apiVersion"
-  (get-unique-values 'metis::sessionCredentialFromConsole))
-
 (defun get-ct-files ()
   "Return unique list of ct files"
   (get-unique-values 'metis::files))
