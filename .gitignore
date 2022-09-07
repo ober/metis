@@ -1,4 +1,4 @@
 dist
 *.fasl
 *.64ufasl
-autoloads.out
+*/autoloads.out
