@@ -4,7 +4,7 @@
 			    :cl-fad
 			    :fare-memoization
 			    :gzip-stream
-                ;;:jonathan
+			    :jonathan
 			    :pcall
 			    ;;:postmodern
 			    :manardb
