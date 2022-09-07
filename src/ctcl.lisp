@@ -69,7 +69,7 @@
 
 (defun cloudtrail-report-async (workers path)
   (setf *metis-need-files* t)
-  (time (db-init))
+  (db-init)
   (force-output)
   (let ((workers (parse-integer workers)))
     (setf (pcall:thread-pool-size) workers)

@@ -5,8 +5,8 @@
 		:gzip-stream
 		:cl-json
 		:pcall
-		:postmodern
-		;;:manardb
+		;;:postmodern
+		:manardb
 		:usocket
 		))
 

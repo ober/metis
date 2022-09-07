@@ -131,8 +131,8 @@
       ((equal "ctf" verb) (get-ct-files))
       ((equal "web" verb) (web/start))
       (t (progn
-           (usage))))))
-;;(manardb:close-all-mmaps)))
+           (usage))))
+    (manardb:close-all-mmaps)))
 
 
 (defun main (&optional argz)

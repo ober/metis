@@ -81,7 +81,7 @@
 							  "db-manardb.fasl"
 							  "ctcl.fasl"
 							  "main.fasl"
-							  "bench.fasl"
+							  ;;"bench.fasl"
 							  "flows.fasl")
 				:runtime :partners
 				:show-window :shownoactivate
