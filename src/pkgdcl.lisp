@@ -9,5 +9,5 @@
 ;; 		:usocket
 ;; 		:cl-date-time-parser
 ;;          :manardb
-;; 		;;:postmodern
+;; 		:postmodern
 ;; 		))

@@ -77,7 +77,7 @@
       (walk-ct cloudtrail-reports
                #'async-ct-file))
     (mapc #'pcall:join *mytasks*))
-  (myexit))
+  (uiop:quit))
 
 (defun sync-from-s3 (bucket)
   ;;(setf zs3::*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
@@ -90,14 +90,6 @@
                       (get-filename-hash
                        (slot-value x 'zs3:name))))
           (coerce (all-keys bucket) 'list))))
-
-(defun myexit ()
-  (let ((code 0))
-    #+allegro (excl:exit code)
-    #+sbcl (sb-ext::exit)
-    #+lispworks (cl-user::quit)
-    #+clozure (ccl::quit)
-    #+cmucl (quit)))
 
 (defun hash-keys (hash-table)
   (loop for key being the hash-keys of hash-table collect key))

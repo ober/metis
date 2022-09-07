@@ -6,7 +6,7 @@
 			    :gzip-stream
 			    :jonathan
 			    :pcall
-			    ;;:postmodern
+			    :postmodern
 			    :manardb
 			    ;;:s-sql
 			    :zs3
