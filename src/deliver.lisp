@@ -10,13 +10,13 @@
 		:cl-json
 		:fare-memoization
 		:gzip-stream
-    :jonathan
+        :jonathan
 		:manardb
 		:pcall
-		:postmodern
+		;;:postmodern
 		;;:sqlite
 		:thnappy
-    :zs3
+        :zs3
 		:uiop
 		:usocket))
 

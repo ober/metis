@@ -4,10 +4,10 @@
 ;; 		:cl-fad
 ;; 		:gzip-stream
 ;; 		:cl-json
-;; 		;;:s-sql
 ;; 		:pcall
 ;; 		:uiop
 ;; 		:usocket
 ;; 		:cl-date-time-parser
-;; 		:postmodern
+;;          :manardb
+;; 		;;:postmodern
 ;; 		))
