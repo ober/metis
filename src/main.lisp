@@ -68,9 +68,7 @@
   )
 
 (defun process-args (args)
-
   #+sbcl (setf args (nth 1 args))
-
   ;;(format t "!! args: ~a type: ~a length: ~a" args (type-of args) (length args))
   (if (< (length args) 1)
       (progn
@@ -131,7 +129,7 @@
       ((equal "ctf" verb) (get-ct-files))
       ((equal "web" verb) (web/start))
       (t (progn
-           (usage))))
+           (usage))))))
 
 
 
