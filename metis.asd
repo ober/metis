@@ -32,7 +32,7 @@
                  :uiop
                  :usocket
                  :zs3
-                 ;;:manardb
+                 :manardb
                  ;;:sqlite
                  )
     :components ((:module src :serial t
@@ -43,9 +43,9 @@
                                (:file "version" :depends-on ("package"))
                                ;;(:file "bench" :depends-on ("package" "ctcl"))
                                (:file "database" :depends-on ("package"))
-                               (:file "db-postgres" :depends-on ("package" "database"))
+                               ;;(:file "db-postgres" :depends-on ("package" "database"))
                                ;;	       (:file "db-sqlite" :depends-on ("package" "database"))
-                               ;;          (:file "db-manardb" :depends-on ("package" "database"))
+                               (:file "db-manardb" :depends-on ("package" "database"))
                                (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))
                                (:file "main" :depends-on ("package" "ctcl" "utils" "database" "flows"))
                                (:file "pkgdcl" :depends-on ("package" "ctcl" "utils" "database"))
