@@ -49,6 +49,14 @@
     ((equal :lmdb *db-backend*) (lmdb-init))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
+(defun db-close ()
+  (cond
+    ((equal :sqlite *db-backend*) (format t "fixme"))
+    ((equal :postgres *db-backend*) (format t "fixme"))
+    ((equal :manardb *db-backend*) (manardb:close-all-mmaps))
+    ((equal :lmdb *db-backend*) (format t "fixme"))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
 (defun db-have-we-seen-this-file (file)
   (cond
     ((equal :sqlite *db-backend*) (sqlite-have-we-seen-this-file file))
