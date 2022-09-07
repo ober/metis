@@ -132,17 +132,20 @@
       ((equal "web" verb) (web/start))
       (t (progn
            (usage))))
-    (manardb:close-all-mmaps)))
+
 
 
 (defun main (&optional argz)
   (let ((args (or argz (argv))))
+    (db-init)
     #+sbcl
     (handler-case (process-args (list "metis" args))
       (sb-sys:interactive-interrupt ()
+        (db-close)
         (sb-ext:quit)))
     #-sbcl
-    (process-args (argv))))
+    (progn (process-args (argv))
+           (db-close))))
 
 #+allegro
 (in-package :cl-user)
