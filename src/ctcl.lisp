@@ -61,6 +61,7 @@
 
 (defun cloudtrail-report-sync (path)
   (setf *metis-need-files* t)
+  (setf *metis-need-hashes* t)
   (db-init)
   (force-output)
   (let ((cloudtrail-reports (or path "~/CT")))
@@ -69,6 +70,7 @@
 
 (defun cloudtrail-report-async (workers path)
   (setf *metis-need-files* t)
+  (setf *metis-need-hashes* t)
   (db-init)
   (force-output)
   (let ((workers (parse-integer workers)))

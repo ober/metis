@@ -7,6 +7,7 @@
 (defvar *files* nil)
 (defvar *conn* nil)
 (defvar syncing nil)
+(defvar *metis-need-hashes* nil)
 
 (defparameter to-db (pcall-queue:make-queue))
 
