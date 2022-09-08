@@ -47,5 +47,4 @@
                                (:file "db-manardb" :depends-on ("package" "database"))
                                (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))
                                (:file "main" :depends-on ("package" "ctcl" "utils" "database" "flows"))
-                               (:file "pkgdcl" :depends-on ("package" "ctcl" "utils" "database"))
                                ))))

@@ -8,6 +8,6 @@
 ;; 		:uiop
 ;; 		:usocket
 ;; 		:cl-date-time-parser
-;;          :manardb
+;;;;          :manardb
 ;; 		:postmodern
 ;; 		))
