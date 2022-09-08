@@ -3,7 +3,7 @@
 (defvar zs3::*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
 ;;(defvar cl-user:*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
 
-(defvar *db-backend* :manardb)
+(defvar *db-backend* (or (uiop:getenv "METISDB") :manardb)
 
 (defvar *mytasks* (list))
 
