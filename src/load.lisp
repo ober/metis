@@ -13,7 +13,7 @@
 (princ "pkgdcl")
 (load (compile-file "pkgdcl.lisp"))
 (princ "database")
-(load (compile-file "db-postgres.lisp"))
+;;(load (compile-file "db-postgres.lisp"))
 (load (compile-file "database.lisp"))
 ;;(load (compile-file "db-sqlite.lisp"))
 (load (compile-file "db-manardb.lisp"))

@@ -1,4 +1,5 @@
-;;(ql:quickload :metis)
+(ql:quickload :metis)
+
 (in-package :metis)
 
 (defun init-manardb-bench()
@@ -11,7 +12,8 @@
   (manardb:use-mmap-dir "~/ct-manardb/")
   (defvar *benching* t)
   ;;(cloudtrail-report-async "1" "~/nov/"))
-  (cloudtrail-report-async "4" "~/jan/"))
+  (cloudtrail-report-async "3" "~/testct/"))
+  ;;(cloudtrail-report-sync "~/testct/"))
 
 (defun run-bench ()
   (princ "XXX: Running Test")
@@ -24,8 +26,9 @@
     (hcl:profile (do-bench)))
   #+allegro
   (progn
+    (format t "In bench.....~%")
     (setf excl:*tenured-bytes-limit* 524288000)
-    ;;    (setf *maxsamples* 100)
+    (setf *maxsamples* 100000)
     (prof::with-profiling (:type :time) (metis::do-bench))
     (prof::show-call-graph)
     (prof::show-flat-profile))
@@ -33,4 +36,4 @@
   #+(or clozure abcl ecl) (time (do-bench))
   )
 
-;;(run-bench)
+(run-bench)

@@ -102,5 +102,5 @@
    :include-ide nil
    :runtime :partners
    :suppress-allegro-cl-banner t
-   :newspace 16777216
-   :oldspace 33554432))
+   :newspace 167772160
+   :oldspace 335544320))

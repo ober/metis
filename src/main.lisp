@@ -135,6 +135,7 @@
 
 (defun main (&optional argz)
   (let ((args (or argz (argv))))
+#+allegro (setf excl:*tenured-bytes-limit* 524288000)
     (db-init)
     #+sbcl
     (handler-case (process-args (list "metis" args))

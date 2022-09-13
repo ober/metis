@@ -78,8 +78,8 @@
     (let ((cloudtrail-reports (or path "~/CT")))
       (walk-ct cloudtrail-reports
                #'async-ct-file))
-    (mapc #'pcall:join *mytasks*))
-  (uiop:quit))
+    (mapc #'pcall:join *mytasks*)))
+  ;;(uiop:quit))
 
 (defun sync-from-s3 (bucket)
   ;;(setf zs3::*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
