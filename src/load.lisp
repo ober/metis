@@ -1,21 +1,17 @@
 ;;#-cmucl (load "~/quicklisp/setup.lisp")
 (ql:quickload '(
-		:fare-memoization
 		:cl-fad
-		:gzip-stream
 		:cl-json
-		:pcall
-		;;:postmodern
+		:fare-memoization
+		:gzip-stream
 		:manardb
-		:usocket
-		))
+		:pcall
+		:usocket))
 
 (princ "pkgdcl")
 (load (compile-file "pkgdcl.lisp"))
 (princ "database")
-;;(load (compile-file "db-postgres.lisp"))
 (load (compile-file "database.lisp"))
-;;(load (compile-file "db-sqlite.lisp"))
 (load (compile-file "db-manardb.lisp"))
 (princ "bench")
 (load (compile-file "bench.lisp"))

@@ -10,40 +10,32 @@
     :build-pathname "metis"
     :defsystem-depends-on (:asdf-package-system)
     :entry-point "metis:main"
-    :depends-on (
-                 :asdf
-                 :cffi-grovel
-                 :cl-date-time-parser
-                 :cl-fad
-                 :cl-json
-                 :closer-mop
-                 :fare-memoization
-                 :gzip-stream
-                 :jonathan
-                 :local-time
-                 :pcall
-                 :pcall-queue
-                 ;;:postmodern
-                 ;;:shasht
-                 :split-sequence
-                 :thnappy
-                 :trivial-garbage
-                 :uiop
-                 :usocket
-                 :zs3
-                 :manardb
-                 ;;:sqlite
-                 )
+    :depends-on ( :asdf
+                  :cffi-grovel
+                  :cl-date-time-parser
+                  :cl-fad
+                  :cl-json
+                  :closer-mop
+                  :fare-memoization
+                  :gzip-stream
+                  :jonathan
+                  :local-time
+                  :manardb
+                  :pcall
+                  :pcall-queue
+                  :split-sequence
+                  :thnappy
+                  :trivial-garbage
+                  :uiop
+                  :usocket
+                  :zs3)
     :components ((:module src :serial t
                   :components (
                                (:file "package")
                                (:file "ctcl")
                                (:file "utils")
                                (:file "version" :depends-on ("package"))
-                               ;;(:file "bench" :depends-on ("package" "ctcl")) ;;
                                (:file "database" :depends-on ("package"))
-                               ;;(:file "db-postgres" :depends-on ("package" "database"))
-                               ;;	       (:file "db-sqlite" :depends-on ("package" "database"))
                                (:file "db-manardb" :depends-on ("package" "database"))
                                (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))
                                (:file "main" :depends-on ("package" "ctcl" "utils" "database" "flows"))

@@ -5,16 +5,13 @@
 			    :fare-memoization
 			    :gzip-stream
 			    :jonathan
-			    :pcall
-			    :postmodern
 			    :manardb
-			    ;;:s-sql
-			    :zs3
-			    ;;:sqlite
-			    :uiop
+			    :pcall
 			    :thnappy
 			    :trivial-garbage
-			    :usocket)))
+			    :uiop
+			    :usocket
+			    :zs3)))
 
 (defpackage :metis
   (:use :cl :zs3
