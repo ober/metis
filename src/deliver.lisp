@@ -13,9 +13,7 @@
                 :jonathan
                 :manardb
                 :pcall
-                ;;:postmodern
-                ;;:sqlite
-                :thnappy
+                :salza2
                 :zs3
                 :uiop
                 :usocket))

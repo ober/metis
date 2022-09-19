@@ -13,11 +13,6 @@
    #+lispworks sys:*line-arguments-list*
    nil))
 
-;; (let ((verb (or (nth 1 args) nil))
-;; 	(a (or (nth 2 args) nil))
-;; 	(b (or (nth 3 args) nil))
-;; 	(c (or (nth 4 args) nil)))
-
 #+sbcl
 (defun sbcl-entry()
   (handler-case (main)
@@ -45,10 +40,7 @@
   (format t "lvs - get-vpc-status-list~%")
   (format t "lvsa - get-vpc-srcaddr-list~%")
   (format t "lvsp - get-vpc-srcport-list~%")
-  (format t "r - run-bench~%")
   (format t "s - cloudtrail-report-sync arg~%")
-  (format t "sa - find-by-srcaddr arg~%")
-  (format t "sd - ct-get-by-date arg~%")
   (format t "sec - get-by-errorcode arg~%")
   (format t "seca - ct-get-all-errors~%")
   (format t "sev - get-by-event arg~%")
@@ -56,9 +48,8 @@
   (format t "sip - get-by-sourceip arg~%")
   (format t "sn - get-by-name arg~%")
   (format t "sr - get-by-region arg~%")
-  (format t "sp - find-by-srcport arg~%")
   (format t "st - get-stats~%")
-  (format t "va - vpc-flows-report-async arg beta~%")
+  (format t "va - vpc-flows-report-async arg dir~%")
   (format t "vs - vpc-flows-report-sync arg~%")
   (format t "vsp - vpc-search-by-srcport port~%")
   (format t "vdp - vpc-search-by-dstport port~%")
@@ -78,7 +69,6 @@
          (rest (cdr args)))
     (cond
       ((equal "a" verb) (cloudtrail-report-async (cadr rest) (caddr rest)))
-      ((equal "b" verb) (bench-vpc-flows-report-sync (cadr rest)))
       ((equal "lc" verb) (get-unique-conversation))
       ((equal "lcts" verb) (get-cts))
       ((equal "lec" verb) (get-errorcode-list))
@@ -104,7 +94,6 @@
       ((equal "lvs" verb) (get-vpc-status-list))
       ((equal "lvsa" verb) (get-vpc-srcaddr-list))
       ((equal "lvsp" verb) (get-vpc-srcport-list))
-      ((equal "r" verb) (run-bench))
       ((equal "s" verb) (cloudtrail-report-sync (cadr rest)))
       ((equal "sa" verb) (find-by-srcaddr (cadr rest)))
       ((equal "sd" verb) (get-by-date (cadr rest)))
@@ -119,7 +108,7 @@
       ((equal "sr" verb) (ct-get-by-region (cadr rest)))
       ((equal "sp" verb) (find-by-srcport (cadr rest)))
       ((equal "st" verb) (get-stats))
-      ((equal "va" verb) (vpc-flows-report-async (cadr rest) beta))
+      ((equal "va" verb) (vpc-flows-report-async (cadr rest) rest))
       ((equal "vda" verb) (vpc-search-by-dstaddr (cadr rest)))
       ((equal "vdp" verb) (vpc-search-by-dstport (cadr rest)))
       ((equal "vs" verb) (vpc-flows-report-sync (cadr rest)))
@@ -127,11 +116,8 @@
       ((equal "vsp" verb) (vpc-search-by-srcport (cadr rest)))
       ((equal "ls" verb) (sync-from-s3 (cadr rest)))
       ((equal "ctf" verb) (get-ct-files))
-      ((equal "web" verb) (web/start))
       (t (progn
            (usage))))))
-
-
 
 (defun main (&optional argz)
   (let ((args (or argz (argv))))

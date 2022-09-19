@@ -7,7 +7,9 @@
 			    :jonathan
 			    :manardb
 			    :pcall
-			    :thnappy
+			    :salza2
+			    :cl-base64
+                :thnappy
 			    :trivial-garbage
 			    :uiop
 			    :usocket

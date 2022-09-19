@@ -4,6 +4,8 @@
 		:cl-json
 		:fare-memoization
 		:gzip-stream
+		:cl-base64
+		:thnappy
 		:manardb
 		:pcall
 		:usocket))
