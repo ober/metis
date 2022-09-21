@@ -12,8 +12,6 @@
     :entry-point "metis:main"
     :depends-on ( :asdf
                   :cffi-grovel
-                  :cl-base64
-                  :cl-store
                   :cl-date-time-parser
                   :cl-fad
                   :cl-json

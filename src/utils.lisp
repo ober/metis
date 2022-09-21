@@ -151,13 +151,13 @@ is replaced with replacement."
 
 ;; From https://rosettacode.org/wiki/Base64_encode_data#Common_Lisp
 
-(defun base64-encode-obj (obj)
-  "Returns the BASE64 encoded string of the file at URI."
-    (let ((output (loop
-                   with array = (make-array 0 :element-type 'unsigned-byte
-                                              :adjustable t :fill-pointer 0)
-                   for data-chunk = (read-byte obj nil nil)
-                   while data-chunk
-                   do (vector-push-extend data-chunk array)
-                   finally (return (usb8-array-to-base64-string array)))))
-      output))
+;; (defun base64-encode-obj (obj)
+;;   "Returns the BASE64 encoded string of the file at URI."
+;;     (let ((output (loop
+;;                    with array = (make-array 0 :element-type 'unsigned-byte
+;;                                               :adjustable t :fill-pointer 0)
+;;                    for data-chunk = (read-byte obj nil nil)
+;;                    while data-chunk
+;;                    do (vector-push-extend data-chunk array)
+;;                    finally (return (usb8-array-to-base64-string array)))))
+;;       output))
