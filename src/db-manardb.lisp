@@ -509,12 +509,12 @@
                    :userIdentity userIdentity
                    :userName userName)))
 
-(defun compress-obj (obj)
-  (when obj
-    (flexi-streams:octets-to-string
-     (ignore-errors (thnappy:compress (flexi-streams:with-output-to-sequence
-                           (stream)
-                         (cl-store:store 'obj stream)))))))
+;; (defun compress-obj (obj)
+;;   (when obj
+;;     (flexi-streams:octets-to-string
+;;      (ignore-errors (thnappy:compress (flexi-streams:with-output-to-sequence
+;;                            (stream)
+;;                          (cl-store:store 'obj stream)))))))
 
 (defun manardb-normalize-insert (record)
   (destructuring-bind (
