@@ -12,6 +12,8 @@
     :entry-point "metis:main"
     :depends-on ( :asdf
                   :cffi-grovel
+                  :cl-base64
+                  :cl-store
                   :cl-date-time-parser
                   :cl-fad
                   :cl-json
@@ -23,14 +25,14 @@
                   :manardb
                   :pcall
                   :pcall-queue
-                  :split-sequence
                   :salza2
+                  :split-sequence
                   :thnappy
-                  :cl-base64
                   :trivial-garbage
                   :uiop
                   :usocket
-                  :zs3)
+                  :zs3
+                  )
     :components ((:module src :serial t
                   :components (
                                (:file "package")

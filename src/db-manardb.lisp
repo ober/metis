@@ -349,6 +349,10 @@
   "Return unique list of events"
   (get-unique-values 'metis::errorcode))
 
+(defun get-response-elements ()
+  "Return unique list of events"
+  (get-unique-values 'metis::responseElements))
+
 (defun get-name-list ()
   "Return unique list of events"
   (get-unique-values 'metis::username))
@@ -505,22 +509,12 @@
                    :userIdentity userIdentity
                    :userName userName)))
 
-(defun compress-str (str)
-  (handler-case
-      (when str
-        (let ((store-me nil))
-          (cond
-            ((consp str) (setf store-me (format nil "~{~A ~}" str)))
-            ((stringp str) (setf store-me str)))
-          (if (< (length store-me) 10)
-              (flexi-streams:octets-to-string (thnappy:compress-string str))
-              store-me)))
-    (t (e) (error-print "compress-str" e))))
-      ;;(flexi-streams:octets-to-string
-    ;; (cl-base64:string-to-base64-string
-    ;;  (salza2:compress-data
-    ;;   (flexi-streams:string-to-octets str)
-    ;;   'salza2:zlib-compressor))))
+(defun compress-obj (obj)
+  (when obj
+    (flexi-streams:octets-to-string
+     (ignore-errors (thnappy:compress (flexi-streams:with-output-to-sequence
+                           (stream)
+                         (cl-store:store 'obj stream)))))))
 
 (defun manardb-normalize-insert (record)
   (destructuring-bind (
@@ -572,7 +566,7 @@
           (requestID-i (get-idx 'metis::requestID requestID))
           (requestParameters-i (get-idx 'metis::requestParameters requestParameters))
           (resources-i (get-idx 'metis::resources resources))
-          (responseElements-i (get-idx 'metis::responseElements (compress-str responseElements)))
+          (responseElements-i (get-idx 'metis::responseElements  responseElements))
           (serviceEventDetails-i (get-idx 'metis::serviceEventDetails serviceEventDetails))
           (sessionCredentialFromConsole-i (get-idx 'metis::sessionCredentialFromConsole sessionCredentialFromConsole))
           (sharedEventID-i (get-idx 'metis::sharedEventID sharedEventID))
