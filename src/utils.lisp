@@ -31,7 +31,7 @@
        (jonathan:parse json)))
    (t (e) (error-print "read-json-gzip-file" e))))
 
-;;#+ecl
+#+ecl
 (defun get-json-gzip-contents (file)
   (uiop:run-program
    (format nil "zcat ~A" file)
@@ -48,13 +48,13 @@
 
 ;; #+(or clozure sbcl allegro)
 
-;; #-ecl
-;; (defun get-json-gzip-contents (file)
-;;   (handler-case
-;;       (progn (first (gzip-stream:with-open-gzip-file (in file)
-;; 		      (loop for l = (read-line in nil nil)
-;; 			 while l collect l))))
-;;     (t (e) (error-print "get-json-gzip-contents" e))))
+#-ecl
+(defun get-json-gzip-contents (file)
+  (handler-case
+      (progn (first (gzip-stream:with-open-gzip-file (in file)
+		      (loop for l = (read-line in nil nil)
+			 while l collect l))))
+    (t (e) (error-print "get-json-gzip-contents" e))))
 
 
 (defun cdr-assoc (item a-list &rest keys)

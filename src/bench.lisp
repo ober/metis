@@ -12,12 +12,11 @@
   (manardb:use-mmap-dir "~/ct-manardb/")
   (defvar *benching* t)
   ;;(cloudtrail-report-async "1" "~/nov/"))
-  (cloudtrail-report-async "3" "~/testct/"))
-  ;;(cloudtrail-report-sync "~/testct/"))
+  (cloudtrail-report-sync "~/testct/"))
 
 (defun run-bench ()
   (princ "XXX: Running Test")
-  #+sbcl ;;(time (do-bench))
+  #+sbcl
   (progn
     (sb-sprof:with-profiling (:report :flat) (do-bench)))
   #+lispworks  ;;(hcl:extended-time (do-bench))

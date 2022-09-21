@@ -456,12 +456,11 @@
     (if counter
         (setf (gethash klass *metis-counters*) (+ counter 1)))))
 
-
-;;(fare-memoization:define-memo-function get-idx (klass new-value)
 (defun get-idx (klass new-value)
   "Return the object for a given value of klass"
   (if (and klass new-value)
-      (let ((klass-hash (gethash klass *metis-fields*))
+      (let* ((fields *metis-fields*)
+            (klass-hash (gethash klass fields))
             (nid nil)
             (obj nil))
         (if (hash-table-p klass-hash)

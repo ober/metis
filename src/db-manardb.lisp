@@ -239,7 +239,7 @@
 (defun allocate-klass-hash (klass)
   (or (hash-table-p (gethash klass *metis-fields*))
       (progn
-        ;;(format t "allocating class:~A~%" klass)
+        (format t "allocating class:~A~%" klass)
         (create-klass-hash klass)
         (manardb:doclass (x klass :fresh-instances nil)
                          (with-slots (value idx) x
@@ -440,6 +440,8 @@
          (no-returns (cl-ppcre:regex-replace-all "\\n" no-dupes " "))
          no-returns)))
 
+;; Search functions
+
 (defun ct-get-all-errors ()
   (ct-get-by-klass-value 'metis::errorCode nil t))
 
@@ -463,9 +465,6 @@
 
 (defun ct-get-by-sourceIPAddress (name)
   (ct-get-by-klass-value 'metis::sourceIPAddress name))
-
-(defun manardb-recreate-tables ()
-  (format t "manardb-recreate-tables~%"))
 
 (defun manardb-normalize-insert-2 (record)
   (destructuring-bind (additionalEventData
@@ -612,6 +611,11 @@
     (null (string var))
     (string var)
     (list (format nil "~{~s = ~s~%~}" var))))
+
+;; noops
+
+(defun manardb-recreate-tables ()
+  (format t "manardb-recreate-tables~%"))
 
 (defun manardb-get-or-insert-id (table value)
   (format t "manard-get-or-insert-id table:~A value:~A~%" table value))

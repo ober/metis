@@ -34,6 +34,7 @@
     :components ((:module src :serial t
                   :components (
                                (:file "package")
+                               ;;(:file "bench")
                                (:file "ctcl")
                                (:file "utils")
                                (:file "version" :depends-on ("package"))

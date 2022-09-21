@@ -22,6 +22,7 @@
 (defun usage ()
   (format t "a - cloudtrail-report-async~%")
   (format t "b - bench-vpc-flows-report-sync arg~%")
+  (format t "bench - run benchmark~%")
   (format t "lc - get-unique-conversation~%")
   (format t "lec - get-errorcode-list~%")
   (format t "gre - get-response-elements~%")
@@ -70,6 +71,7 @@
          (rest (cdr args)))
     (cond
       ((equal "a" verb) (cloudtrail-report-async (cadr rest) (caddr rest)))
+      ((equal "bench" verb) (run-bench))
       ((equal "lc" verb) (get-unique-conversation))
       ((equal "lcts" verb) (get-cts))
       ((equal "lec" verb) (get-errorcode-list))
