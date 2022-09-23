@@ -25,7 +25,6 @@
                   :pcall-queue
                   :salza2
                   :split-sequence
-                  :thnappy
                   :trivial-garbage
                   :uiop
                   :usocket

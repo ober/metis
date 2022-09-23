@@ -23,7 +23,6 @@
 		     :pcall
 		     :pcall-queue
 		     :split-sequence
-		     :thnappy
 		     :trivial-garbage
 		     :uiop
 		     :usocket

@@ -9,7 +9,6 @@
 			    :pcall
 			    :salza2
 			    :cl-base64
-                :thnappy
 			    :trivial-garbage
 			    :uiop
 			    :usocket
