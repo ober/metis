@@ -5,30 +5,6 @@
     (format nil "cat ~A" filename)
     :output :string))
 
-(fare-memoization:define-memo-function get-hostname-by-ip (ip)
-  (handler-case
-      (if (boundp '*benching*)
-          "bogus.example.com"
-          (progn
-            (if (cl-ppcre:all-matches "^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" ip)
-                (let ((name
-                        #+allegro
-                        (ignore-errors (socket:ipaddr-to-hostname ip))
-                        #+sbcl
-                        (ignore-errors
-                         (sb-bsd-sockets:host-ent-name
-                          (sb-bsd-sockets:get-host-by-address
-                           (sb-bsd-sockets:make-inet-address ip))))
-                        #+lispworks
-                        (ignore-errors (comm:get-host-entry ip :fields '(:name)))
-                        #+clozure
-                        (ignore-errors (ccl:ipaddr-to-hostname (ccl:dotted-to-ipaddr ip)))))
-                  (if (null name)
-                      ip
-                      name))
-                ip)))
-    (t (e) (error-print "get-hostname-by-ip" e))))
-
 (defun read-json-gzip-file (file)
   (handler-case
    (progn
@@ -41,8 +17,6 @@
 (defun error-print (fn error)
   (format t "~%~A~%~A~%~A~%~A~%~A~%" fn fn error fn fn))
 
-;; #+(or clozure sbcl allegro)
-
 (defun get-json-gzip-contents (file)
   (handler-case
       (progn (first (gzip-stream:with-open-gzip-file (in file)
@@ -50,29 +24,14 @@
 			 while l collect l))))
     (t (e) (error-print "get-json-gzip-contents" e))))
 
-
 (defun cdr-assoc (item a-list &rest keys)
   (cdr (apply #'assoc item a-list keys)))
-
-(define-setf-expander cdr-assoc (item a-list &rest keys)
-  (let ((item-var (gensym))
-        (a-list-var (gensym))
-        (store-var (gensym)))
-    (values
-     (list item-var a-list-var)
-     (list item a-list)
-     (list store-var)
-     `(let ((a-cons (assoc ,item-var ,a-list-var ,@ keys)))
-        (if a-cons
-            (setf (cdr a-cons) ,store-var)
-            (setf ,a-list (acons ,item-var ,store-var ,a-list-var)))
-        ,store-var)
-     `(cdr (assoc ,item-var ,a-list-var ,@ keys)))))
 
 (defun flatten (obj)
     (cond ((atom obj) (list obj))
             ((null obj) nil)
-            (t (append (flatten (car obj)) (flatten (cdr obj))))))
+            (t (append (flatten (car obj))
+                       (flatten (cdr obj))))))
 
 (defun file-string (path)
   (with-open-file (stream path)
@@ -95,37 +54,15 @@ is replaced with replacement."
        when pos do (write-string replacement out)
        while pos)))
 
-(defun get-full-filename (x)
-  (let* ((split (split-sequence:split-sequence #\/ (directory-namestring x)))
-	 (length (list-length split))
-	 (dir1 (nth (- length 2) split))
-	 (dir2 (nth (- length 3) split))
-	 (dir3 (nth (- length 4) split)))
-    (format nil "~A/~A/~A/~A" dir3 dir2 dir1 (file-namestring x))))
-
 (defun thread-safe-hash-table ()
   "Return A thread safe hash table"
-  (let ((size 10000000)
-	(rehash-size 2.0)
-	(rehash-threshold 0.7))
-    #+(or abcl ecl) (make-hash-table :test 'equalp)
-    #+sbcl
-    (make-hash-table :synchronized t :test 'equalp
-		     ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
-		     )
-    #+ccl
-    (make-hash-table :shared :lock-free :test 'equalp
-		     ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
-		     )
-    #+(or allegro lispworks)
-    (make-hash-table :test 'equalp
-		     ;;:size size :rehash-size rehash-size :rehash-threshold rehash-threshold
-		     )
-    ))
-
-(fare-memoization:define-memo-function reverse-hash-kv (old)
-  (let ((new (thread-safe-hash-table)))
-    (maphash #'(lambda (k v) (setf (gethash v new) k)) old) new))
+  #+(or abcl ecl) (make-hash-table :test 'equalp)
+  #+sbcl
+  (make-hash-table :synchronized t :test 'equalp)
+  #+ccl
+  (make-hash-table :shared :lock-free :test 'equalp)
+  #+(or allegro lispworks)
+  (make-hash-table :test 'equalp))
 
 (defun get-size (file)
   (let ((stat (get-stat file)))

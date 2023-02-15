@@ -43,11 +43,11 @@
   "process the json output"
   (handler-case
       (progn
-        (let* ((records (second (read-json-gzip-file x)))
+        (let* ((records (read-json-gzip-file x))
                (num (length records))
                (btime (get-internal-real-time))
                (fields *fields*))
-          (dolist (x records)
+          (dolist (x (coerce records 'list))
             (normalize-insert (process-record x fields)))
           (let* ((etime (get-internal-real-time))
                  (delta (/ (float (- etime btime)) (float internal-time-units-per-second)))

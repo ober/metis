@@ -466,54 +466,6 @@
 (defun ct-get-by-sourceIPAddress (name)
   (ct-get-by-klass-value 'metis::sourceIPAddress name))
 
-(defun manardb-normalize-insert-2 (record)
-  (destructuring-bind (additionalEventData
-                       awsRegion
-                       errorCode
-                       errorMessage
-                       eventID
-                       eventName
-                       eventSource
-                       eventTime
-                       eventType
-                       eventVersion
-                       recipientAccountId
-                       requestID
-                       requestParameters
-                       resources
-                       responseElements
-                       sourceIPAddress
-                       userAgent
-                       userIdentity
-                       userName)
-      record
-    (make-instance 'ct
-                   :additionalEventData additionalEventData
-                   :awsRegion awsRegion
-                   :errorCode errorCode
-                   :errorMessage errorMessage
-                   :eventID eventID
-                   :eventName eventName
-                   :eventSource eventSource
-                   :eventTime eventTime
-                   :eventType eventType
-                   :eventVersion eventVersion
-                   :recipientAccountId recipientAccountId
-                   :requestID requestID
-                   :requestParameters requestParameters
-                   :resources resources
-                   :responseElements responseElements
-                   :sourceIPAddress sourceIPAddress
-                   :userAgent userAgent
-                   :userIdentity userIdentity
-                   :userName userName)))
-
-;; (defun compress-obj (obj)
-;;   (when obj
-;;     (flexi-streams:octets-to-string
-;;      (ignore-errors (thnappy:compress (flexi-streams:with-output-to-sequence
-;;                            (stream)
-;;                          (cl-store:store 'obj stream)))))))
 
 (defun manardb-normalize-insert (record)
   (destructuring-bind (

@@ -19,6 +19,8 @@
                   :fare-memoization
                   :gzip-stream
                   :jonathan
+                  :shasht
+                  :for
                   :local-time
                   :manardb
                   :pcall

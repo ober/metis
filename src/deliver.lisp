@@ -11,6 +11,8 @@
                 :fare-memoization
                 :gzip-stream
                 :jonathan
+                :shasht
+                :for
                 :manardb
                 :pcall
                 :salza2

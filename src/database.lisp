@@ -123,7 +123,8 @@
       (replace-all str "'" "")
       str))
 
-(defun process-record (record fields)
+(defun process-record-jonathan (record fields)
+  (format t "I got a ~a~%" (type-of record))
   (handler-case
       (progn
         (dolist (r record)
@@ -135,6 +136,9 @@
         (loop for i in fields
               collect (make-safe-string (get-value i record))))
     (t (e) (error-print "process-record" e))))
+
+(defun process-record (record fields) ;; shasht
+  (format t "~{ ~a ~}~%" (hash-keys record)))
 
 (defun get-value (field rec)
   (handler-case
