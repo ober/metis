@@ -1,5 +1,10 @@
 (in-package :metis)
 
+(defun read-file-as-string (filename)
+   (uiop:run-program
+    (format nil "cat ~A" filename)
+    :output :string))
+
 (fare-memoization:define-memo-function get-hostname-by-ip (ip)
   (handler-case
       (if (boundp '*benching*)
@@ -28,27 +33,16 @@
   (handler-case
    (progn
      (let ((json (get-json-gzip-contents file)))
-       (jonathan:parse json)))
+       ;;(jonathan:parse json)
+       (gethash "Records" (shasht:read-json json))
+       ))
    (t (e) (error-print "read-json-gzip-file" e))))
-
-#+ecl
-(defun get-json-gzip-contents (file)
-  (uiop:run-program
-   (format nil "zcat ~A" file)
-   :output :string))
 
 (defun error-print (fn error)
   (format t "~%~A~%~A~%~A~%~A~%~A~%" fn fn error fn fn))
 
-;; #-(or clozure sbcl allegro)
-;; (defun get-json-gzip-contents (file)
-;;   (uiop:run-program
-;;    (format nil "zcat ~A" file)
-;;    :output :string))
-
 ;; #+(or clozure sbcl allegro)
 
-#-ecl
 (defun get-json-gzip-contents (file)
   (handler-case
       (progn (first (gzip-stream:with-open-gzip-file (in file)
@@ -76,13 +70,9 @@
      `(cdr (assoc ,item-var ,a-list-var ,@ keys)))))
 
 (defun flatten (obj)
-  (do* ((result (list obj))
-        (node result))
-       ((null node) (delete nil result))
-    (cond ((consp (car node))
-           (when (cdar node) (push (cdar node) (cdr node)))
-           (setf (car node) (caar node)))
-          (t (setf node (cdr node))))))
+    (cond ((atom obj) (list obj))
+            ((null obj) nil)
+            (t (append (flatten (car obj)) (flatten (cdr obj))))))
 
 (defun file-string (path)
   (with-open-file (stream path)
@@ -148,16 +138,5 @@ is replaced with replacement."
     #+ccl (elt stat 2)
     ))
 
-
-;; From https://rosettacode.org/wiki/Base64_encode_data#Common_Lisp
-
-;; (defun base64-encode-obj (obj)
-;;   "Returns the BASE64 encoded string of the file at URI."
-;;     (let ((output (loop
-;;                    with array = (make-array 0 :element-type 'unsigned-byte
-;;                                               :adjustable t :fill-pointer 0)
-;;                    for data-chunk = (read-byte obj nil nil)
-;;                    while data-chunk
-;;                    do (vector-push-extend data-chunk array)
-;;                    finally (return (usb8-array-to-base64-string array)))))
-;;       output))
+(defun hash-keys (hash-table)
+  (loop for key being the hash-keys of hash-table collect key))
