@@ -12,34 +12,34 @@
 (defparameter to-db (pcall-queue:make-queue))
 
 (defvar *fields* '(
-                   :additionalEventData
-                   :apiVersion
-                   :awsRegion
-                   :errorCode
-                   :errorMessage
-                   :eventCategory
-                   :eventID
-                   :eventName
-                   :eventSource
-                   :eventTime
-                   :eventType
-                   :eventVersion
-                   :managementEvent
-                   :readOnly
-                   :recipientAccountId
-                   :requestID
-                   :requestParameters
-                   :resources
-                   :responseElements
-                   :serviceEventDetails
-                   :sessionCredentialFromConsole
-                   :sharedEventID
-                   :sourceIPAddress
-                   :tlsDetails
-                   :userAgent
-                   :userIdentity
-                   :userName
-                   :vpcEndpointId
+                   "additionalEventData"
+                   "apiVersion"
+                   "awsRegion"
+                   "errorCode"
+                   "errorMessage"
+                   "eventCategory"
+                   "eventID"
+                   "eventName"
+                   "eventSource"
+                   "eventTime"
+                   "eventType"
+                   "eventVersion"
+                   "managementEvent"
+                   "readOnly"
+                   "recipientAccountId"
+                   "requestID"
+                   "requestParameters"
+                   "resources"
+                   "responseElements"
+                   "serviceEventDetails"
+                   "sessionCredentialFromConsole"
+                   "sharedEventID"
+                   "sourceIPAddress"
+                   "tlsDetails"
+                   "userAgent"
+                   "userIdentity"
+                   "userName"
+                   "vpcEndpointId"
                    ))
 
 (defun db-init ()
@@ -138,9 +138,25 @@
     (t (e) (error-print "process-record" e))))
 
 (defun process-record (record fields) ;; shasht
-  (format t "~{ ~a ~}~%" (hash-keys record)))
+  ;;  (for:for ((a in fields))
+  ;;           (format t "item: ~a in key:~a is ~a~%" a (hash-keys record) (type-of (gethash (format nil "~a" a) record))))
+  (setf (gethash "userName" record) (get-user record))
+  (loop for f in fields
+        collect (format nil "~a" (gethash f record))))
 
-(defun get-value (field rec)
+(defun get-user (rec)
+  "Given a record, find the username"
+  (let ((ui (gethash "userIdentity" rec)))
+    (when (hash-table-p ui)
+      (let ((sc (gethash "sessionContext" ui)))
+        (when (hash-table-p sc)
+          (let ((si (gethash "sessionIssuer" sc)))
+            (when (hash-table-p si)
+              (let ((username (gethash "userName" si)))
+                (when (stringp username)
+                  username)))))))))
+
+(defun get-value-jonathan (field rec)
   (handler-case
       (let ((record rec))
         (cond

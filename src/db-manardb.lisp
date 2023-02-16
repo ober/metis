@@ -430,7 +430,9 @@
                        (get-val-by-idx 'metis::errorCode errorCode)
                        (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::requestParameters requestParameters)) ""))
                        (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) ""))
-                       (find-username (get-val-by-idx 'metis::userIdentity userIdentity))))
+                       (get-val-by-idx 'metis::userName userName)
+                       ;;(find-username (get-val-by-idx 'metis::userIdentity userIdentity))
+                       ))
               results))))))
     results))
 
@@ -465,7 +467,6 @@
 
 (defun ct-get-by-sourceIPAddress (name)
   (ct-get-by-klass-value 'metis::sourceIPAddress name))
-
 
 (defun manardb-normalize-insert (record)
   (destructuring-bind (
