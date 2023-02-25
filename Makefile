@@ -9,20 +9,13 @@ lispworks:
 	@ mkdir -p dist/lispworks
 	@ cd src && lispworks -build deliver.lisp
 
-ecl:
-	@ mkdir -p dist/ecl
-	@ cat collector/deliver-ecl.lisp|ecl
-
 sbcl:
 	@ mkdir -p dist/sbcl
-	@ cat src/deliver.lisp|sbcl --control-stack-size 2048 --dynamic-space-size 20480  2>&1 > /dev/null #--control-stack-size 2048  #--disable-debugger
+	@ cat src/deliver.lisp|sbcl --control-stack-size 2048 --dynamic-space-size 8096  2>&1 > /dev/null #--control-stack-size 2048  #--disable-debugger
+
 ccl:
 	@ mkdir -p dist/ccl || true
 	@ cd src && cat deliver.lisp|ccl64
-
-clisp:
-	@ mkdir -p dist/clisp || true
-	@ cat deliver.lisp|clisp
 
 allegro:
 	@ rm -rf dist/allegro metis
@@ -30,21 +23,6 @@ allegro:
 	@ cd src && cat deliver.lisp|allegro
 	@ mv src/metis/* dist/allegro
 	@ rm -rf src/metis
-
-abcl:
-	@ mkdir -p dist/abcl || true
-	@ cat deliver.lisp|abcl
-
-cmucl:
-	@ cat deliver.lisp|/usr/cmucl/bin/lisp
-
-chicken:
-	@ rm -rf ./dist/chicken
-	@ mkdir -p dist/chicken
-#	@ usr/local/bin/chicken-install z3 medea vector-lib posix files srfi-13 format list-bindings s11n srfi-19 args natural-sort lmdb posix srfi-1
-	@ /usr/local/bin/chicken-install -deploy -p dist/chicken z3 medea vector-lib posix files srfi-13 format list-bindings s11n srfi-19 args natural-sort lmdb posix srfi-1
-	@ /usr/local/bin/csc -deploy -o dist/chicken chicken/metis.scm
-	@ mv dist/chicken/chicken dist/chicken/metis
 
 bench: all
 	rm -rf /tmp/m-a && mkdir /tmp/m-a

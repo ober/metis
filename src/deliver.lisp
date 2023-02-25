@@ -66,11 +66,8 @@
                 "utils.lisp"
                 "ctcl.lisp"
                 "database.lisp"
-                ;;"db-postgres.lisp"
-                ;;"db-sqlite.lisp"
                 "db-manardb.lisp"
                 "main.lisp"
-                ;;"bench.lisp"
                 "flows.lisp")))
   (mapcar #'compile-file lfiles)
   (cl-user::generate-executable
@@ -78,12 +75,9 @@
    '("package.fasl"
      "utils.fasl"
      "database.fasl"
-     ;;"db-postgres.fasl"
-     ;;"db-sqlite.fasl"
      "db-manardb.fasl"
      "ctcl.fasl"
      "main.fasl"
-     ;;"bench.fasl"
      "flows.fasl")
    :runtime :partners
    :show-window :shownoactivate
@@ -102,5 +96,5 @@
    :include-ide nil
    :runtime :partners
    :suppress-allegro-cl-banner t
-   :newspace 167772160
-   :oldspace 335544320))
+   :newspace 1677721600
+   :oldspace 3355443200))

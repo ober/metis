@@ -19,7 +19,7 @@
                     metis::readOnly
                     metis::managementEvent
                     ;;metis::sharedEventID
-                    metis::tlsDetails
+                    ;;metis::tlsDetails
                     metis::vpcEndpointId
                     metis::sessionCredentialFromConsole
                     metis::apiVersion
@@ -259,8 +259,7 @@
 (defun init-ct-hashes ()
   (mapc
    #'(lambda (x)
-       (format t "Allocating hash for class ~a~%" x)
-       (allocate-klass-hash x))
+       (time (allocate-klass-hash x)))
    ct-fields))
 
 (defun get-stats ()
