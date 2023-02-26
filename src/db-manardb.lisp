@@ -410,9 +410,10 @@
              ((equal (find-class klass) (find-class 'metis::sourceIPAddress)) (setf slotv sourceIPAddress))
              ((equal (find-class klass) (find-class 'metis::errorMessage)) (setf slotv errorMessage))
              ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode))
-             ;;((equal (find-class klass) (find-class 'metis::requestParameters)) (setf slotv requestParameters))
-             ;;((equal (find-class klass) (find-class 'metis::responseElements)) (setf slotv responseElements))
+             ((equal (find-class klass) (find-class 'metis::requestParameters)) (setf slotv requestParameters))
+             ((equal (find-class klass) (find-class 'metis::responseElements)) (setf slotv responseElements))
              )
+           (format t ".")
            (when
                (or
                 (and inverse slotv)
@@ -428,8 +429,8 @@
                        (get-val-by-idx 'metis::userAgent userAgent)
                        (get-val-by-idx 'metis::errorMessage errorMessage)
                        (get-val-by-idx 'metis::errorCode errorCode)
-                      ;;(cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::requestParameters requestParameters)) ""))
-                      ;; (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) ""))
+                       (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::requestParameters requestParameters)) ""))
+                       (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) ""))
                        (get-val-by-idx 'metis::userName userName)
                        ;;(find-username (get-val-by-idx 'metis::userIdentity userIdentity))
                        ))
