@@ -382,6 +382,7 @@
 
 (defun ct-get-by-klass-value-real (klass value &optional inverse)
   (allocate-klass-hash klass)
+  (format t "klass:~A value:~A inverse:~A~%" klass value inverse)
   (let ((results '())
         (klass-hash (gethash klass *metis-fields*))
         (slotv nil))
