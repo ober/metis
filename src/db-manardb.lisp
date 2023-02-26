@@ -382,7 +382,6 @@
 
 (defun ct-get-by-klass-value-real (klass value &optional inverse)
   (allocate-klass-hash klass)
-  (format t "ct-get-by-klass-value-real klass:~A value:~A inverse:~A~%" klass value inverse)
   (let ((results '())
         (klass-hash (gethash klass *metis-fields*))
         (slotv nil))
@@ -412,7 +411,7 @@
              ((equal (find-class klass) (find-class 'metis::errorMessage)) (setf slotv errorMessage))
              ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode))
              ((equal (find-class klass) (find-class 'metis::requestParameters)) (setf slotv requestParameters))
-             ((equal (find-class klass) (find-class 'metis::responseElements)) (setf slotv responseElements))
+             ;;((equal (find-class klass) (find-class 'metis::responseElements)) (setf slotv responseElements))
              )
            (when
                (or
@@ -430,7 +429,7 @@
                        (get-val-by-idx 'metis::errorMessage errorMessage)
                        (get-val-by-idx 'metis::errorCode errorCode)
                        (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::requestParameters requestParameters)) ""))
-                       (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) ""))
+                      ;; (cleanup-output (cl-ppcre:regex-replace-all "\\n" (format nil "~A" (get-val-by-idx 'metis::responseElements responseElements)) ""))
                        (get-val-by-idx 'metis::userName userName)
                        ;;(find-username (get-val-by-idx 'metis::userIdentity userIdentity))
                        ))
