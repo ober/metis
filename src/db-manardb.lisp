@@ -412,7 +412,7 @@
              ((equal (find-class klass) (find-class 'metis::errorMessage)) (setf slotv errorMessage))
              ((equal (find-class klass) (find-class 'metis::errorCode)) (setf slotv errorCode))
              ((equal (find-class klass) (find-class 'metis::requestParameters)) (setf slotv requestParameters))
-             ;;((equal (find-class klass) (find-class 'metis::responseElements)) (setf slotv responseElements))
+             ((equal (find-class klass) (find-class 'metis::responseElements)) (setf slotv responseElements))
              )
            (when
                (or
