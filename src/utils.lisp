@@ -9,7 +9,6 @@
   (handler-case
    (progn
      (let ((json (get-json-gzip-contents file)))
-       ;;(jonathan:parse json)
        (gethash "Records" (shasht:read-json json))
        ))
    (t (e) (error-print "read-json-gzip-file" e))))
@@ -18,11 +17,16 @@
   (format t "~%~A~%~A~%~A~%~A~%~A~%" fn fn error fn fn))
 
 (defun get-json-gzip-contents (file)
-  (handler-case
-      (progn (first (gzip-stream:with-open-gzip-file (in file)
-		      (loop for l = (read-line in nil nil)
-			 while l collect l))))
-    (t (e) (error-print "get-json-gzip-contents" e))))
+  (uiop:run-program
+   (format nil "zcat ~A" file)
+   :output :string))
+
+;; (defun get-json-gzip-contents (file)
+;;   (handler-case
+;;       (progn (first (gzip-stream:with-open-gzip-file (in file)
+;; 		      (loop for l = (read-line in nil nil)
+;; 			 while l collect l))))
+;;     (t (e) (error-print "get-json-gzip-contents" e))))
 
 (defun cdr-assoc (item a-list &rest keys)
   (cdr (apply #'assoc item a-list keys)))
