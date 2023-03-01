@@ -1,10 +1,5 @@
 (in-package :metis)
 
-(defun read-file-as-string (filename)
-   (uiop:run-program
-    (format nil "cat ~A" filename)
-    :output :string))
-
 (defun read-json-gzip-file (file)
   (handler-case
    (progn
@@ -60,24 +55,12 @@ is replaced with replacement."
 
 (defun thread-safe-hash-table ()
   "Return A thread safe hash table"
-  #+(or abcl ecl) (make-hash-table :test 'equalp)
   #+sbcl
   (make-hash-table :synchronized t :test 'equalp)
   #+ccl
   (make-hash-table :shared :lock-free :test 'equalp)
   #+(or allegro lispworks)
   (make-hash-table :test 'equalp))
-
-(defun get-size (file)
-  (let ((stat (get-stat file)))
-    #+allegro (progn
-		(require 'osi)
-		(excl.osi:stat-size stat))
-    #+lispworks (progn
-		  (sys:file-stat-size stat))
-    #+sbcl (sb-posix:stat-size stat)
-    #+ccl (elt stat 2)
-    ))
 
 (defun hash-keys (hash-table)
   (loop for key being the hash-keys of hash-table collect key))
