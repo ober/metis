@@ -44,10 +44,10 @@
 
 (defun db-init ()
   (cond
-    ((equal :sqlite *db-backend*) (sqlite-init))
-    ((equal :postgres *db-backend*) (psql-init))
-    ((equal :manardb *db-backend*) (manardb-init))
-    ((equal :lmdb *db-backend*) (lmdb-init))
+    ((equal :sqlite *db-backend*) (sqlite/init))
+    ((equal :postgres *db-backend*) (psql/init))
+    ((equal :manardb *db-backend*) (manardb/init))
+    ((equal :lmdb *db-backend*) (lmdb/init))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-close ()
@@ -60,82 +60,68 @@
 
 (defun db-have-we-seen-this-file (file)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite-have-we-seen-this-file file))
-    ((equal :postgres *db-backend*) (psql-have-we-seen-this-file file))
-    ((equal :manardb *db-backend*) (manardb-have-we-seen-this-file file))
-    ((equal :lmdb *db-backend*) (lmdb-have-we-seen-this-file file))
+    ((equal :sqlite *db-backend*) (sqlite/have-we-seen-this-file file))
+    ((equal :postgres *db-backend*) (psql/have-we-seen-this-file file))
+    ((equal :manardb *db-backend*) (manardb/have-we-seen-this-file file))
+    ((equal :lmdb *db-backend*) (lmdb/have-we-seen-this-file file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-mark-file-processed (file)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite-mark-file-processed file))
-    ((equal :postgres *db-backend*) (psql-mark-file-processed file))
-    ((equal :manardb *db-backend*) (manardb-mark-file-processed file))
-    ((equal :lmdb *db-backend*) (lmdb-mark-file-processed file))
+    ((equal :sqlite *db-backend*) (sqlite/mark-file-processed file))
+    ((equal :postgres *db-backend*) (psql/mark-file-processed file))
+    ((equal :manardb *db-backend*) (manardb/mark-file-processed file))
+    ((equal :lmdb *db-backend*) (lmdb/mark-file-processed file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-recreate-tables (db)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite-recreate-tables))
-    ((equal :postgres *db-backend*) (psql-recreate-tables))
-    ((equal :manardb *db-backend*) (manardb-recreate-tables))
-    ((equal :lmdb *db-backend*) (lmdb-recreate-tables))
+    ((equal :sqlite *db-backend*) (sqlite/recreate-tables))
+    ((equal :postgres *db-backend*) (psql/recreate-tables))
+    ((equal :manardb *db-backend*) (manardb/recreate-tables))
+    ((equal :lmdb *db-backend*) (lmdb/recreate-tables))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun normalize-insert (record)
   (if record
       (handler-case
           (cond
-            ((equal :sqlite *db-backend*) (sqlite-normalize-insert record))
-            ((equal :postgres *db-backend*) (psql-normalize-insert record))
-            ((equal :manardb *db-backend*) (manardb-normalize-insert record))
-            ((equal :lmdb *db-backend*) (lmdb-normalize-insert record))
+            ((equal :sqlite *db-backend*) (sqlite/normalize-insert record))
+            ((equal :postgres *db-backend*) (psql/normalize-insert record))
+            ((equal :manardb *db-backend*) (manardb/normalize-insert record))
+            ((equal :lmdb *db-backend*) (lmdb/normalize-insert record))
             (t (format t "unknown *db-backend*:~A~%" *db-backend*)))
         (t (e) (error-print "normalize-insert" e)))
       (format t "normalize-insert record empty")))
 
 (defun db-get-or-insert-id (table value)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite-get-or-insert-id table value))
-    ((equal :postgres *db-backend*) (psql-get-or-insert-id table value))
-    ((equal :manardb *db-backend*) (manardb-get-or-insert-id table value))
-    ((equal :lmdb *db-backend*) (lmdb-get-or-insert-id table value))
+    ((equal :sqlite *db-backend*) (sqlite/get-or-insert-id table value))
+    ((equal :postgres *db-backend*) (psql/get-or-insert-id table value))
+    ((equal :manardb *db-backend*) (manardb/get-or-insert-id table value))
+    ((equal :lmdb *db-backend*) (lmdb/get-or-insert-id table value))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-do-query (query)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite-do-query query))
-    ((equal :postgres *db-backend*)(psql-do-query query))
-    ((equal :manardb *db-backend*)(manardb-do-query query))
-    ((equal :lmdb *db-backend*)(lmdb-do-query query))
+    ((equal :sqlite *db-backend*) (sqlite/do-query query))
+    ((equal :postgres *db-backend*)(psql/do-query query))
+    ((equal :manardb *db-backend*)(manardb/do-query query))
+    ((equal :lmdb *db-backend*)(lmdb/do-query query))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-drop-table (query)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite-drop-table query))
-    ((equal :postgres *db-backend*) (psql-drop-table query))
-    ((equal :manardb *db-backend*) (manardb-drop-table query))
-    ((equal :lmdb *db-backend*) (lmdb-drop-table query))
+    ((equal :sqlite *db-backend*) (sqlite/drop-table query))
+    ((equal :postgres *db-backend*) (psql/drop-table query))
+    ((equal :manardb *db-backend*) (manardb/drop-table query))
+    ((equal :lmdb *db-backend*) (lmdb/drop-table query))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun make-safe-string (str)
   (if (stringp str)
       (replace-all str "'" "")
       str))
-
-(defun process-record-jonathan (record fields)
-  (format t "I got a ~a~%" (type-of record))
-  (handler-case
-      (progn
-        (dolist (r record)
-          (if (and r
-                   (keywordp r))
-              (unless (member r fields :test (function string-equal))
-                (format t "!! missing field. r: ~a type: ~a~%" r (type-of r)))))
-
-        (loop for i in fields
-              collect (make-safe-string (get-value i record))))
-    (t (e) (error-print "process-record" e))))
 
 (defun process-record (record fields) ;; shasht
   ;;  (for:for ((a in fields))
@@ -155,42 +141,6 @@
               (let ((username (gethash "userName" si)))
                 (when (stringp username)
                   username)))))))))
-
-(defun get-value-jonathan (field rec)
-  (handler-case
-      (let ((record rec))
-        (cond
-          ((equal :accessKeyId field) (fetch-value '(:|userIdentity| :|accessKeyId|) record))
-          ((equal :additionalEventData field) (getf record :|additionalEventData|))
-          ((equal :apiVersion field) (getf record :|apiVersion|))
-          ((equal :awsRegion field) (getf record :|awsRegion|))
-          ((equal :errorCode field) (getf record :|errorCode|))
-          ((equal :errorMessage field) (getf record :|errorMessage|))
-          ((equal :eventCategory field) (getf record :|eventCategory|))
-          ((equal :eventID field) (getf record :|eventID|))
-          ((equal :eventName field) (getf record :|eventName|))
-          ((equal :eventSource field) (getf record :|eventSource|))
-          ((equal :eventTime field) (getf record :|eventTime|))
-          ((equal :eventType field) (getf record :|eventType|))
-          ((equal :eventVersion field) (getf record :|eventVersion|))
-          ((equal :managementEvent field) (getf record :|managementEvent|))
-          ((equal :readOnly field) (getf record :|readOnly|))
-          ((equal :recipientAccountId field) (getf record :|recipientAccountId|))
-          ((equal :requestID field) (getf record :|requestID|))
-          ((equal :requestParameters field) (getf record :|requestParameters|))
-          ((equal :resources field) (getf record :|resources|))
-          ((equal :responseElements field) (getf record :|responseElements|))
-          ((equal :serviceEventDetails field) (getf record :|serviceEventDetails|))
-          ((equal :sessionCredentialFromConsole field) (getf record :|sessionCredentialFromConsole|))
-          ((equal :sharedEventID field) (getf record :|sharedEventID|))
-          ((equal :sourceIPAddress field) (getf record :|sourceIPAddress|))
-          ((equal :tlsDetails field) (getf record :|tlsDetails|))
-          ((equal :userAgent field) (getf record :|userAgent|))
-          ((equal :userIdentity field) (getf record :|userIdentity|))
-          ((equal :userName field) (fetch-value '(:|userIdentity| :|sessionContext| :|sessionIssuer| :|userName|) record))
-          ((equal :vpcEndpointId field) (getf record :|vpcEndpointId|))
-          (t (format nil "Unknown arg:~A~%" field))))
-    (t (e) (error-print (format nil "get-value field: ~a" field) e))))
 
 (defun try-twice (table query)
   (let ((val (or
@@ -234,11 +184,11 @@
   (if (null syncing)
       (progn
         (setf syncing t)
-        ;;(psql-commit)
+        ;;(psql/commit)
         (let ((q-len (pcall-queue:queue-length to-db)))
           (format t "Sync limit of ~A hit." q-len)
           (emit-drain-file to-db)
-          ;;(psql-begin)
+          ;;(psql/begin)
           (setf syncing nil))
         (format t "sync already running...~%"))))
 

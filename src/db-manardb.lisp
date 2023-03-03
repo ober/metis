@@ -36,7 +36,7 @@
                     metis::userName
                     ))
 
-(defun manardb-init()
+(defun manardb/init()
   (unless (boundp 'manardb:use-mmap-dir)
     (progn
       (manardb:use-mmap-dir (or (uiop:getenv "METIS") "~/ct-manardb/"))
@@ -213,13 +213,13 @@
                 (setf (gethash new-value (gethash klass *metis-fields*)) obj))))))
     obj))
 
-(defun manardb-have-we-seen-this-file (file)
+(defun manardb/have-we-seen-this-file (file)
   (let ((name (get-filename-hash file)))
     (multiple-value-bind (id seen)
         (gethash name *manard-files*)
       seen)))
 
-(defun manardb-get-files (file)
+(defun manardb/get-files (file)
   (format t "manardb-get-files:~A~%" file)
   (remove-if-not
    (lambda (x) (string-equal
@@ -227,7 +227,7 @@
            (slot-value x :value2)))
    (manardb:retrieve-all-instances 'metis::files)))
 
-(defun manardb-mark-file-processed (file)
+(defun manardb/mark-file-processed (file)
   (let ((name (get-filename-hash file)))
     (setf (gethash name *manard-files*) t)
     (make-instance 'files :value name :idx 1)))
@@ -468,7 +468,7 @@
 (defun ct-get-by-sourceIPAddress (name)
   (ct-get-by-klass-value 'metis::sourceIPAddress name))
 
-(defun manardb-normalize-insert (record)
+(defun manardb/normalize-insert (record)
   (destructuring-bind (
                        additionalEventData
                        apiVersion
@@ -567,14 +567,14 @@
 
 ;; noops
 
-(defun manardb-recreate-tables ()
+(defun manardb/recreate-tables ()
   (format t "manardb-recreate-tables~%"))
 
-(defun manardb-get-or-insert-id (table value)
+(defun manardb/get-or-insert-id (table value)
   (format t "manard-get-or-insert-id table:~A value:~A~%" table value))
 
-(defun manardb-drop-table (query)
+(defun manardb/drop-table (query)
   (format t "manardb-drop-table query:~A~%" query) )
 
-(defun manardb-do-query (query)
+(defun manardb/do-query (query)
   (format nil "manardb-do-query query:~A~%" query))
