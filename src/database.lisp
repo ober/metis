@@ -83,7 +83,7 @@
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun normalize-insert (record)
-  (when record
+  (if record
       (handler-case
           (cond
             ((equal :sqlite *db-backend*) (sqlite/normalize-insert record))

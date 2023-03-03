@@ -1,5 +1,3 @@
-(ql:quickload :metis)
-
 (in-package :metis)
 
 (defun init-manardb-bench()
@@ -30,8 +28,5 @@
     (prof::with-profiling (:type :time) (metis::do-bench))
     (prof::show-call-graph)
     (prof::show-flat-profile))
-
-  #+(or clozure abcl ecl) (time (do-bench))
+  #+(or clozure) (time (do-bench))
   )
-
-(run-bench)

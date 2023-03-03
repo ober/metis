@@ -1,16 +1,15 @@
 #+allegro (progn
             (load (merge-pathnames "~/quicklisp/setup.lisp" *default-pathname-defaults*))
             (ql:quickload '(:cl-date-time-parser
+                            :cl-base64
                             :cl-fad
                             :fare-memoization
-                            :gzip-stream
-                            :jonathan
-                            :shasht
-                            :manardb
                             :for
+                            :gzip-stream
+                            :manardb
                             :pcall
                             :salza2
-                            :cl-base64
+                            :shasht
                             :trivial-garbage
                             :uiop
                             :usocket
@@ -18,7 +17,8 @@
 
 (defpackage :metis
   (:use :cl :zs3
-        #+allegro :prof)
+        #+allegro :prof
+        )
 
   (:export
    #:main))

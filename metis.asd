@@ -17,15 +17,14 @@
                   :cl-json
                   :closer-mop
                   :fare-memoization
-                  :gzip-stream
-                  :jonathan
-                  :shasht
                   :for
+                  :gzip-stream
                   :local-time
                   :manardb
                   :pcall
                   :pcall-queue
                   :salza2
+                  :shasht
                   :split-sequence
                   :trivial-garbage
                   :uiop
@@ -35,10 +34,10 @@
     :components ((:module src :serial t
                   :components (
                                (:file "package")
-                               ;;(:file "bench")
                                (:file "ctcl")
                                (:file "utils")
                                (:file "version" :depends-on ("package"))
+                               (:file "bench")
                                (:file "database" :depends-on ("package"))
                                (:file "db-manardb" :depends-on ("package" "database"))
                                (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))

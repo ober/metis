@@ -63,6 +63,7 @@
 
 #+allegro
 (let ((lfiles '("package.lisp"
+                "bench.lisp"
                 "utils.lisp"
                 "ctcl.lisp"
                 "database.lisp"
@@ -73,6 +74,7 @@
   (cl-user::generate-executable
    "../dist/allegro/metis"
    '("package.fasl"
+     "bench.fasl"
      "utils.fasl"
      "database.fasl"
      "db-manardb.fasl"

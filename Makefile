@@ -11,7 +11,7 @@ lispworks:
 
 sbcl:
 	@ mkdir -p dist/sbcl
-	@ cat src/deliver.lisp|sbcl --control-stack-size 2048 --dynamic-space-size 8096  2>&1 > /dev/null #--control-stack-size 2048  #--disable-debugger
+	@ cat src/deliver.lisp|sbcl --control-stack-size 2048 --dynamic-space-size 18096  2>&1 > /dev/null #--control-stack-size 2048  #--disable-debugger
 
 ccl:
 	@ mkdir -p dist/ccl || true
