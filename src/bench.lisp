@@ -9,7 +9,7 @@
   (init-manardb-bench)
   (manardb:use-mmap-dir "~/ct-manardb/")
   (defvar *benching* t)
-  (cloudtrail-report-async "3" "~/testct/"))
+  (cloudtrail-report-sync "~/testct/"))
 
 (defun run-bench ()
   (princ "XXX: Running Test")
