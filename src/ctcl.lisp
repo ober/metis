@@ -1,8 +1,5 @@
 (in-package :metis)
 
-(defvar zs3::*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
-;;(defvar cl-user:*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
-
 (defvar *db-backend* (or (uiop:getenv "METISDB") :manardb))
 
 (defvar *mytasks* (list))
@@ -79,18 +76,6 @@
       (walk-ct cloudtrail-reports
                #'async-ct-file))
     (mapc #'pcall:join *mytasks*)))
-
-(defun sync-from-s3 (bucket)
-  ;;(setf zs3::*credentials* (zs3:file-credentials "~/.aws/s3.conf"))
-  (setf *credentials* (file-credentials "~/.aws/s3.conf"))
-  (let
-      ((exists (bucket-exists-p bucket)))
-    (format t "bucket:~A exists:~A~%" bucket exists)
-    (mapc #'(lambda (x)
-              (format t "~A~%"
-                      (get-filename-hash
-                       (slot-value x 'zs3:name))))
-          (coerce (all-keys bucket) 'list))))
 
 (defun hash-keys (hash-table)
   (loop for key being the hash-keys of hash-table collect key))
