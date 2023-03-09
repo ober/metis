@@ -1,4 +1,3 @@
-
 (defun lmdb/init ()
   )
 
@@ -16,11 +15,10 @@
 
 
 (defun lmdb/normalize-insert (db file)
-  (lmdb/put db file "1"))
+)
 
 (defun lmdb/get-or-insert-id (table value)
-
-  )
+)
 
 (defun lmdb/db-do-query (query)
 

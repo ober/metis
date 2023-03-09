@@ -42,72 +42,44 @@
                    "vpcEndpointId"
                    ))
 
+;; primary db functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun db-init ()
   (cond
-    ((equal :postgres *db-backend*) (psql/init))
     ((equal :manardb *db-backend*) (manardb/init))
-    ((equal :lmdb *db-backend*) (lmdb/init))
+    ((equal :ssdb *db-backend*) (ssdb/init))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-close ()
   (cond
-    ((equal :postgres *db-backend*) (format t "fixme"))
     ((equal :manardb *db-backend*) (manardb:close-all-mmaps))
-    ((equal :lmdb *db-backend*) (format t "fixme"))
+    ((equal :ssdb *db-backend*) (format t "fixme"))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-have-we-seen-this-file (file)
   (cond
-    ((equal :postgres *db-backend*) (psql/have-we-seen-this-file file))
     ((equal :manardb *db-backend*) (manardb/have-we-seen-this-file file))
-    ((equal :lmdb *db-backend*) (lmdb/have-we-seen-this-file file))
+    ((equal :ssdb *db-backend*) (ssdb/have-we-seen-this-file file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-mark-file-processed (file)
   (cond
-    ((equal :postgres *db-backend*) (psql/mark-file-processed file))
     ((equal :manardb *db-backend*) (manardb/mark-file-processed file))
-    ((equal :lmdb *db-backend*) (lmdb/mark-file-processed file))
-    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
-
-(defun db-recreate-tables (db)
-  (cond
-    ((equal :postgres *db-backend*) (psql/recreate-tables))
-    ((equal :manardb *db-backend*) (manardb/recreate-tables))
-    ((equal :lmdb *db-backend*) (lmdb/recreate-tables))
+    ((equal :ssdb *db-backend*) (ssdb/mark-file-processed file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun normalize-insert (record)
   (if record
       (handler-case
           (cond
-            ((equal :postgres *db-backend*) (psql/normalize-insert record))
             ((equal :manardb *db-backend*) (manardb/normalize-insert record))
-            ((equal :lmdb *db-backend*) (lmdb/normalize-insert record))
+            ((equal :ssdb *db-backend*) (ssdb/normalize-insert record))
             (t (format t "unknown *db-backend*:~A~%" *db-backend*)))
         (t (e) (error-print "normalize-insert" e)))
       (format t "normalize-insert record empty")))
 
-(defun db-get-or-insert-id (table value)
-  (cond
-    ((equal :postgres *db-backend*) (psql/get-or-insert-id table value))
-    ((equal :manardb *db-backend*) (manardb/get-or-insert-id table value))
-    ((equal :lmdb *db-backend*) (lmdb/get-or-insert-id table value))
-    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
-
-(defun db-do-query (query)
-  (cond
-    ((equal :postgres *db-backend*)(psql/do-query query))
-    ((equal :manardb *db-backend*)(manardb/do-query query))
-    ((equal :lmdb *db-backend*)(lmdb/do-query query))
-    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
-
-(defun db-drop-table (query)
-  (cond
-    ((equal :postgres *db-backend*) (psql/drop-table query))
-    ((equal :manardb *db-backend*) (manardb/drop-table query))
-    ((equal :lmdb *db-backend*) (lmdb/drop-table query))
-    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun make-safe-string (str)
   (if (stringp str)
