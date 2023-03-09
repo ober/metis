@@ -44,7 +44,6 @@
 
 (defun db-init ()
   (cond
-    ((equal :sqlite *db-backend*) (sqlite/init))
     ((equal :postgres *db-backend*) (psql/init))
     ((equal :manardb *db-backend*) (manardb/init))
     ((equal :lmdb *db-backend*) (lmdb/init))
@@ -52,7 +51,6 @@
 
 (defun db-close ()
   (cond
-    ((equal :sqlite *db-backend*) (format t "fixme"))
     ((equal :postgres *db-backend*) (format t "fixme"))
     ((equal :manardb *db-backend*) (manardb:close-all-mmaps))
     ((equal :lmdb *db-backend*) (format t "fixme"))
@@ -60,7 +58,6 @@
 
 (defun db-have-we-seen-this-file (file)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite/have-we-seen-this-file file))
     ((equal :postgres *db-backend*) (psql/have-we-seen-this-file file))
     ((equal :manardb *db-backend*) (manardb/have-we-seen-this-file file))
     ((equal :lmdb *db-backend*) (lmdb/have-we-seen-this-file file))
@@ -68,7 +65,6 @@
 
 (defun db-mark-file-processed (file)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite/mark-file-processed file))
     ((equal :postgres *db-backend*) (psql/mark-file-processed file))
     ((equal :manardb *db-backend*) (manardb/mark-file-processed file))
     ((equal :lmdb *db-backend*) (lmdb/mark-file-processed file))
@@ -76,7 +72,6 @@
 
 (defun db-recreate-tables (db)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite/recreate-tables))
     ((equal :postgres *db-backend*) (psql/recreate-tables))
     ((equal :manardb *db-backend*) (manardb/recreate-tables))
     ((equal :lmdb *db-backend*) (lmdb/recreate-tables))
@@ -86,7 +81,6 @@
   (if record
       (handler-case
           (cond
-            ((equal :sqlite *db-backend*) (sqlite/normalize-insert record))
             ((equal :postgres *db-backend*) (psql/normalize-insert record))
             ((equal :manardb *db-backend*) (manardb/normalize-insert record))
             ((equal :lmdb *db-backend*) (lmdb/normalize-insert record))
@@ -96,7 +90,6 @@
 
 (defun db-get-or-insert-id (table value)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite/get-or-insert-id table value))
     ((equal :postgres *db-backend*) (psql/get-or-insert-id table value))
     ((equal :manardb *db-backend*) (manardb/get-or-insert-id table value))
     ((equal :lmdb *db-backend*) (lmdb/get-or-insert-id table value))
@@ -104,7 +97,6 @@
 
 (defun db-do-query (query)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite/do-query query))
     ((equal :postgres *db-backend*)(psql/do-query query))
     ((equal :manardb *db-backend*)(manardb/do-query query))
     ((equal :lmdb *db-backend*)(lmdb/do-query query))
@@ -112,7 +104,6 @@
 
 (defun db-drop-table (query)
   (cond
-    ((equal :sqlite *db-backend*) (sqlite/drop-table query))
     ((equal :postgres *db-backend*) (psql/drop-table query))
     ((equal :manardb *db-backend*) (manardb/drop-table query))
     ((equal :lmdb *db-backend*) (lmdb/drop-table query))
@@ -123,9 +114,7 @@
       (replace-all str "'" "")
       str))
 
-(defun process-record (record fields) ;; shasht
-  ;;  (for:for ((a in fields))
-  ;;           (format t "item: ~a in key:~a is ~a~%" a (hash-keys record) (type-of (gethash (format nil "~a" a) record))))
+(defun process-record (record fields)
   (setf (gethash "userName" record) (get-user record))
   (loop for f in fields
         collect (format nil "~a" (gethash f record))))
