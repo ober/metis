@@ -3,12 +3,12 @@
 (defun string-to-keyword (string)
   (intern (string-upcase string) :keyword))
 
-(let ((be (uiop:getenv "metisdb")))
-  (if be
-    (setf *backend* (string-to-keyword be))
-    (setf *backend* :manardb)))
+(defvar *db-backend* :manardb)
 
-;;(defvar *db-backend* (or (string-to-keyword (uiop:getenv "metisdb")) :manardb))
+;; (let ((be (uiop:getenv "metisdb")))
+;;   (when be
+;;     (setf *backend* (string-to-keyword be))
+;;     (setf *backend* :manardb)))
 
 (defvar *mytasks* (list))
 
