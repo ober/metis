@@ -8,6 +8,7 @@
 (ql:quickload '(:cl-date-time-parser
                 :cl-fad
                 :cl-json
+                :cl-ssdb
                 :fare-memoization
                 :gzip-stream
                 :jonathan
@@ -16,7 +17,6 @@
                 :manardb
                 :pcall
                 :salza2
-                :zs3
                 :uiop
                 :usocket))
 

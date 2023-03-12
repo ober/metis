@@ -17,6 +17,7 @@
                  :cl-date-time-parser
                  :cl-fad
                  :cl-json
+                 :cl-ssdb
                  :closer-mop
                  :fare-memoization
                  :for
@@ -28,7 +29,6 @@
                  :salza2
                  :shasht
                  :split-sequence
-                 :cl-ssdb
                  :trivial-garbage
                  :uiop
                  :usocket
@@ -37,8 +37,8 @@
     :components ((:module src :serial t
                   :components (
                                (:file "package")
-                               (:file "ctcl")
                                (:file "utils")
+                               (:file "ctcl")
                                (:file "version" :depends-on ("package"))
                                (:file "bench")
                                (:file "database" :depends-on ("package"))

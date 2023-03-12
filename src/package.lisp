@@ -3,6 +3,7 @@
             (ql:quickload '(:cl-date-time-parser
                             :cl-base64
                             :cl-fad
+                            :cl-ssdb
                             :fare-memoization
                             :for
                             :gzip-stream

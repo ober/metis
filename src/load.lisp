@@ -1,7 +1,7 @@
-;;#-cmucl (load "~/quicklisp/setup.lisp")
 (ql:quickload '(
 		:cl-fad
 		:cl-json
+		:cl-ssdb
 		:fare-memoization
 		:gzip-stream
 		:manardb
@@ -12,7 +12,7 @@
 (load (compile-file "pkgdcl.lisp"))
 (princ "database")
 (load (compile-file "database.lisp"))
-;;(load (compile-file "db-manardb.lisp"))
+(load (compile-file "db-manardb.lisp"))
 (load (compile-file "db-ssdb.lisp"))
 (princ "bench")
 (load (compile-file "bench.lisp"))
