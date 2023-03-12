@@ -1,6 +1,6 @@
 (in-package :metis)
 
-(defvar *db-backend* (or (uiop:getenv "METISDB") :ssdb)) ;;manardb))
+(defvar *db-backend* (or (string-to-keyword (uiop:getenv "METISDB")) :ssdb))
 
 (defvar *mytasks* (list))
 

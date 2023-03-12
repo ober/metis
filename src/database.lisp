@@ -54,7 +54,7 @@
 (defun db-close ()
   (cond
     ((equal :manardb *db-backend*) (manardb:close-all-mmaps))
-    ((equal :ssdb *db-backend*) (format t "fixme"))
+    ((equal :ssdb *db-backend*) (ssdb/close))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-have-we-seen-this-file (file)

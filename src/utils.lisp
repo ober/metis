@@ -61,3 +61,6 @@ is replaced with replacement."
   (make-hash-table :shared :lock-free :test 'equalp)
   #+(or allegro lispworks)
   (make-hash-table :test 'equalp))
+
+(defun string-to-keyword (str)
+  (intern (concatenate 'string ":" str) :keyword))
