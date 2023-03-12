@@ -42,7 +42,7 @@
                                (:file "version" :depends-on ("package"))
                                (:file "bench")
                                (:file "database" :depends-on ("package"))
-                               ;;(:file "db-manardb" :depends-on ("package" "database"))
+                               (:file "db-manardb" :depends-on ("package" "database"))
                                (:file "db-ssdb" :depends-on ("package" "database"))
                                (:file "flows" :depends-on ("package" "ctcl" "utils" "database"))
                                (:file "main" :depends-on ("package" "ctcl" "utils" "database" "flows"))

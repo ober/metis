@@ -67,7 +67,7 @@
                 "utils.lisp"
                 "ctcl.lisp"
                 "database.lisp"
-                ;;"db-manardb.lisp"
+                "db-manardb.lisp"
                 "db-ssdb.lisp"
                 "main.lisp"
                 "flows.lisp")))
@@ -78,7 +78,7 @@
      "bench.fasl"
      "utils.fasl"
      "database.fasl"
-     ;;"db-manardb.fasl"
+     "db-manardb.fasl"
      "db-ssdb.fasl"
      "ctcl.fasl"
      "main.fasl"

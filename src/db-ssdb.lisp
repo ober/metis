@@ -10,10 +10,10 @@
   (ssdb:disconnect))
 
 (defun ssdb/have-we-seen-this-file (file)
-  (ssdb:exists file))
+  (ssdb:exists (format nil "F-~a" file)))
 
 (defun ssdb/mark-file-processed (file)
-  (ssdb:set (format nil "~a" file) "1"))
+  (ssdb:set (format nil "F-~a" file) "1"))
 
 (defun ssdb/normalize-insert (record)
   (destructuring-bind (
