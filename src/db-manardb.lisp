@@ -262,7 +262,7 @@
        (time (allocate-klass-hash x)))
    ct-fields))
 
-(defun get-stats ()
+(defun manardb/get-stats ()
   (format t "Totals ct:~A files:~A flows:~A vpc-files:~A ec:~A srcaddr:~A dstaddr:~A srcport:~A dstport:~A protocol:~A~%"
           (manardb:count-all-instances 'metis::ct)
           (manardb:count-all-instances 'metis::files)

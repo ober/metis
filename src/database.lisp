@@ -51,6 +51,12 @@
     ((equal :ssdb *db-backend*) (ssdb/init))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
+(defun db-get-stats ()
+  (cond
+    ((equal :manardb *db-backend*) (manardb/get-stats))
+    ((equal :ssdb *db-backend*) (ssdb/get-stats))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
 (defun db-close ()
   (cond
     ((equal :manardb *db-backend*) (manardb:close-all-mmaps))

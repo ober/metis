@@ -106,7 +106,7 @@
       ((equal "sn" verb) (ct-get-by-name (cadr rest)))
       ((equal "sr" verb) (ct-get-by-region (cadr rest)))
       ((equal "sp" verb) (find-by-srcport (cadr rest)))
-      ((equal "st" verb) (get-stats))
+      ((equal "st" verb) (db-get-stats))
       ((equal "va" verb) (vpc-flows-report-async (cadr rest) rest))
       ((equal "vda" verb) (vpc-search-by-dstaddr (cadr rest)))
       ((equal "vdp" verb) (vpc-search-by-dstport (cadr rest)))
@@ -121,7 +121,7 @@
 (defun main (&optional argz)
   (let ((args (or argz (argv))))
     #+allegro (setf excl:*tenured-bytes-limit* 5242880000)
-    ;;(db-init)
+    (db-init)
     #+sbcl
     (handler-case (process-args (list "metis" args))
       (sb-sys:interactive-interrupt ()
