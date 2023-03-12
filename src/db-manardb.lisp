@@ -352,7 +352,7 @@
   "Return unique list of events"
   (get-unique-values 'metis::responseElements))
 
-(defun get-name-list ()
+(defun manardb/get-name-list ()
   "Return unique list of events"
   (get-unique-values 'metis::username))
 

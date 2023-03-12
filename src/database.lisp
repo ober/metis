@@ -75,6 +75,18 @@
     ((equal :ssdb *db-backend*) (ssdb/mark-file-processed file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
+(defun db-get-unique-names ()
+    (cond
+        ((equal :manardb *db-backend*) (manardb/get-unique-names))
+        ((equal :ssdb *db-backend*) (ssdb/get-unique-names))
+        (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
+(defun db-get-unique-events ()
+    (cond
+        ((equal :manardb *db-backend*) (manardb/get-unique-events))
+        ((equal :ssdb *db-backend*) (ssdb/get-unique-events))
+        (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
 (defun normalize-insert (record)
   (if record
       (handler-case

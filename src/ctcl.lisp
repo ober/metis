@@ -3,7 +3,7 @@
 (defun string-to-keyword (string)
   (intern (string-upcase string) :keyword))
 
-(defvar *db-backend* :manardb)
+(defvar *db-backend* :ssdb)
 
 ;; (let ((be (uiop:getenv "metisdb")))
 ;;   (when be

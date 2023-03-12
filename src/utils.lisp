@@ -61,3 +61,6 @@ is replaced with replacement."
   (make-hash-table :shared :lock-free :test 'equalp)
   #+(or allegro lispworks)
   (make-hash-table :test 'equalp))
+
+(defun sort-uniq (list)
+  (remove-duplicates (sort list #'string<=) :test #'equalp))
