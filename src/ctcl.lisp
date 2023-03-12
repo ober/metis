@@ -1,6 +1,6 @@
 (in-package :metis)
 
-(defvar *db-backend* (or (uiop:getenv "METISDB") :manardb))
+(defvar *db-backend* (or (uiop:getenv "METISDB") :ssdb)) ;;manardb))
 
 (defvar *mytasks* (list))
 
@@ -76,6 +76,3 @@
       (walk-ct cloudtrail-reports
                #'async-ct-file))
     (mapc #'pcall:join *mytasks*)))
-
-(defun hash-keys (hash-table)
-  (loop for key being the hash-keys of hash-table collect key))

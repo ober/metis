@@ -120,8 +120,8 @@
 
 (defun main (&optional argz)
   (let ((args (or argz (argv))))
-#+allegro (setf excl:*tenured-bytes-limit* 5242880000)
-    (db-init)
+    #+allegro (setf excl:*tenured-bytes-limit* 5242880000)
+    ;;(db-init)
     #+sbcl
     (handler-case (process-args (list "metis" args))
       (sb-sys:interactive-interrupt ()

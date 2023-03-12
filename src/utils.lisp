@@ -61,6 +61,3 @@ is replaced with replacement."
   (make-hash-table :shared :lock-free :test 'equalp)
   #+(or allegro lispworks)
   (make-hash-table :test 'equalp))
-
-(defun hash-keys (hash-table)
-  (loop for key being the hash-keys of hash-table collect key))
