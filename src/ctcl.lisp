@@ -61,6 +61,7 @@
                 (format t "~%rps:~A rows:~A delta:~A" rps num delta))
             )))
     (t (e) (error-print "parse-ct-contents" e)))
+
   ;;#+sbcl (room) ;; (trivial-garbage:gc)
   )
 

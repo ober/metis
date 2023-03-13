@@ -113,7 +113,6 @@
       ((equal "vs" verb) (vpc-flows-report-sync (cadr rest)))
       ((equal "vsa" verb) (vpc-search-by-srcaddr (cadr rest)))
       ((equal "vsp" verb) (vpc-search-by-srcport (cadr rest)))
-      ((equal "ls" verb) (sync-from-s3 (cadr rest)))
       ((equal "ctf" verb) (get-ct-files))
       (t (progn
            (usage))))))

@@ -87,12 +87,6 @@
         ((equal :ssdb *db-backend*) (ssdb/get-unique-events))
         (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
-(defun db-flush-db ()
-    (cond
-      ((equal :manardb *db-backend*) (manardb/flush-db))
-      ((equal :ssdb *db-backend*) (ssdb/flush-db))
-      (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
-
 (defun normalize-insert (record)
   (if record
       (handler-case
