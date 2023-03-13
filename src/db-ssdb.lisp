@@ -160,5 +160,5 @@
 (defun ssdb/get-unique (field)
   (format t "~{~a~%~}"
           (sort-uniq
-           (loop for key in (ssdb:hlist "" "" -1)
+           (loop for key in (ssdb:hlist "" "" 10000)
                  collect (ssdb:hget key field)))))
