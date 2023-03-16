@@ -94,7 +94,7 @@
 
 (defun ssdb/get-by-index (key)
   "Get all records from index of key"
-  (let ((hits (time (ssdb:qrange key 0 -1))))
+  (let ((hits (flatten (ssdb:qrange key 0 -1))))
     (mapcar
      (lambda (hit)
        (format t "~a~%" (ssdb:multi_hget hit "eventTime" "eventName" "userName" "errorCode")))
