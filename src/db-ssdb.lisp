@@ -94,7 +94,7 @@
 
 (defun ssdb/get-by-index (key)
   "Get all records from index of key"
-  (let ((hits (flatten (ssdb:qrange key 0 -1))))
+  (let ((hits (sort-uniq (ssdb:qrange key 0 -1))))
     (mapcar
      (lambda (hit)
        (ssdb/fetch-print-hash hit)
