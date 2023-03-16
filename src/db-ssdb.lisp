@@ -92,19 +92,19 @@
 (defun ssdb/get-unique-events ()
   (ssdb/get-unique "eventName"))
 
-(defun ssdb/get-unique (field)
-  (let* ((records (time (ssdb:hlist "" "" -1)))
-         (items (time (mapcar (lambda (record)
-                          (ssdb:hget record field))
-                        records)))
-         (uniqs (time (sort-uniq items))))
-    (format t "~{~a~%~}" uniqs)))
+(defun ssdb/get-by-index (key)
+  "Get all records from index of key"
+  (let ((hits (time (ssdb:qrange key 0 -1))))
+    (mapcar
+     (lambda (hit)
+       (format t "~a~%" (ssdb:multi_hget hit "eventTime" "eventName" "userName" "errorCode")))
+     hits)))
 
 (defun ssdb/index (field)
   (let* ((records (time (ssdb:hlist "" "" -1))))
     (mapcar
      (lambda (record)
-       (format t "index: ~a:~a~%" record field)
-       (ssdb:hget record field)
-       (ssdb:qpush field record))
+       (let ((value (ssdb:hget record field)))
+         (format t "index: ~a:~a~%" record value)
+         (ssdb:qpush value record)))
      records)))

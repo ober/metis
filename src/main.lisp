@@ -104,7 +104,7 @@
       ((equal "sev" verb) (ct-get-by-eventName (cadr rest)))
       ((equal "sin" verb) (get-useridentity-by-name (cadr rest)))
       ((equal "sip" verb) (ct-get-by-sourceipaddress (cadr rest)))
-      ((equal "sn" verb) (ct-get-by-name (cadr rest)))
+      ((equal "sn" verb) (db-get-by-name (cadr rest)))
       ((equal "sp" verb) (find-by-srcport (cadr rest)))
       ((equal "sr" verb) (ct-get-by-region (cadr rest)))
       ((equal "st" verb) (db-get-stats))

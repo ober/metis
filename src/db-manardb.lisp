@@ -447,7 +447,7 @@
 (defun ct-get-all-errors ()
   (ct-get-by-klass-value 'metis::errorCode nil t))
 
-(defun ct-get-by-name (name)
+(defun manardb/ct-get-by-name (name)
   (ct-get-by-klass-value 'metis::userName name))
 
 (defun ct-get-by-region (region)
