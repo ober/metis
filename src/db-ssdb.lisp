@@ -97,14 +97,16 @@
   (let ((hits (flatten (ssdb:qrange key 0 -1))))
     (mapcar
      (lambda (hit)
-       (format t "~a~%" (ssdb:multi_hget hit "eventTime" "eventName" "userName" "errorCode")))
+       (ssdb/fetch-print-hash hit)
      hits)))
+
+(defun ssdb/fetch-print-hash (hit)
+  (format t "~a~%" (ssdb:multi_hget hit "eventTime" "eventName" "userName" "errorCode")))
 
 (defun ssdb/index (field)
   (let* ((records (time (ssdb:hlist "" "" -1))))
     (mapcar
      (lambda (record)
        (let ((value (ssdb:hget record field)))
-         (format t "index: ~a:~a~%" record value)
          (ssdb:qpush value record)))
      records)))
