@@ -51,6 +51,12 @@
     ((equal :ssdb *db-backend*) (ssdb/init))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
+(defun db-index (field)
+  (cond
+    ((equal :manardb *db-backend*) (manardb/index field))
+    ((equal :ssdb *db-backend*) (ssdb/index field))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
 (defun db-get-stats ()
   (cond
     ((equal :manardb *db-backend*) (manardb/get-stats))

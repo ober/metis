@@ -99,3 +99,12 @@
                         records)))
          (uniqs (time (sort-uniq items))))
     (format t "~{~a~%~}" uniqs)))
+
+(defun ssdb/index (field)
+  (let* ((records (time (ssdb:hlist "" "" -1))))
+    (mapcar
+     (lambda (record)
+       (format t "index: ~a:~a~%" record field)
+       (ssdb:hget record field)
+       (ssdb:qpush field record))
+     records)))
