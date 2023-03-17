@@ -46,34 +46,34 @@
                        vpcEndpointId
                        )
       record
-    (ssdb:multi_hset eventID
-                     "additionalEventData" additionalEventData
-                     "apiVersion" apiVersion
-                     "awsRegion" awsRegion
-                     "errorCode" errorCode
-                     "errorMessage" errorMessage
-                     "eventCategory" eventCategory
-                     "eventName" eventName
-                     "eventSource" eventSource
-                     "eventTime" eventTime
-                     "eventType" eventType
-                     "eventVersion" eventVersion
-                     "managementEvent" managementEvent
-                     "readOnly" readOnly
-                     "recipientAccountId" recipientAccountId
-                     "requestID" requestID
-                     "requestParameters" requestParameters
-                     "resources" resources
-                     "responseElements" responseElements
-                     "serviceEventDetails" serviceEventDetails
-                     "sessionCredentialFromConsole" sessionCredentialFromConsole
-                     "sharedEventID" sharedEventID
-                     "sourceIPAddress" sourceIPAddress
-                     "tlsDetails" tlsDetails
-                     "userAgent" userAgent
-                     "userIdentity" userIdentity
-                     "userName" userName
-                     "vpcEndpointId" vpcEndpointId)))
+    (ssdb:multi_hset (format nil "~a:~a" userName eventTime)
+                     "aed" additionalEventData
+                     "av" apiVersion
+                     "ar" awsRegion
+                     "ec" errorCode
+                     "em" errorMessage
+                     "eca" eventCategory
+                     "en" eventName
+                     "es" eventSource
+                     "eti" eventTime
+                     "typ" eventType
+                     "ev" eventVersion
+                     "me" managementEvent
+                     "ro" readOnly
+                     "rai" recipientAccountId
+                     "rqi" requestID
+                     "rp" requestParameters
+                     "res" resources
+                     "re" responseElements
+                     "sed" serviceEventDetails
+                     "scf" sessionCredentialFromConsole
+                     "sei" sharedEventID
+                     "sia" sourceIPAddress
+                     "td" tlsDetails
+                     "ua" userAgent
+                     "ui" userIdentity
+                     "un" userName
+                     "vpc" vpcEndpointId)))
 
 ;; ported kunabi style ops
 
