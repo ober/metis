@@ -46,16 +46,16 @@
                        vpcEndpointId
                        )
       record
-    (ssdb:multi_hset (format nil "~a:~a:~a" userName eventName eventTime)
+    (ssdb:multi_hset (format nil "~a|~a|~a" userName eventName eventTime)
                      "aed" additionalEventData
                      "av" apiVersion
                      "ar" awsRegion
                      "ec" errorCode
                      "em" errorMessage
                      "eca" eventCategory
-                     "en" eventName
+                     ;;"en" eventName
                      "es" eventSource
-                     "eti" eventTime
+                     ;;"eti" eventTime
                      "typ" eventType
                      "ev" eventVersion
                      "me" managementEvent
@@ -72,7 +72,7 @@
                      "td" tlsDetails
                      "ua" userAgent
                      "ui" userIdentity
-                     "un" userName
+                     ;;"un" userName
                      "vpc" vpcEndpointId)))
 
 ;; ported kunabi style ops
