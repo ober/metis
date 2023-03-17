@@ -46,7 +46,7 @@
                        vpcEndpointId
                        )
       record
-    (ssdb:multi_hset (format nil "~a:~a" userName eventTime)
+    (ssdb:multi_hset (format nil "~a:~a:~a" userName eventName eventTime)
                      "aed" additionalEventData
                      "av" apiVersion
                      "ar" awsRegion
