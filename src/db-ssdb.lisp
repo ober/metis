@@ -111,13 +111,21 @@
 (defun ssdb/fetch-print-hash (hit)
   (format t "~a~%" (ssdb:multi_hget hit "et" "en" "un" "ec")))
 
+(defun add-item-to-list (item list)
+    (if (member item list)
+        list
+        (cons item list)))
+
 (defun ssdb/index (field)
-  (let* ((records (time (ssdb:hlist "" "" -1))))
+  (let ((records (time (ssdb:hlist "" "" -1)))
+        (seen '()))
     (format t "records: ~a~%" (length records))
     (mapcar
      (lambda (record)
        (let ((value (ssdb:hget record field)))
-         (ssdb:qpush field value)
+         (if (member value seen)
+                (format t "seen: ~a~%" value)
+                (ssdb:qpush field value))
          (ssdb:qpush value record)))
      records)))
 
