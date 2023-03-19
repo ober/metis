@@ -108,6 +108,7 @@
      (lambda (record)
        (let ((value (ssdb:hget record field)))
          (ssdb:qpush field value)
+         (format t "qpush ~a ~a~%" field value)
          (ssdb:qpush value record)))
      records)))
 
