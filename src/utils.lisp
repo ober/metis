@@ -64,3 +64,7 @@ is replaced with replacement."
 
 (defun sort-uniq (list)
   (remove-duplicates (sort list #'string<=) :test #'equalp))
+
+(defun rfc3339-to-epoch (datetime)
+  (local-time:timestamp-to-unix
+   (local-time:parse-timestring datetime)))

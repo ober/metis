@@ -5,11 +5,6 @@
 
 (defvar *db-backend* :ssdb)
 
-;; (let ((be (uiop:getenv "metisdb")))
-;;   (when be
-;;     (setf *backend* (string-to-keyword be))
-;;     (setf *backend* :manardb)))
-
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
