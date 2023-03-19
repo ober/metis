@@ -46,16 +46,16 @@
                        vpcEndpointId
                        )
       record
-    (ssdb:multi_hset (format nil "~a|~a|~a" userName eventName eventTime)
+    (ssdb:multi_hset eventID
                      "aed" additionalEventData
                      "av" apiVersion
                      "ar" awsRegion
                      "ec" errorCode
                      "em" errorMessage
                      "eca" eventCategory
-                     ;;"en" eventName
+                     "en" eventName
                      "es" eventSource
-                     ;;"eti" eventTime
+                     "eti" eventTime
                      "typ" eventType
                      "ev" eventVersion
                      "me" managementEvent
@@ -72,7 +72,7 @@
                      "td" tlsDetails
                      "ua" userAgent
                      "ui" userIdentity
-                     ;;"un" userName
+                     "un" userName
                      "vpc" vpcEndpointId)))
 
 ;; ported kunabi style ops
@@ -92,14 +92,6 @@
 (defun ssdb/get-unique-events ()
   (ssdb/get-unique "eventName"))
 
-(defun ssdb/get-by-index (key)
-  "Get all records from index of key"
-  (let ((hits (sort-uniq (ssdb:qrange key 0 -1))))
-    (mapcar
-     (lambda (hit)
-       (ssdb/fetch-print-hash hit))
-     hits)))
-
 (defun ssdb/fetch-print-hash (hit)
   (format t "~a~%" (ssdb:multi_hget hit "eventTime" "eventName" "userName" "errorCode")))
 
@@ -110,3 +102,11 @@
        (let ((value (ssdb:hget record field)))
          (ssdb:qpush value record)))
      records)))
+
+(defun ssdb/get-by-index (key)
+  "Get all records from index of key"
+  (let ((hits (sort-uniq (ssdb:qrange key 0 -1))))
+    (mapcar
+     (lambda (hit)
+       (ssdb/fetch-print-hash hit))
+     hits)))
