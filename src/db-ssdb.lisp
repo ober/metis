@@ -46,7 +46,7 @@
                        vpcEndpointId
                        )
       record
-    (ssdb:multi_hset eventID
+    (ssdb:multi_hset (format nil "~a:~a" (rfc3339-to-epoch eventTime) eventID)
                      "aed" additionalEventData
                      "av" apiVersion
                      "ar" awsRegion
@@ -118,12 +118,8 @@
     (mapcar
      (lambda (record)
        (let ((value (ssdb:hget record field)))
-         (if (member value seen)
-             (format t "seen: ~a~%" value)
-             (progn
-               (setf seen (cons value seen))
-               (ssdb:qpush field value)))
-             (ssdb:qpush value record)))
+         (ssdb:qpush field value)
+         (ssdb:qpush value record)))
      records)))
 
 (defun ssdb/get-by-index (key)
