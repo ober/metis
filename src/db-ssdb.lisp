@@ -112,9 +112,9 @@
   (format t "~a~%" (ssdb:multi_hget hit "et" "en" "un" "ec")))
 
 (defun add-item-to-list (item list)
-    (if (member item list)
-        list
-        (cons item list)))
+  (if (member item list)
+      list
+      (cons item list)))
 
 (defun ssdb/index (field)
   (let ((records (time (ssdb:hlist "" "" -1)))
@@ -124,11 +124,11 @@
      (lambda (record)
        (let ((value (ssdb:hget record field)))
          (if (member value seen)
-                (format t "seen: ~a~%" value)
-                (progn
-                  (setf seen (add-item-to-list value seen))
-                  (ssdb:qpush field value))
-                (ssdb:qpush value record))))
+             (format t "seen: ~a~%" value)
+             (progn
+               (setf seen (add-item-to-list value seen))
+               (ssdb:qpush field value)))
+             (ssdb:qpush value record)))
      records)))
 
 (defun ssdb/get-by-index (key)
@@ -150,4 +150,4 @@
          (format t "q:~a size:~a uniq:~a~%" q (length items) (length uniqs))
          (ssdb:qclear q)
          (ssdb:qpush q uniqs)))
-       queues)))
+     queues)))
