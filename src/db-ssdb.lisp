@@ -111,11 +111,6 @@
 (defun ssdb/fetch-print-hash (hit)
   (format t "~a~%" (ssdb:multi_hget hit "et" "en" "un" "ec")))
 
-(defun add-item-to-list (item list)
-  (if (member item list)
-      list
-      (cons item list)))
-
 (defun ssdb/index (field)
   (let ((records (time (ssdb:hlist "" "" -1)))
         (seen '()))
@@ -126,7 +121,7 @@
          (if (member value seen)
              (format t "seen: ~a~%" value)
              (progn
-               (setf seen (add-item-to-list value seen))
+               (setf seen (cons value seen))
                (ssdb:qpush field value)))
              (ssdb:qpush value record)))
      records)))
