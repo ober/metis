@@ -106,10 +106,10 @@
   (let* ((records (time (ssdb:hlist "" "" -1))))
     (mapcar
      (lambda (record)
-       (let ((value (ssdb:hget record field)))
-         (ssdb:qpush field value)
+       (let ((value (time (ssdb:hget record field))))
+         (time (ssdb:qpush field value))
          (format t "qpush ~a ~a~%" field value)
-         (ssdb:qpush value record)))
+         (time (ssdb:qpush value record))))
      records)))
 
 (defun ssdb/get-by-index (key)
