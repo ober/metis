@@ -63,7 +63,7 @@
                      "rai" recipientAccountId
                      "rqi" requestID
                      "rp" requestParameters
-                     "res" resources
+                     ;;"res" resources
                      "re" responseElements
                      "sed" serviceEventDetails
                      "scf" sessionCredentialFromConsole
@@ -71,7 +71,7 @@
                      "sia" sourceIPAddress
                      "td" tlsDetails
                      "ua" userAgent
-                     "ui" userIdentity
+                     ;;"ui" userIdentity
                      "un" userName
                      "vpc" vpcEndpointId)))
 
@@ -85,6 +85,15 @@
 
 (defun ssdb/get-stats ()
   (format t "~a" (ssdb:info)))
+
+(defun ssdb/get-unique-region ()
+  (ssdb/get-unique "ar"))
+
+(defun ssdb/get-unique-ip ()
+  (ssdb/get-unique "sia"))
+
+(defun ssdb/get-unique-agent ()
+  (ssdb/get-unique "ua"))
 
 (defun ssdb/get-unique-names ()
   (ssdb/get-unique "un"))
@@ -100,7 +109,7 @@
      hits)))
 
 (defun ssdb/fetch-print-hash (hit)
-  (format t "~a~%" (ssdb:multi_hget hit "eventTime" "eventName" "userName" "errorCode")))
+  (format t "~a~%" (ssdb:multi_hget hit "et" "en" "un" "ec")))
 
 (defun ssdb/index (field)
   (let* ((records (time (ssdb:hlist "" "" -1))))
@@ -108,7 +117,6 @@
      (lambda (record)
        (let ((value (ssdb:hget record field)))
          (ssdb:qpush field value)
-         (format t "qpush ~a ~a ~a~%" field value record)
          (ssdb:qpush value record)))
      records)))
 
@@ -117,6 +125,5 @@
   (let ((hits (sort-uniq (ssdb:qrange key 0 -1))))
     (mapcar
      (lambda (hit)
-       (format t "hit: ~A~%" hit))
-       ;;       (ssdb/fetch-print-hash hit))
+       (ssdb/fetch-print-hash hit))
      hits)))
