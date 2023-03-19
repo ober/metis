@@ -117,5 +117,6 @@
   (let ((hits (sort-uniq (ssdb:qrange key 0 -1))))
     (mapcar
      (lambda (hit)
-       (ssdb/fetch-print-hash hit))
+       (format t "hit: ~A~%" hit))
+       ;;       (ssdb/fetch-print-hash hit))
      hits)))
