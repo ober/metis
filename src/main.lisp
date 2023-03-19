@@ -102,7 +102,7 @@
       ((equal "seca" verb) (ct-get-all-errors))
       ((equal "sem" verb) (ct-get-by-errormessage (cadr rest)))
       ((equal "ses" verb) (ct-get-by-event-source (cadr rest)))
-      ((equal "sev" verb) (ct-get-by-eventName (cadr rest)))
+      ((equal "sev" verb) (db-get-by-event (cadr rest)))
       ((equal "sin" verb) (get-useridentity-by-name (cadr rest)))
       ((equal "sip" verb) (ct-get-by-sourceipaddress (cadr rest)))
       ((equal "sn" verb) (db-get-by-name (cadr rest)))
