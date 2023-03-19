@@ -113,6 +113,7 @@
 
 (defun ssdb/index (field)
   (let* ((records (time (ssdb:hlist "" "" -1))))
+    (format t "records: ~a~%" (length records))
     (mapcar
      (lambda (record)
        (let ((value (ssdb:hget record field)))
@@ -127,3 +128,16 @@
      (lambda (hit)
        (ssdb/fetch-print-hash hit))
      hits)))
+
+(defun ssdb/uniq-queues ()
+  "For each queue, go fetch its contents uniq them and put them back"
+  (let ((queues (ssdb:qlist "" "" -1)))
+    (format t "queues: ~A~%" (length queues))
+    (mapcar
+     (lambda (q)
+       (let* ((items (ssdb:qrange q 0 -1))
+              (uniqs (sort-uniq items)))
+         (format t "q:~a size:~a uniq:~a~%" q (length items) (length uniqs))
+         (ssdb:qclear q)
+         (ssdb:qpush q uniqs)))
+       queues)))
