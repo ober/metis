@@ -87,10 +87,17 @@
   (format t "~a" (ssdb:info)))
 
 (defun ssdb/get-unique-names ()
-  (ssdb/get-unique "userName"))
+  (ssdb/get-unique "un"))
 
 (defun ssdb/get-unique-events ()
-  (ssdb/get-unique "eventName"))
+  (ssdb/get-unique "en"))
+
+(defun ssdb/get-unique (key)
+  (let ((hits (sort-uniq (ssdb:qrange key 0 -1))))
+    (mapcar
+     (lambda (hit)
+       (format t "~a~%" hit))
+     hits)))
 
 (defun ssdb/fetch-print-hash (hit)
   (format t "~a~%" (ssdb:multi_hget hit "eventTime" "eventName" "userName" "errorCode")))
@@ -100,6 +107,7 @@
     (mapcar
      (lambda (record)
        (let ((value (ssdb:hget record field)))
+         (ssdb:qpush field value)
          (ssdb:qpush value record)))
      records)))
 
