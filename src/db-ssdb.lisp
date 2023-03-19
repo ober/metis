@@ -55,7 +55,7 @@
                      "eca" eventCategory
                      "en" eventName
                      "es" eventSource
-                     "eti" eventTime
+                     "et" eventTime
                      "typ" eventType
                      "ev" eventVersion
                      "me" managementEvent
