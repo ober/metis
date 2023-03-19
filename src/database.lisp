@@ -88,6 +88,13 @@
     ((equal :ssdb *db-backend*) (ssdb/mark-file-processed file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
+
+(defun db-get-unique (field)
+    (cond
+        ((equal :manardb *db-backend*) (manardb/get-unique-names))
+        ((equal :ssdb *db-backend*) (ssdb/get-unique field))
+        (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
 (defun db-get-unique-names ()
     (cond
         ((equal :manardb *db-backend*) (manardb/get-unique-names))

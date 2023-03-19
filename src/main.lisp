@@ -68,6 +68,7 @@
 
       ((equal "bench" verb) (run-bench))
       ((equal "gre" verb) (get-response-elements))
+      ((equal "gu" verb) (db-get-unique (cadr rest)))
       ((equal "lapi" verb) (get-apiVersion))
       ((equal "index" verb) (db-index (cadr rest)))
       ((equal "lc" verb) (get-unique-conversation))
@@ -108,6 +109,7 @@
       ((equal "sp" verb) (find-by-srcport (cadr rest)))
       ((equal "sr" verb) (ct-get-by-region (cadr rest)))
       ((equal "st" verb) (db-get-stats))
+      ((equal "uq" verb) (ssdb/uniq-queues))
       ((equal "va" verb) (vpc-flows-report-async (cadr rest) rest))
       ((equal "vda" verb) (vpc-search-by-dstaddr (cadr rest)))
       ((equal "vdp" verb) (vpc-search-by-dstport (cadr rest)))
