@@ -125,8 +125,10 @@
        (let ((value (ssdb:hget record field)))
          (if (member value seen)
                 (format t "seen: ~a~%" value)
-                (ssdb:qpush field value))
-         (ssdb:qpush value record)))
+                (progn
+                  (setf seen (add-item-to-list value seen))
+                  (ssdb:qpush field value))
+                (ssdb:qpush value record))))
      records)))
 
 (defun ssdb/get-by-index (key)
