@@ -3,7 +3,7 @@
 (defun string-to-keyword (string)
   (intern (string-upcase string) :keyword))
 
-(defvar *db-backend* :ssdb)
+(defvar *db-backend* :manardb) ;;:ssdb)
 
 (defvar *mytasks* (list))
 
