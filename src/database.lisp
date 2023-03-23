@@ -72,7 +72,7 @@
 (defun db-get-by-name (name)
   "Get all records of name"
   (cond
-    ((equal :manardb *db-backend*) (manardb/get-by-name name))
+    ((equal :manardb *db-backend*) (manardb/ct-get-by-name name))
     ((equal :ssdb *db-backend*) (ssdb/get-by-index name))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 

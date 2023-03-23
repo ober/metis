@@ -40,8 +40,9 @@
   (unless (boundp 'manardb:use-mmap-dir)
     (progn
       (manardb:use-mmap-dir (or (uiop:getenv "METIS") "~/ct-manardb/"))
-      (when *metis-need-hashes*
-        (init-ct-hashes))))
+      ;; (when *metis-need-hashes*
+      ;;   (init-ct-hashes))
+      ))
   (if (and (eql (hash-table-count *manard-files*) 0) *metis-need-files*)
       (allocate-file-hash)))
 
@@ -239,7 +240,7 @@
 (defun allocate-klass-hash (klass)
   (or (hash-table-p (gethash klass *metis-fields*))
       (progn
-        ;;(format t "allocating class:~A~%" klass)
+        (format t "allocating class:~A~%" klass)
         (create-klass-hash klass)
         (manardb:doclass (x klass :fresh-instances nil)
                          (with-slots (value idx) x
@@ -558,9 +559,3 @@
                      :userName userName-i
                      :vpcEndpointId vpcEndpointId-i
                      ))))
-
-(defun cleanse (var)
-  (typecase var
-    (null (string var))
-    (string var)
-    (list (format nil "~{~s = ~s~%~}" var))))
