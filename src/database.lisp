@@ -76,6 +76,13 @@
     ((equal :ssdb *db-backend*) (ssdb/get-by-index name))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
+(defun db-get-by-event (event)
+  "Get all records of name"
+  (cond
+    ((equal :manardb *db-backend*) (manardb/ct-get-by-eventName event))
+    ((equal :ssdb *db-backend*) (ssdb/get-by-index event))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
 (defun db-have-we-seen-this-file (file)
   (cond
     ((equal :manardb *db-backend*) (manardb/have-we-seen-this-file file))
@@ -91,19 +98,19 @@
 
 (defun db-get-unique (field)
     (cond
-        ((equal :manardb *db-backend*) (manardb/get-unique-names))
+        ((equal :manardb *db-backend*) (manardb/get-unique field))
         ((equal :ssdb *db-backend*) (ssdb/get-unique field))
         (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-get-unique-names ()
     (cond
-        ((equal :manardb *db-backend*) (manardb/get-unique-names))
+        ((equal :manardb *db-backend*) (manardb/get-name-list))
         ((equal :ssdb *db-backend*) (ssdb/get-unique-names))
         (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-get-unique-events ()
     (cond
-        ((equal :manardb *db-backend*) (manardb/get-unique-events))
+        ((equal :manardb *db-backend*) (manardb/get-event-list))
         ((equal :ssdb *db-backend*) (ssdb/get-unique-events))
         (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 

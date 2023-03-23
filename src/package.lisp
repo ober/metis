@@ -14,10 +14,10 @@
                             :trivial-garbage
                             :uiop
                             :usocket
-                            :zs3)))
+                            )))
 
 (defpackage :metis
-  (:use :cl :zs3
+  (:use :cl
         #+allegro :prof
         )
 

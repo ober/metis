@@ -46,34 +46,36 @@
                        vpcEndpointId
                        )
       record
-    (ssdb:multi_hset (format nil "~a:~a" (rfc3339-to-epoch eventTime) eventID)
-                     "aed" additionalEventData
-                     "av" apiVersion
-                     "ar" awsRegion
-                     "ec" errorCode
-                     "em" errorMessage
-                     "eca" eventCategory
-                     "en" eventName
-                     "es" eventSource
-                     ;;"et" eventTime
-                     "typ" eventType
-                     "ev" eventVersion
-                     "me" managementEvent
-                     "ro" readOnly
-                     "rai" recipientAccountId
-                     "rqi" requestID
-                     "rp" requestParameters
-                     ;;"res" resources
-                     "re" responseElements
-                     "sed" serviceEventDetails
-                     "scf" sessionCredentialFromConsole
-                     "sei" sharedEventID
-                     "sia" sourceIPAddress
-                     "td" tlsDetails
-                     "ua" userAgent
-                     ;;"ui" userIdentity
-                     "un" userName
-                     "vpc" vpcEndpointId)))
+    (let ((epoch (rfc3339-to-epoch eventTime)))
+      (ssdb:multi_hset (format nil "~a:~a" epoch requestID)
+                       "aed" additionalEventData
+                       "av" apiVersion
+                       "ar" awsRegion
+                       "ec" errorCode
+                       "em" errorMessage
+                       "eca" eventCategory
+                       "en" eventName
+                       "es" eventSource
+                       ;;"ei" eventID
+                       ;;"et" eventTime
+                       "typ" eventType
+                       "ev" eventVersion
+                       "me" managementEvent
+                       "ro" readOnly
+                       "rai" recipientAccountId
+                       "rqi" requestID
+                       ;;"rp" requestParameters
+                       ;;"res" resources
+                       "re" responseElements
+                       "sed" serviceEventDetails
+                       "scf" sessionCredentialFromConsole
+                       "sei" sharedEventID
+                       "sia" sourceIPAddress
+                       ;;"td" tlsDetails
+                       "ua" userAgent
+                       ;;"ui" userIdentity
+                       "un" userName
+                       "vpc" vpcEndpointId))))
 
 ;; ported kunabi style ops
 
@@ -130,15 +132,15 @@
        (ssdb/fetch-print-hash hit))
      hits)))
 
-(defun ssdb/uniq-queues ()
-  "For each queue, go fetch its contents uniq them and put them back"
-  (let ((queues (ssdb:qlist "" "" -1)))
-    (format t "queues: ~A~%" (length queues))
-    (mapcar
-     (lambda (q)
-       (let* ((items (ssdb:qrange q 0 -1))
-              (uniqs (sort-uniq items)))
-         (format t "q:~a size:~a uniq:~a~%" q (length items) (length uniqs))
-         (ssdb:qclear q)
-         (ssdb:qpush q uniqs)))
-     queues)))
+;; (defun ssdb/uniq-queues ()
+;;   "For each queue, go fetch its contents uniq them and put them back"
+;;   (let ((queues (ssdb:qlist "" "" -1)))
+;;     (format t "queues: ~A~%" (length queues))
+;;     (mapcar
+;;      (lambda (q)
+;;        (let* ((items (ssdb:qrange q 0 -1))
+;;               (uniqs (sort-uniq items)))
+;;          (format t "q:~a size:~a uniq:~a~%" q (length items) (length uniqs))
+;;          (ssdb:qclear q)
+;;          (ssdb:qpush q uniqs)))
+;;      queues)))

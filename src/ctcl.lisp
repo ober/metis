@@ -8,10 +8,7 @@
 (defvar *mytasks* (list))
 
 (defun have-we-seen-this-file (file)
-  (let ((found (db-have-we-seen-this-file file)))
-    (if found
-        t
-        nil)))
+  (db-have-we-seen-this-file file))
 
 (defun walk-ct (path fn)
   (cl-fad:walk-directory path fn))
@@ -79,4 +76,5 @@
     (let ((cloudtrail-reports (or path "~/CT")))
       (walk-ct cloudtrail-reports
                #'async-ct-file))
-    (mapc #'pcall:join *mytasks*)))
+    (mapc #'pcall:join *mytasks*))
+)

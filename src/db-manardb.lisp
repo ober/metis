@@ -239,7 +239,7 @@
 (defun allocate-klass-hash (klass)
   (or (hash-table-p (gethash klass *metis-fields*))
       (progn
-        (format t "allocating class:~A~%" klass)
+        ;;(format t "allocating class:~A~%" klass)
         (create-klass-hash klass)
         (manardb:doclass (x klass :fresh-instances nil)
                          (with-slots (value idx) x
@@ -340,7 +340,7 @@
   "Return unique cts"
   (get-unique-values 'metis::ct))
 
-(defun get-event-list ()
+(defun manardb/get-event-list ()
   "Return unique list of events"
   (get-unique-values 'metis::eventname))
 
@@ -349,15 +349,15 @@
   (get-unique-values 'metis::errorcode))
 
 (defun get-response-elements ()
-  "Return unique list of events"
+  "Return unique list of responseelements"
   (get-unique-values 'metis::responseElements))
 
 (defun manardb/get-name-list ()
-  "Return unique list of events"
+  "Return unique list of names"
   (get-unique-values 'metis::username))
 
 (defun get-region-list ()
-  "Return unique list of events"
+  "Return unique list of regions"
   (get-unique-values 'metis::awsRegion))
 
 (defun get-sourceips-list ()
@@ -459,7 +459,7 @@
 (defun ct-get-by-errorMessage (name)
   (ct-get-by-klass-value 'metis::errorMessage name))
 
-(defun ct-get-by-eventName (name)
+(defun manardb/ct-get-by-eventName (name)
   (ct-get-by-klass-value 'metis::eventName name))
 
 (defun ct-get-by-eventSource (name)
