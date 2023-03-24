@@ -24,6 +24,7 @@
                  :gzip-stream
                  :local-time
                  :manardb
+                 :parse-number
                  :pcall
                  :pcall-queue
                  :salza2

@@ -68,3 +68,6 @@ is replaced with replacement."
 (defun rfc3339-to-epoch (datetime)
   (local-time:timestamp-to-unix
    (local-time:parse-timestring datetime)))
+
+(defun epoch-to-rfc3339 (epoch)
+  (local-time:format-rfc3339-timestring nil (local-time:unix-to-timestamp epoch) :omit-timezone-part t :use-zulu t))
