@@ -123,10 +123,22 @@
     (format t "records: ~a~%" (length records))
     (mapcar
      (lambda (record)
-       (let ((value (ssdb:hget record field)))
-         (ssdb:qpush field value)
-         (ssdb:qpush value record)))
-     records)))
+       (unless (string= record "NIL")
+         (let ((value (ssdb:hget record field)))
+           (ssdb:qpush field value)
+           (unless (member value seen :test #'string=)
+             (progn
+               (format t "not seen: ~a type: ~a member?:~a~%" value (type-of value) (member value seen :test #'string=))
+               (push value seen))))))
+     records)
+    (ssdb:qclear field)
+    (ssdb/qpush-list field seen)))
+
+(defun ssdb/qpush-list (field list)
+  (mapcar
+   (lambda (item)
+     (ssdb:qpush field item))
+   (sort-uniq list)))
 
 (defun ssdb/get-by-index (key)
   "Get all records from index of key"
