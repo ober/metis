@@ -141,7 +141,10 @@
          (uniqs (sort-uniq items)))
     (format t "q: ~a orig: ~a uniq: ~a~%" q (length items) (length uniqs))
     (ssdb:qclear q)
-    (ssdb:qpush q uniqs)))
+    (mapcar
+     (lambda (uniq)
+       (ssdb:qpush q uniq))
+     uniqs)))
 
 ;; (defun ssdb/uniq-queues ()
 ;;   "For each queue, go fetch its contents uniq them and put them back"
