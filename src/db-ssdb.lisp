@@ -136,6 +136,13 @@
        (ssdb/fetch-print-hash hit))
      hits)))
 
+(defun ssdb/unique-queue (q)
+  (let* ((items (ssdb:qrange q 0 -1))
+         (uniqs (sort-uniq items)))
+    (format t "q: ~a orig: ~a uniq: ~a~%" q (length items) (length uniqs))
+    (ssdb:qclear q)
+    (ssdb:qpush q uniqs)))
+
 ;; (defun ssdb/uniq-queues ()
 ;;   "For each queue, go fetch its contents uniq them and put them back"
 ;;   (let ((queues (ssdb:qlist "" "" -1)))

@@ -109,7 +109,7 @@
       ((equal "sp" verb) (find-by-srcport (cadr rest)))
       ((equal "sr" verb) (ct-get-by-region (cadr rest)))
       ((equal "st" verb) (db-get-stats))
-      ((equal "uq" verb) (ssdb/uniq-queues))
+      ((equal "uq" verb) (ssdb/uniq-queue (cadr rest)))
       ((equal "va" verb) (vpc-flows-report-async (cadr rest) rest))
       ((equal "vda" verb) (vpc-search-by-dstaddr (cadr rest)))
       ((equal "vdp" verb) (vpc-search-by-dstport (cadr rest)))
