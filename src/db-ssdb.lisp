@@ -111,7 +111,11 @@
      hits)))
 
 (defun ssdb/fetch-print-hash (hit)
-  (format t "~a~%" (ssdb:multi_hget hit "et" "en" "un" "ec")))
+  (format t "~a ~{~a: ~a ~}~%"
+          (epoch-to-rfc3339
+           (parse-number:parse-number
+            (car (cl-ppcre:split ":" hit))))
+          (ssdb:multi_hget hit  "en" "un" "ua" "sia" "ec" "em" "re")))
 
 (defun ssdb/index (field)
   (let ((records (time (ssdb:hlist "" "" -1)))
