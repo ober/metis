@@ -84,7 +84,7 @@
           (epoch-to-rfc3339
            (parse-number:parse-number
             (car (cl-ppcre:split ":" hit))))
-          (ssdb:multi_hget hit  "en" "ua" "sia" "ec" "em" "sip" "ua" "es")))
+          (ssdb:multi_hget hit  "en" "un" "ui" "ua" "sia" "ec" "em" "sip" "ua" "es")))
 
 (defun ssdb/db-key? (key)
   (ssdb:exists key))
@@ -120,9 +120,28 @@
        (format t "~a~%" hit))
      hits)))
 
+;; (defun ssdb/index (field)
+;;   (let ((records (time (ssdb:hlist "" "" -1)))
+;;         (seen '()))
+;;     (format t "records: ~a~%" (length records))
+;;     (mapcar
+;;      (lambda (record)
+;;        (unless (string= record "NIL")
+;;          (let ((value (ssdb:hget record field)))
+;;            (ssdb:qpush value record)
+;;            (unless (member value seen :test #'string=)
+;;              (progn
+;;                (format t "not seen: ~a~%" value)
+;;                (push value seen))))))
+;;      records)
+;;     (ssdb:qclear field)
+;;     (ssdb/qpush-list field seen)))
+
 (defun ssdb/index (field)
-  (let ((records (time (ssdb:hlist "" "" -1)))
-        (seen '()))
+  (let* ((from (local-time:timestamp-to-unix (local-time:timestamp- (local-time:now) 1 :day)))
+         (to (local-time:timestamp-to-unix (local-time:now)))
+         (records (time (ssdb:hlist (format nil "~a:" from) (format nil "~a:" to) -1)))
+         (seen '()))
     (format t "records: ~a~%" (length records))
     (mapcar
      (lambda (record)
