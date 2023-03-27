@@ -64,20 +64,27 @@
                        "ro" readOnly
                        "rai" recipientAccountId
                        "rqi" requestID
-                       ;;"rp" requestParameters
-                       ;;"res" resources
+                       "rp" requestParameters
+                       "res" resources
                        "re" responseElements
                        "sed" serviceEventDetails
                        "scf" sessionCredentialFromConsole
                        "sei" sharedEventID
                        "sia" sourceIPAddress
-                       ;;"td" tlsDetails
+                       "td" tlsDetails
                        "ua" userAgent
-                       ;;"ui" userIdentity
+                       "ui" userIdentity
                        "un" userName
                        "vpc" vpcEndpointId))))
 
 ;; ported kunabi style ops
+
+(defun ssdb/fetch-print-hash (hit)
+  (format t "|~a| ~{~a: ~a| ~}|~%"
+          (epoch-to-rfc3339
+           (parse-number:parse-number
+            (car (cl-ppcre:split ":" hit))))
+          (ssdb:multi_hget hit  "en" "ua" "sia" "ec" "em" "sip" "ua" "es")))
 
 (defun ssdb/db-key? (key)
   (ssdb:exists key))
@@ -103,19 +110,15 @@
 (defun ssdb/get-unique-events ()
   (ssdb/get-unique "en"))
 
+(defun ssdb/get-unique-errorcode ()
+  (ssdb/get-unique "ec"))
+
 (defun ssdb/get-unique (key)
   (let ((hits (sort-uniq (ssdb:qrange key 0 -1))))
     (mapcar
      (lambda (hit)
        (format t "~a~%" hit))
      hits)))
-
-(defun ssdb/fetch-print-hash (hit)
-  (format t "~a ~{~a: ~a ~}~%"
-          (epoch-to-rfc3339
-           (parse-number:parse-number
-            (car (cl-ppcre:split ":" hit))))
-          (ssdb:multi_hget hit  "en" "un" "ua" "sia" "ec" "em" "re")))
 
 (defun ssdb/index (field)
   (let ((records (time (ssdb:hlist "" "" -1)))
@@ -125,10 +128,10 @@
      (lambda (record)
        (unless (string= record "NIL")
          (let ((value (ssdb:hget record field)))
-           (ssdb:qpush field value)
+           (ssdb:qpush value record)
            (unless (member value seen :test #'string=)
              (progn
-               (format t "not seen: ~a type: ~a member?:~a~%" value (type-of value) (member value seen :test #'string=))
+               (format t "not seen: ~a~%" value)
                (push value seen))))))
      records)
     (ssdb:qclear field)

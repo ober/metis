@@ -83,6 +83,13 @@
     ((equal :ssdb *db-backend*) (ssdb/get-by-index event))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
+(defun db-get-by-errorcode (ec)
+  "Get all records of name"
+  (cond
+    ((equal :manardb *db-backend*) (manardb/ct-get-by-errorcode ec))
+    ((equal :ssdb *db-backend*) (ssdb/get-by-index ec))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
 (defun db-have-we-seen-this-file (file)
   (cond
     ((equal :manardb *db-backend*) (manardb/have-we-seen-this-file file))
@@ -95,7 +102,6 @@
     ((equal :ssdb *db-backend*) (ssdb/mark-file-processed file))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
-
 (defun db-get-unique (field)
     (cond
         ((equal :manardb *db-backend*) (manardb/get-unique field))
@@ -106,6 +112,12 @@
     (cond
         ((equal :manardb *db-backend*) (manardb/get-name-list))
         ((equal :ssdb *db-backend*) (ssdb/get-unique-names))
+        (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+
+(defun db-get-unique-errorcode ()
+    (cond
+        ((equal :manardb *db-backend*) (manardb/get-errorcode-list))
+        ((equal :ssdb *db-backend*) (ssdb/get-unique-errorcode))
         (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-get-unique-events ()
@@ -134,7 +146,17 @@
 (defun process-record (record fields)
   (setf (gethash "userName" record) (get-user record))
   (loop for f in fields
-        collect (format nil "~a" (gethash f record))))
+        collect (format-field (gethash f record))))
+
+(defun format-field (field)
+  (cond
+    ((stringp field) (format nil "~a" field))
+    ((numberp field) (format nil "~a" field))
+    ((hash-table-p field) (format nil "~a" (alexandria:hash-table-plist field)))
+    ((arrayp field) (format nil "array: ~a" field))
+    ((listp field) (format nil "~a" field))
+    ((null field) "n/a")
+    (t (format nil "~a" field))))
 
 (defun get-user (rec)
   "Given a record, find the username"
