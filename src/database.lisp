@@ -103,28 +103,28 @@
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-get-unique (field)
-    (cond
-        ((equal :manardb *db-backend*) (manardb/get-unique field))
-        ((equal :ssdb *db-backend*) (ssdb/get-unique field))
-        (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+  (cond
+    ((equal :manardb *db-backend*) (manardb/get-unique field))
+    ((equal :ssdb *db-backend*) (ssdb/get-unique field))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-get-unique-names ()
-    (cond
-        ((equal :manardb *db-backend*) (manardb/get-name-list))
-        ((equal :ssdb *db-backend*) (ssdb/get-unique-names))
-        (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+  (cond
+    ((equal :manardb *db-backend*) (manardb/get-name-list))
+    ((equal :ssdb *db-backend*) (ssdb/get-unique-names))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-get-unique-errorcode ()
-    (cond
-        ((equal :manardb *db-backend*) (manardb/get-errorcode-list))
-        ((equal :ssdb *db-backend*) (ssdb/get-unique-errorcode))
-        (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+  (cond
+    ((equal :manardb *db-backend*) (manardb/get-errorcode-list))
+    ((equal :ssdb *db-backend*) (ssdb/get-unique-errorcode))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun db-get-unique-events ()
-    (cond
-        ((equal :manardb *db-backend*) (manardb/get-event-list))
-        ((equal :ssdb *db-backend*) (ssdb/get-unique-events))
-        (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
+  (cond
+    ((equal :manardb *db-backend*) (manardb/get-event-list))
+    ((equal :ssdb *db-backend*) (ssdb/get-unique-events))
+    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
 (defun normalize-insert (record)
   (if record
