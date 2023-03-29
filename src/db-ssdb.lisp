@@ -95,6 +95,9 @@
 (defun ssdb/get-stats ()
   (format t "~a" (ssdb:info)))
 
+(defun ssdb/get-unique-items (field)
+  (ssdb/get-unique (format nil "~a" field)))
+
 (defun ssdb/get-unique-region ()
   (ssdb/get-unique "ar"))
 
