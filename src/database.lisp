@@ -144,7 +144,11 @@
       str))
 
 (defun process-record (record fields)
-  (setf (gethash "userName" record) (get-user record))
+  (let ((username (get-user record)))
+    (setf (gethash "userName" record) username)
+    (when (string= username "NIL")
+      (format t "~a" (alexandria:hash-table-plist (gethash "userIdentity" record))))
+
   (loop for f in fields
         collect (format-field (gethash f record))))
 
