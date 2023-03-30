@@ -150,7 +150,7 @@
       (format t "~a" (alexandria:hash-table-plist (gethash "userIdentity" record))))
 
   (loop for f in fields
-        collect (format-field (gethash f record))))
+        collect (format-field (gethash f record)))))
 
 (defun format-field (field)
   (cond
