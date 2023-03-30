@@ -161,10 +161,8 @@
   (let ((users (ssdb:zlist "" "" -1)))
     (mapcar
      (lambda (user)
-       (format t "|~a | ~a|~%" user (ssdb:zsum user "" "")))
+       (format t "| ~a | ~a |~%" user (ssdb:zsum user "" "")))
      users)))
-
-
 
 (defun ssdb/index (field)
   (let* ((from (format nil "~a:" (epoch-one-day-ago)))
