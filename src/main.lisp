@@ -67,6 +67,7 @@
     (cond
 
       ((equal "bench" verb) (run-bench))
+      ((equal "cc" verb) (ssdb/count-calls))
       ((equal "gre" verb) (get-response-elements))
       ((equal "gu" verb) (db-get-unique (cadr rest)))
       ((equal "lapi" verb) (get-apiVersion))
@@ -79,7 +80,6 @@
       ((equal "lev" verb) (db-get-unique-events))
       ((equal "lip" verb) (get-sourceips-list))
       ((equal "ln" verb) (db-get-unique-names))
-      ((equal "lu" verb) (db-get-unique-items (cadr rest)))
       ((equal "lr" verb) (get-region-list))
       ((equal "lsed" verb) (get-serviceEventDetails))
       ((equal "ltls" verb) (get-tlsDetails))

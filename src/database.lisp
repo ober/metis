@@ -108,12 +108,6 @@
     ((equal :ssdb *db-backend*) (ssdb/get-unique field))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
-(defun db-get-unique-items (field)
-  (cond
-    ((equal :manardb *db-backend*) (manardb/get-unique-items field))
-    ((equal :ssdb *db-backend*) (ssdb/get-unique-items field))
-    (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
-
 (defun db-get-unique-names ()
   (cond
     ((equal :manardb *db-backend*) (manardb/get-name-list))

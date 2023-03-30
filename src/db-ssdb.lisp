@@ -95,9 +95,6 @@
 (defun ssdb/get-stats ()
   (format t "~a" (ssdb:info)))
 
-(defun ssdb/get-unique-items (field)
-  (ssdb/get-unique (format nil "~a" field)))
-
 (defun ssdb/get-unique-region ()
   (ssdb/get-unique "ar"))
 
@@ -140,10 +137,22 @@
 ;;     (ssdb:qclear field)
 ;;     (ssdb/qpush-list field seen)))
 
+(defun ssdb/count-calls ()
+  (let* ((from (format nil "~a:" (epoch-one-day-ago)))
+         (to (format nil "~a:" (epoch-now)))
+         (records (ssdb:hlist from to -1)))
+    (format t "records: ~a~%" (length records))
+    (mapcar
+      (lambda (record)
+        (let ((un (ssdb:hget record "un"))
+              (en (ssdb:hget record "en")))
+            (ssdb:zincr un en)))
+        records)))
+
 (defun ssdb/index (field)
-  (let* ((from (local-time:timestamp-to-unix (local-time:timestamp- (local-time:now) 1 :day)))
-         (to (local-time:timestamp-to-unix (local-time:now)))
-         (records (time (ssdb:hlist (format nil "~a:" from) (format nil "~a:" to) -1)))
+  (let* ((from (format nil "~a:" (epoch-one-day-ago)))
+         (to (format nil "~a:" (epoch-now)))
+         (records (ssdb:hlist from to -1))
          (seen '()))
     (format t "records: ~a~%" (length records))
     (mapcar

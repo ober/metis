@@ -71,3 +71,12 @@ is replaced with replacement."
 
 (defun epoch-to-rfc3339 (epoch)
   (local-time:format-rfc3339-timestring nil (local-time:unix-to-timestamp epoch) :omit-timezone-part t :use-zulu t))
+
+(defun epoch-one-day-ago ()
+  (local-time:timestamp-to-unix
+   (local-time:timestamp-
+    (local-time:now) 1 :day)))
+
+(defun epoch-now ()
+  (local-time:timestamp-to-unix
+   (local-time:now)))
