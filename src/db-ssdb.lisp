@@ -146,8 +146,25 @@
       (lambda (record)
         (let ((un (ssdb:hget record "un"))
               (en (ssdb:hget record "en")))
-            (ssdb:zincr un en)))
+            (ssdb:zincr un en 1)))
         records)))
+
+(defun ssdb/count-by-user (user)
+  (let ((ops (ssdb:zkeys user "" "" "" -1)))
+    (format t "Total: ~a~%" (ssdb:zsum user "" ""))
+    (mapcar
+     (lambda (op)
+       (format t "|~a| ~a|~%" op (ssdb:zget user op)))
+     ops)))
+
+(defun ssdb/totals ()
+  (let ((users (ssdb:zlist "" "" -1)))
+    (mapcar
+     (lambda (user)
+       (format t "|~a | ~a|~%" user (ssdb:zsum user "" "")))
+     users)))
+
+
 
 (defun ssdb/index (field)
   (let* ((from (format nil "~a:" (epoch-one-day-ago)))

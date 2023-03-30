@@ -68,6 +68,8 @@
 
       ((equal "bench" verb) (run-bench))
       ((equal "cc" verb) (ssdb/count-calls))
+      ((equal "cu" verb) (ssdb/count-by-user (cadr rest)))
+      ((equal "tot" verb) (ssdb/totals))
       ((equal "gre" verb) (get-response-elements))
       ((equal "gu" verb) (db-get-unique (cadr rest)))
       ((equal "lapi" verb) (get-apiVersion))
