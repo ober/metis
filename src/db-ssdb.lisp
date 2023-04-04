@@ -161,9 +161,9 @@
               (ec (ssdb:hget record "ec"))
               (sia (ssdb:hget record "sia"))
               (en (ssdb:hget record "en")))
-          (if (member un seen :test #'string=)
-              (push un seen)
+          (unless (member un seen :test #'string=)
               (progn
+                (push un seen)
                 (format t "Not seen ~a~%" un)
                 (ssdb:zclear un)))
           (ssdb:zincr un en 1)
