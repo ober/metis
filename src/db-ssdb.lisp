@@ -162,10 +162,10 @@
               (sia (ssdb:hget record "sia"))
               (en (ssdb:hget record "en")))
           (if (member un seen :test #'string=)
-            (progn
-              (format t "Not seen ~a~%" un)
-              (ssdb:zclear un))
-            (push un seen))
+              (push un seen)
+              (progn
+                (format t "Not seen ~a~%" un)
+                (ssdb:zclear un)))
           (ssdb:zincr un en 1)
           (ssdb:zincr un ec 1)
           (ssdb:zincr un sia 1)))
