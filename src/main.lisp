@@ -68,6 +68,7 @@
 
       ((equal "bench" verb) (run-bench))
       ((equal "cc" verb) (ssdb/count-calls))
+      ((equal "ce" verb) (ssdb/count-errors))
       ((equal "cu" verb) (ssdb/count-by-user (cadr rest)))
       ((equal "tot" verb) (ssdb/totals))
       ((equal "gre" verb) (get-response-elements))
