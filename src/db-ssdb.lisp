@@ -3,7 +3,7 @@
 ;; fundamental metis ops
 (defun ssdb/init ()
   (unless ssdb:*connection*
-    (ssdb:connect)))
+    (ssdb:connect :host "10.0.0.158" :port 8888)))
 
 (defun ssdb/close ()
   (ssdb:disconnect))
@@ -84,7 +84,7 @@
           (epoch-to-rfc3339
            (parse-number:parse-number
             (car (cl-ppcre:split ":" hit))))
-          (ssdb:multi_hget hit  "en" "un" "ui" "ua" "sia" "ec" "em" "sip" "ua" "es")))
+          (ssdb:multi_hget hit  "en" "un" "ui" "ua" "sia" "ec" "em" "sip" "ua" "es" "res" "rp")))
 
 (defun ssdb/db-key? (key)
   (ssdb:exists key))
@@ -137,7 +137,7 @@
 ;;     (ssdb:qclear field)
 ;;     (ssdb/qpush-list field seen)))
 
-(defun ssdb/count-calls ()
+(defun ssdb/count-errors ()
   (let* ((from (format nil "~a:" (epoch-one-day-ago)))
          (to (format nil "~a:" (epoch-now)))
          (records (ssdb:hlist from to -1)))
@@ -145,9 +145,30 @@
     (mapcar
       (lambda (record)
         (let ((un (ssdb:hget record "un"))
-              (en (ssdb:hget record "en")))
-            (ssdb:zincr un en 1)))
+              (ec (ssdb:hget record "ec")))
+            (ssdb:zincr un ec 1)))
         records)))
+
+(defun ssdb/count-calls ()
+  (let* ((from (format nil "~a:" (epoch-one-day-ago)))
+         (to (format nil "~a:" (epoch-now)))
+         (records (ssdb:hlist from to -1))
+         (seen '()))
+    (format t "records: ~a~%" (length records))
+    (mapcar
+      (lambda (record)
+        (let ((un (ssdb:hget record "un"))
+              (ec (ssdb:hget record "ec"))
+              (sia (ssdb:hget record "sia"))
+              (en (ssdb:hget record "en")))
+          (unless (member un seen :test #'string=)
+            (progn
+              (format t "Not seen ~a~%" un)
+              (ssdb:zclear un)))
+          (ssdb:zincr un en 1)
+          (ssdb:zincr un ec 1)
+          (ssdb:zincr un sia 1)))
+      records)))
 
 (defun ssdb/count-by-user (user)
   (let ((ops (ssdb:zkeys user "" "" "" -1)))
