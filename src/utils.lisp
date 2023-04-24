@@ -80,7 +80,7 @@ is replaced with replacement."
 (defun epoch-days-ago (days)
   (local-time:timestamp-to-unix
    (local-time:timestamp-
-    (local-time:now) days :day)))
+    (local-time:now) (parse-number:parse-number days) :day)))
 
 (defun epoch-now ()
   (local-time:timestamp-to-unix
