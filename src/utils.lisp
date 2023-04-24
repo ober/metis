@@ -77,6 +77,11 @@ is replaced with replacement."
    (local-time:timestamp-
     (local-time:now) 1 :day)))
 
+(defun epoch-days-ago (days)
+  (local-time:timestamp-to-unix
+   (local-time:timestamp-
+    (local-time:now) days :day)))
+
 (defun epoch-now ()
   (local-time:timestamp-to-unix
    (local-time:now)))

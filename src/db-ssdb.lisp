@@ -186,8 +186,8 @@
        (format t "| ~a | ~a |~%" user (ssdb:zsum user "" "")))
      users)))
 
-(defun ssdb/index (field)
-  (let* ((from (format nil "~a:" (epoch-one-day-ago)))
+(defun ssdb/index (field days-ago)
+  (let* ((from (format nil "~a:" (epoch-ago days-ago)))
          (to (format nil "~a:" (epoch-now)))
          (records (ssdb:hlist from to -1))
          (seen '()))
