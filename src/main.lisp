@@ -74,7 +74,7 @@
       ((equal "gre" verb) (get-response-elements))
       ((equal "gu" verb) (db-get-unique (cadr rest)))
       ((equal "lapi" verb) (get-apiVersion))
-      ((equal "index" verb) (db-index (cadr rest)))
+      ((equal "index" verb) (db-index (cadr rest) (caddr rest)))
       ((equal "lc" verb) (get-unique-conversation))
       ((equal "lconsole" verb) (get-sessionCredentialFromConsole))
       ((equal "lcts" verb) (get-cts))
