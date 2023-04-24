@@ -187,7 +187,7 @@
      users)))
 
 (defun ssdb/index (field days-ago)
-  (let* ((from (format nil "~a:" (epoch-ago days-ago)))
+  (let* ((from (format nil "~a:" (epoch-days-ago days-ago)))
          (to (format nil "~a:" (epoch-now)))
          (records (ssdb:hlist from to -1))
          (seen '()))
