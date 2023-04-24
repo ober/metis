@@ -51,7 +51,7 @@
     ((equal :ssdb *db-backend*) (ssdb/init))
     (t (format t "unknown *db-backend*:~A~%" *db-backend*))))
 
-(defun db-index (field)
+(defun db-index (field days-ago)
   (cond
     ((equal :manardb *db-backend*) (manardb/index field))
     ((equal :ssdb *db-backend*) (ssdb/index field))
