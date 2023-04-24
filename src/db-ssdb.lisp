@@ -3,7 +3,7 @@
 ;; fundamental metis ops
 (defun ssdb/init ()
   (unless ssdb:*connection*
-    (ssdb:connect :host "10.0.0.158" :port 8888)))
+    (ssdb:connect :host "10.0.0.155" :port 8888)))
 
 (defun ssdb/close ()
   (ssdb:disconnect))
