@@ -147,6 +147,10 @@
     (mapcar
      (lambda (record)
        (destructuring-bind (_ un _ ec _ sia _ en) (ssdb:multi_hget record "un" "ec" "sia" "en")
+         ;; (let ((un (ssdb:hget record "un"))
+         ;;       (ec (ssdb:hget record "ec"))
+         ;;       (sia (ssdb:hget record "sia"))
+         ;;       (en (ssdb:hget record "en")))
          (unless (member un seen :test #'string=)
            (progn
              (push un seen)
